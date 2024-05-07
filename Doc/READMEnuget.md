@@ -1,7 +1,7 @@
 
 # ArrayT
 
-[![Array on fuget.org](https://www.fuget.org/packages/ArrayT/badge.svg)](https://www.fuget.org/packages/ArrayT)
+[![ArrayT on fuget.org](https://www.fuget.org/packages/ArrayT/badge.svg)](https://www.fuget.org/packages/ArrayT)
 ![code size](https://img.shields.io/github/languages/code-size/goswinr/ArrayT.svg)
 [![license](https://img.shields.io/github/license/goswinr/ArrayT)](LICENSE)
 
