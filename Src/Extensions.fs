@@ -13,16 +13,25 @@ module AutoOpenExtensions =
 
     type ``[]``<'T>  with //Generic Array
 
-        /// Gets an item at index
-        /// (Use Array.GetNeg(i) member if you want to use negative indices too)
+        /// Gets an item at index, same as this.[index] or this.Idx(index)
+        /// Throws a descriptive Exception if the index is out of range.
+        /// (Use this.GetNeg(i) member if you want to use negative indices too)
         member inline xs.Get index =
             if index < 0 then ArgumentOutOfRangeException.Raise "arr.Get(%d) failed for Array of %d items, use arr.GetNeg method if you want negative indices too:\r\n%s" index xs.Length xs.ToNiceStringLong
             if index >= xs.Length then ArgumentOutOfRangeException.Raise "arr.Get(%d) failed for Array of %d items:\r\n%s" index xs.Length xs.ToNiceStringLong
             xs.[index]
 
+        /// Gets an item at index, same as this.[index] or this.Get(index)
+        /// Throws a descriptive Exception if the index is out of range.
+        /// (Use this.GetNeg(i) member if you want to use negative indices too)
+        member inline xs.Idx index =
+            if index < 0 then ArgumentOutOfRangeException.Raise "arr.Idx(%d) failed for Array of %d items, use arr.GetNeg method if you want negative indices too:\r\n%s" index xs.Length xs.ToNiceStringLong
+            if index >= xs.Length then ArgumentOutOfRangeException.Raise "arr.Idx(%d) failed for Array of %d items:\r\n%s" index xs.Length xs.ToNiceStringLong
+            xs.[index]
+
 
         /// Sets an item at index
-        /// (Use Array.SetNeg(i) member if you want to use negative indices too)
+        /// (Use this.SetNeg(i) member if you want to use negative indices too)
         member inline xs.Set index value =
             if index < 0 then ArgumentOutOfRangeException.Raise "The curried function arr.Set %d value, failed for negative number on Array of %d items, use arr.SetNeg method if you want top use negative indices too, for setting %s " index xs.Length (toNiceString value)
             if index >= xs.Length then ArgumentOutOfRangeException.Raise "tThe curried function arr.Set %d value, failed for Array of %d items. for setting %s " index xs.Length (toNiceString value)
@@ -34,27 +43,27 @@ module AutoOpenExtensions =
         /// Returns -1 for empty Array.
         member inline xs.LastIndex =
             // don't fail so that a loop for i=0 to xs.LastIndex will work for empty Array
-            //if xs.Length = 0 then ArgumentOutOfRangeException.Raise "Array.LastIndex: Failed to get LastIndex of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
+            //if xs.Length = 0 then ArgumentOutOfRangeException.Raise "array.LastIndex: Failed to get LastIndex of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
             xs.Length - 1
 
         /// Get (or set) the last item in the Array.
         /// Equal to this.[this.Length - 1]
         member inline xs.Last
             with get () =
-                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "Array.Last: Failed to get last item of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
+                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "array.Last: Failed to get last item of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
                 xs.[xs.Length - 1]
             and set (v: 'T) =
-                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "Array.Last: Failed to set last item of %s to %s" xs.ToNiceStringLong (toNiceString v)
+                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "array.Last: Failed to set last item of %s to %s" xs.ToNiceStringLong (toNiceString v)
                 xs.[xs.Length - 1] <- v
 
         /// Get (or set) the second last item in the Array.
         /// Equal to this.[this.Length - 2]
         member inline xs.SecondLast
             with get () =
-                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "Array.SecondLast: Failed to get second last item of %s" xs.ToNiceStringLong
+                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "array.SecondLast: Failed to get second last item of %s" xs.ToNiceStringLong
                 xs.[xs.Length - 2]
             and set (v: 'T) =
-                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "Array.SecondLast: Failed to set second last item of %s to %s" xs.ToNiceStringLong (toNiceString v)
+                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "array.SecondLast: Failed to set second last item of %s to %s" xs.ToNiceStringLong (toNiceString v)
                 xs.[xs.Length - 2] <- v
 
 
@@ -62,27 +71,27 @@ module AutoOpenExtensions =
         /// Equal to this.[this.Length - 3]
         member inline xs.ThirdLast
             with get () =
-                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "Array.ThirdLast: Failed to get third last item of %s." xs.ToNiceStringLong
+                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "array.ThirdLast: Failed to get third last item of %s." xs.ToNiceStringLong
                 xs.[xs.Length - 3]
             and set (v: 'T) =
-                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "Array.ThirdLast: Failed to set third last item of %s to %s" xs.ToNiceStringLong (toNiceString v)
+                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "array.ThirdLast: Failed to set third last item of %s to %s" xs.ToNiceStringLong (toNiceString v)
                 xs.[xs.Length - 3] <- v
 
         /// Get (or set) the first item in the Array.
         /// Equal to this.[0]
         member inline xs.First
             with get () =
-                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "Array.First: Failed to get first item of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
+                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "array.First: Failed to get first item of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
                 xs.[0]
             and set (v: 'T) =
-                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "Array.First: Failed to set first item of empty %s" xs.ToNiceStringLong // Array<%s> to %s" (typeof<'T>).FullName (toNiceString v)
+                if xs.Length = 0 then ArgumentOutOfRangeException.Raise "array.First: Failed to set first item of empty %s" xs.ToNiceStringLong // Array<%s> to %s" (typeof<'T>).FullName (toNiceString v)
                 xs.[0] <- v
 
         /// Gets the the only item in the Array.
         /// Fails if the Array does not have exactly one element.
         member inline xs.FirstAndOnly =
-            if xs.Length = 0 then ArgumentOutOfRangeException.Raise "Array.FirstOnly: Failed to get first item of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
-            if xs.Length > 1 then ArgumentOutOfRangeException.Raise "Array.FirstOnly: Array is expected to have only one item but has %d Array: %s" xs.Length xs.ToNiceStringLong
+            if xs.Length = 0 then ArgumentOutOfRangeException.Raise "array.FirstOnly: Failed to get first item of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
+            if xs.Length > 1 then ArgumentOutOfRangeException.Raise "array.FirstOnly: Array is expected to have only one item but has %d Array: %s" xs.Length xs.ToNiceStringLong
             xs.[0]
 
 
@@ -90,20 +99,20 @@ module AutoOpenExtensions =
         /// Equal to this.[1]
         member inline xs.Second
             with get () =
-                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "Array.Second: Failed to get second item of %s" xs.ToNiceStringLong
+                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "array.Second: Failed to get second item of %s" xs.ToNiceStringLong
                 xs.[1]
             and set (v: 'T) =
-                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "Array.Second: Failed to set second item of %s to %s" xs.ToNiceStringLong (toNiceString v)
+                if xs.Length < 2 then ArgumentOutOfRangeException.Raise "array.Second: Failed to set second item of %s to %s" xs.ToNiceStringLong (toNiceString v)
                 xs.[1] <- v
 
         /// Get (or set) the third item in the Array.
         /// Equal to this.[2]
         member inline xs.Third
             with get () =
-                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "Array.Third: Failed to get third item of %s" xs.ToNiceStringLong
+                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "array.Third: Failed to get third item of %s" xs.ToNiceStringLong
                 xs.[2]
             and set (v: 'T) =
-                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "Array.Third: Failed to set third item of %s to %s" xs.ToNiceStringLong (toNiceString v)
+                if xs.Length < 3 then ArgumentOutOfRangeException.Raise "array.Third: Failed to set third item of %s to %s" xs.ToNiceStringLong (toNiceString v)
                 xs.[2] <- v
 
         /// Checks if this.Length = 0
