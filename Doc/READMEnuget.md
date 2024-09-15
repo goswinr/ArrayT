@@ -56,6 +56,8 @@ npm test
 
 
 ### Changelog
+`0.20.0`
+- add filteri
 
 `0.19.0`
 - copy from ResizeArray library 0.19.0

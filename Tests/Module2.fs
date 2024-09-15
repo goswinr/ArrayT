@@ -68,6 +68,12 @@ module Module2 =
 
 
 
+        testCase "Array.filteri " <| fun _ ->
+            let arr = [|'a';'b';'c'|]
+            let result = arr|> Array.filteri (fun i -> i % 2 = 0)
+            Assert.AreEqual([|'a';'c'|] , result)
+            Assert.AreNotEqual(arr, result,"input array should not be modified")
+
 
 
     ]
