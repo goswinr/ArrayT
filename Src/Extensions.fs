@@ -9,7 +9,7 @@ open UtilArray
 
 
 [<AutoOpen>]
-module AutoOpenExtensions =
+module AutoOpenArrayTExtensions =
 
     type ``[]``<'T>  with //Generic Array
 

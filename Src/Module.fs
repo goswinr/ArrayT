@@ -915,20 +915,6 @@ module Array =
             else find (i - 1 + fLast - f) fLast  // set back search to i-1 before first match
         find tillIdx fLast
 
-    //let testFind() =
-    //    let i =  "abcde".ToCharArray()
-    //    let l =  i.LastIndex
-    //    let ab =  "ab".ToCharArray()
-    //    let de =  "de".ToCharArray()    //
-    //
-    //    printfn "%b" ( 0 = findArray ab 0 l i)
-    //    printfn "%b" (-1 = findArray ab 1 l i)
-    //    printfn "%b" ( 0 = findLastArray ab 0 l i)
-    //    printfn "%b" (-1 = findLastArray ab 1 l i)
-    //    printfn "%b" (-1 = findArray de 0 (l-1)  i)
-    //    printfn "%b" ( 3 = findArray de 0 l   i)
-    //    printfn "%b" (-1 = findLastArray de 0 (l-1)  i)
-    //    printfn "%b" ( 3 = findLastArray de 0 l   i)
 
 
     /// <summary>Returns a new collection containing only the elements of the collection

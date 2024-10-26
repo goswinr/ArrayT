@@ -75,5 +75,21 @@ module Module2 =
             Assert.AreNotEqual(arr, result,"input array should not be modified")
 
 
+        testCase "findlast" <| fun _ ->
+            let i =  "abcde".ToCharArray()
+            let l =  i.LastIndex
+            let ab =  "ab".ToCharArray()
+            let de =  "de".ToCharArray()    //
+
+            Assert.True (
+                ( 0 = Array.findArray ab 0 l i)
+                && (-1 = Array.findArray ab 1 l i)
+                && ( 0 = Array.findLastArray ab 0 l i)
+                && (-1 = Array.findLastArray ab 1 l i)
+                && (-1 = Array.findArray de 0 (l-1)  i)
+                && ( 3 = Array.findArray de 0 l   i)
+                && (-1 = Array.findLastArray de 0 (l-1)  i)
+                && ( 3 = Array.findLastArray de 0 l   i)
+            )
 
     ]
