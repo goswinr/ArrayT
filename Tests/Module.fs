@@ -75,7 +75,7 @@ module Exceptions =
             | e -> sprintf "Expected %O exception, got: %O" typeof<'a> e |> Assert.Fail
         #endif
 
-    let private CheckThrowsExn2<'a when 'a :> exn> s (f : unit -> unit) =
+    let private CheckThrowsExn2<'a when 'a :> exn> _s (f : unit -> unit) =
 
         #if FABLE_COMPILER
             Expect.throws f "CheckThrowsExn2"
@@ -91,14 +91,14 @@ module Exceptions =
                 | _ -> false  // Did now throw a null ref exception!
             if funcThrowsAsExpected
             then ()
-            else Assert.Fail(s)
+            else Assert.Fail(_s)
         #endif
 
 
-    let throwsRange   f = CheckThrowsExn<ArgumentOutOfRangeException>    f
+    let throwsRange   f = CheckThrowsExn<IndexOutOfRangeException>    f
 
     let throwsNull f = CheckThrowsExn<ArgumentNullException>    f
-    let throwsKey f = CheckThrowsExn<KeyNotFoundException>    f
+    let throwsArg f = CheckThrowsExn<ArgumentException>    f
 
 
 

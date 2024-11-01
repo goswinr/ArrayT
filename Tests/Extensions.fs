@@ -17,7 +17,7 @@ module Extensions =
         test "Intro: 9=9" {Expect.equal 9 9 "Intro"}
 
         let a = [|for i in 0 .. 9 ->  float i |]
-        let b = Array.init 10 (fun i -> float i)
+        //let b = Array.init 10 (fun i -> float i)
 
         test "Get" {
             Expect.equal (a.Get 2) 2.0 "Get 2"
@@ -53,12 +53,12 @@ module Extensions =
         testCase "Last getter raises exception on empty Array" <| fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.Last |> ignore
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "Last setter raises exception on empty Array" <| fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.Last <- 1
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "Last getter returns last item on non-empty Array" <| fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
@@ -74,12 +74,12 @@ module Extensions =
         testCase "SecondLast getter raises exception on Array with less than 2 items" <| fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.SecondLast |> ignore
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "SecondLast setter raises exception on Array with less than 2 items" <| fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.SecondLast <- 1
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "SecondLast getter returns second last item on Array with 2 or more items" <| fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
@@ -95,12 +95,12 @@ module Extensions =
         testCase "ThirdLast getter raises exception on Array with less than 3 items" <| fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.ThirdLast |> ignore
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "ThirdLast setter raises exception on Array with less than 3 items" <| fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.ThirdLast <- 1
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "ThirdLast getter returns third last item on Array with 3 or more items" <| fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
@@ -116,12 +116,12 @@ module Extensions =
         testCase "First getter raises exception on empty Array" <| fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.First |> ignore
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "First setter raises exception on empty Array" <| fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.First <- 1
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "First getter returns first item on non-empty Array" <| fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
@@ -137,12 +137,12 @@ module Extensions =
         testCase "FirstAndOnly getter raises exception on empty Array" <| fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.FirstAndOnly |> ignore
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "FirstAndOnly getter raises exception on Array with more than one item" <| fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.FirstAndOnly |> ignore
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "FirstAndOnly getter returns the item on Array with exactly one item" <| fun _ ->
             let xs = [| 1|]
@@ -153,12 +153,12 @@ module Extensions =
         testCase "Second getter raises exception on Array with less than 2 items" <| fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.Second |> ignore
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "Second setter raises exception on Array with less than 2 items" <| fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.Second <- 1
-            Expect.throws testCode "Expected an ArgumentOutOfRangeException"
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         testCase "Second getter returns second item on Array with 2 or more items" <| fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
@@ -246,5 +246,17 @@ module Extensions =
             let newValues = [| 6; 7; 8|]
             xs[1..3] <-  newValues
             Expect.isTrue (xs = [| 1; 6; 7; 8; 5|]) "Expected SetSlice to set a slice in the Array"
+
+
+        testCase "GetSlice raises exception when start index is out of range" <| fun _ ->
+            let xs = [| 1; 2; 3; 4; 5|]
+            let testCode = fun () -> xs.Slice(5,8) |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "toString entries" <| fun _ ->
+            let a = [|1;2;3;4;5;6|]
+            let s = a.ToString(3).Replace("\r\n", "\n").Trim()
+            let expected = "array<Int32> with 6 items:\n  0: 1\n  1: 2\n  2: 3\n  ...\n  5: 6"
+            Expect.equal s expected "toString entries"
 
     ]

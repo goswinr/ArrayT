@@ -43,28 +43,28 @@ module Module2 =
         testCase "Array.rotateDownTill" <| fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             Assert.AreEqual(xs |> Array.rotateDownTill(fun i -> i = 7)     , [|7; 2; 3; 7; 5; 0 |])
-            throwsRange (fun () -> xs |> Array.rotateDownTill (fun i -> i = 99) |> ignore  )
+            throwsArg (fun () -> xs |> Array.rotateDownTill (fun i -> i = 99) |> ignore  )
 
 
 
         testCase "Array.rotateDownTillLast" <| fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             Assert.AreEqual(xs |> Array.rotateDownTillLast(fun i -> i = 7) , [|2; 3; 7; 5; 0; 7 |])
-            throwsRange (fun () -> xs |> Array.rotateDownTillLast (fun i -> i = 99) |> ignore  )
+            throwsArg (fun () -> xs |> Array.rotateDownTillLast (fun i -> i = 99) |> ignore  )
 
 
 
         testCase "Array.rotateUpTill" <| fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             Assert.AreEqual(xs |> Array.rotateUpTill(fun i -> i = 7)       , [|7; 5; 0; 7; 2; 3 |])
-            throwsRange (fun () -> xs |> Array.rotateUpTill (fun i -> i = 99) |> ignore  )
+            throwsArg (fun () -> xs |> Array.rotateUpTill (fun i -> i = 99) |> ignore  )
 
 
 
         testCase "Array.rotateUpTillLast" <| fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             Assert.AreEqual(xs |> Array.rotateUpTillLast(fun i -> i = 7)   , [|5; 0; 7; 2; 3; 7 |])
-            throwsRange (fun () -> xs |> Array.rotateUpTillLast (fun i -> i = 99) |> ignore  )
+            throwsArg (fun () -> xs |> Array.rotateUpTillLast (fun i -> i = 99) |> ignore  )
 
 
 
