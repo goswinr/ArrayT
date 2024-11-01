@@ -113,19 +113,23 @@ module AutoOpenArrayTExtensions =
                 xs.[2] <- v
 
         /// Checks if this.Length = 0
-        member inline xs.IsEmpty = xs.Length = 0
+        member inline xs.IsEmpty =
+            xs.Length = 0
 
 
         /// Checks if this.Length = 1
-        member inline xs.IsSingleton = xs.Length = 1
+        member inline xs.IsSingleton =
+            xs.Length = 1
 
         /// Checks if this.Length > 0
         /// Same as xs.HasItems
-        member inline xs.IsNotEmpty = xs.Length > 0
+        member inline xs.IsNotEmpty =
+            xs.Length > 0
 
         /// Checks if this.Length > 0
         /// Same as xs.IsNotEmpty
-        member inline xs.HasItems = xs.Length > 0
+        member inline xs.HasItems =
+            xs.Length > 0
 
 
         /// Gets an item in the Array by index.
@@ -183,8 +187,7 @@ module AutoOpenArrayTExtensions =
         /// The resulting array includes the end index.
         /// The built in slicing notation (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
         /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.
-        /// (this is an Extension Member from FsEx.ExtensionsArray)
-        member inline this.Slice(startIdx:int , endIdx: int ) : 'T array=
+        member this.Slice(startIdx:int , endIdx: int ) : 'T array=
 
             // overrides of existing methods are unfortunately silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
             // member inline this.GetSlice(startIdx, endIdx) =

@@ -33,7 +33,7 @@ module Array =
 
 
     //---------------------------------------------------
-    // functions added  (not in FSharp.Core Array module)
+    // functions added that are not in FSharp.Core Array module)
     //----------------------------------------------------
 
     /// Raises an Exception if the Array is empty.
