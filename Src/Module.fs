@@ -7,23 +7,18 @@ open System.Collections.Generic
 #nowarn "44" //for opening the hidden but not Obsolete UtilArray module
 open UtilArray
 
-/// A module for functions on Array<'T>.
-/// This module additional functions to the FSharp.Core.Array module.
+/// The main module for functions on Array<'T>.
+/// This module provides additional functions to ones from FSharp.Core.Array module.
 module Array =
-
-
-    let inline private isNullSeq (x:IEnumerable<'T>) = Object.ReferenceEquals(null,x)
-
-    let inline private nullExn msg = ArgumentNullException.Raise msg
 
 
     /// <summary>Gets an element from an Array. (Use Array.getNeg(i) function if you want to use negative indices too.)</summary>
     /// <param name="arr">The input Array.</param>
     /// <param name="index">The input index.</param>
     /// <returns>The value of the Array at the given index.</returns>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
+    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
     let inline get (arr: 'T[]) index =
-        if isNullSeq arr then nullExn "get"
+        if isNull arr then nullExn "get"
         arr.Get index
 
 
@@ -31,9 +26,9 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <param name="index">The input index.</param>
     /// <param name="value">The input value.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
+    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
     let inline set (arr: 'T[]) index value =
-        if isNullSeq arr then nullExn "set"
+        if isNull arr then nullExn "set"
         arr.Set index value
 
 
@@ -60,94 +55,74 @@ module Array =
     /// Allows for negative index too ( -1 is last item,  like Python)
     /// (a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline getNeg index (arr: 'T[]) =
-        if isNullSeq arr then nullExn "getNeg"
-        let len = arr.Length
-        let ii = if index < 0 then len + index else index
-        if ii < 0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.GetNeg: Failed to get index %d from Array of %d items: %s" index arr.Length arr.ToNiceStringLong
-        arr.[ii] // access List directly to not check index twice
+        if isNull arr then nullExn "getNeg"
+        arr.GetNeg index
+
 
     /// Sets an item in the Array by index.
     /// Allows for negative index too ( -1 is last item,  like Python)
     /// (a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline setNeg index value (arr: 'T[]) =
-        if isNullSeq arr then nullExn "setNeg"
-        let len = arr.Length
-        let ii = if index < 0 then len + index else index
-        if ii < 0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.SetNeg: Failed to set index %d to %s from Array of %d items: %s" index (toNiceString value) arr.Length arr.ToNiceStringLong
-        arr.[ii] <- value // access List directly to not check index twice
+        if isNull arr then nullExn "setNeg"
+        arr.SetNeg index value
 
     /// Any index will return a value.
     /// Array is treated as an endless loop in positive and negative direction
     let inline getLooped index (arr: 'T[]) =
-        if isNullSeq arr then nullExn "getLooped"
-        let len = arr.Length
-        if len = 0 then ArgumentOutOfRangeException.Raise "Array.GetLooped: Failed to get index %d from Array of 0 items" index
-        let t = index % len
-        let ii = if t >= 0 then t else t + len
-        arr.[ii] // access List directly to not check index twice
+        if isNull arr then nullExn "getLooped"
+        arr.GetLooped index
 
     /// Any index will set a value.
     /// Array is treated as an endless loop in positive and negative direction
     let inline setLooped index value (arr: 'T[]) =
-        if isNullSeq arr then nullExn "setLooped"
-        let len = arr.Length
-        if len = 0 then ArgumentOutOfRangeException.Raise "Array.SetLooped: Failed to Set index %d to %s in Array of 0 items" index (toNiceString value)
-        let t = index % len
-        let ii = if t >= 0 then t else t + len
-        arr.[ii] <- value // access List directly to not check index twice
+        if isNull arr then nullExn "setLooped"
+        arr.SetLooped index value
 
 
     /// Gets the second last item in the Array.
     /// Same as this.[this.Length - 2]
     let inline secondLast (arr: 'T[]) =
-        if isNullSeq arr then nullExn "secondLast"
-        if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.secondLast: Failed to get second last item of %s" arr.ToNiceStringLong
-        arr.[arr.Length - 2]
+        if isNull arr then nullExn "secondLast"
+        arr.SecondLast
 
     /// Gets the third last item in the Array.
     /// Same as this.[this.Length - 3]
     let inline thirdLast (arr: 'T[]) =
-        if isNullSeq arr then nullExn "thirdLast"
-        if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.thirdLast: Failed to get third last item of %s" arr.ToNiceStringLong
-        arr.[arr.Length - 3]
+        if isNull arr then nullExn "thirdLast"
+        arr.ThirdLast
 
     /// Gets the first item in the Array.
     /// Same as this.[0]
     let inline first (arr: 'T[]) =
-        if isNullSeq arr then nullExn "first"
-        if arr.Length = 0 then ArgumentOutOfRangeException.Raise "Array.first: Failed to get first item of %s" arr.ToNiceStringLong
-        arr.[0]
+        if isNull arr then nullExn "first"
+        arr.First
 
     /// Gets the the only item in the Array.
     /// Fails if the Array does not have exactly one element.
     let inline firstAndOnly (arr: 'T[]) =
-        if isNullSeq arr then nullExn "firstAndOnly"
-        if arr.Length = 0 then ArgumentOutOfRangeException.Raise "Array.firstOnly: Failed to get first item of empty %s" arr.ToNiceStringLong
-        if arr.Length > 1 then ArgumentOutOfRangeException.Raise "Array.firstOnly: Array is expected to have only one item but has %d Array: %s"  arr.Length arr.ToNiceStringLong
-        arr.[0]
+        if isNull arr then nullExn "firstAndOnly"
+        arr.FirstAndOnly
 
     /// Gets the second item in the Array.
     /// Same as this.[1]
     let inline second (arr: 'T[]) =
-        if isNullSeq arr then nullExn "second"
-        if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.second: Failed to get second item of %s" arr.ToNiceStringLong
-        arr.[1]
+        if isNull arr then nullExn "second"
+        arr.Second
 
     /// Gets the third item in the Array.
     /// Same as this.[2]
     let inline third (arr: 'T[]) =
-        if isNullSeq arr then nullExn "third"
-        if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.third: Failed to get third item of %s" arr.ToNiceStringLong
-        arr.[2]
+        if isNull arr then nullExn "third"
+        arr.Third
 
     /// Slice the Array given start and end index.
     /// Allows for negative indices too. ( -1 is last item, like Python)
     /// The resulting Array includes the end index.
-    /// Raises an ArgumentOutOfRangeException if indices are out of range.
+    /// Raises an IndexOutOfRangeException if indices are out of range.
     /// If you don't want an exception to be raised for index overflow or overlap use Array.trim.
     /// (A negative index can also be done with '^' prefix. E.g. ^0 for the last item, when F# Language preview features are enabled.)
     let slice startIdx endIdx (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "slice"
+        if isNull arr then nullExn "slice"
         arr.Slice(startIdx, endIdx)
 
 
@@ -155,9 +130,9 @@ module Array =
     /// If the sum of fromStartCount and fromEndCount is bigger than arr.Length it returns an empty Array.
     /// If you want an exception to be raised for index overlap (total trimming is bigger than count) use Array.slice with negative end index.
     let trim fromStartCount fromEndCount (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "trim"
-        if fromStartCount < 0 then ArgumentOutOfRangeException.Raise "Array.trim: fromStartCount can't be negative: %d" fromStartCount
-        if fromEndCount < 0 then ArgumentOutOfRangeException.Raise "Array.trim: fromEndCount can't be negative: %d" fromEndCount
+        if isNull arr then nullExn "trim"
+        if fromStartCount < 0 then fail arr "trim: fromStartCount can't be negative: %d" fromStartCount
+        if fromEndCount < 0 then fail arr "trim: fromEndCount can't be negative: %d" fromEndCount
         let c = arr.Length
         if fromStartCount + fromEndCount >= c then
             [||]
@@ -175,8 +150,8 @@ module Array =
     /// Not looped.
     /// The resulting seq is one element shorter than the input Array.
     let windowed2 (arr: 'T[]) =
-        if isNullSeq arr then nullExn "windowed2"
-        if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.windowed2 input has less than two items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "windowed2"
+        if arr.Length < 2 then fail arr "windowed2: input has less than two items"
         seq {
             for i = 0 to arr.Length - 2 do
                 arr.[i], arr.[i + 1]
@@ -185,8 +160,8 @@ module Array =
     /// Yields looped Seq from (first, second)  up to (last, first).
     /// The resulting seq has the same element count as the input Array.
     let thisNext (arr: 'T[]) =
-        if isNullSeq arr then nullExn "thisNext"
-        if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.thisNext input has less than two items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "thisNext"
+        if arr.Length < 2 then fail arr "thisNext: input has less than two items"
         seq {
             for i = 0 to arr.Length - 2 do
                 arr.[i], arr.[i + 1]
@@ -196,8 +171,8 @@ module Array =
     /// Yields looped Seq from (last,first)  up to (second-last, last).
     /// The resulting seq has the same element count as the input Array.
     let prevThis (arr: 'T[]) =
-        if isNullSeq arr then nullExn "prevThis"
-        if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.prevThis input has less than two items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "prevThis"
+        if arr.Length < 2 then fail arr "prevThis: input has less than two items"
         seq {
             arr.[arr.Length - 1], arr.[0]
             for i = 0 to arr.Length - 2 do
@@ -208,8 +183,8 @@ module Array =
     /// Not looped.
     /// The resulting seq is two elements shorter than the input Array.
     let windowed3 (arr: 'T[]) =
-        if isNullSeq arr then nullExn "windowed3"
-        if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.windowed3 input has less than three items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "windowed3"
+        if arr.Length < 3 then fail arr "windowed3: input has less than three items"
         seq {
             for i = 0 to arr.Length - 3 do
                 arr.[i], arr.[i + 1], arr.[i + 2]
@@ -218,8 +193,8 @@ module Array =
     /// Yields looped Seq of  from (last, first, second)  up to (second-last, last, first).
     /// The resulting seq has the same element count as the input Array.
     let prevThisNext (arr: 'T[]) =
-        if isNullSeq arr then nullExn "prevThisNext"
-        if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.prevThisNext input has less than three items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "prevThisNext"
+        if arr.Length < 3 then fail arr "prevThisNext: input has less than three items"
         seq {
             arr.[arr.Length - 1], arr.[0], arr.[1]
             for i = 0 to arr.Length - 3 do
@@ -231,8 +206,8 @@ module Array =
     /// Not looped.
     /// The resulting seq is one element shorter than the input Array.
     let windowed2i (arr: 'T[]) =
-        if isNullSeq arr then nullExn "windowed2i"
-        if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.windowed2i input has less than two items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "windowed2i"
+        if arr.Length < 2 then fail arr "windowed2i: input has less than two items"
         seq {
             for i = 0 to arr.Length - 2 do
                 i, arr.[i], arr.[i + 1]
@@ -241,8 +216,8 @@ module Array =
     /// Yields looped Seq  from (0,first, second)  up to (lastIndex, last, first).
     /// The resulting seq has the same element count as the input Array.
     let iThisNext (arr: 'T[]) =
-        if isNullSeq arr then nullExn "iThisNext"
-        if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.iThisNext input has less than two items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "iThisNext"
+        if arr.Length < 2 then fail arr "iThisNext input has less than two items"
         seq {
             for i = 0 to arr.Length - 2 do
                 i, arr.[i], arr.[i + 1]
@@ -253,8 +228,8 @@ module Array =
     /// Not looped.
     /// The resulting seq is two elements shorter than the input Array.
     let windowed3i (arr: 'T[]) =
-        if isNullSeq arr then nullExn "windowed3i"
-        if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.windowed3i input has less than three items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "windowed3i"
+        if arr.Length < 3 then fail arr "windowed3i: input has less than three items"
         seq {
             for i = 0 to arr.Length - 3 do
                 i + 1, arr.[i], arr.[i + 1], arr.[i + 2]
@@ -263,8 +238,8 @@ module Array =
     /// Yields looped Seq from (1, last, first, second)  up to (lastIndex, second-last, last, first)
     /// The resulting seq has the same element count as the input Array.
     let iPrevThisNext (arr: 'T[]) =
-        if isNullSeq arr then nullExn "iPrevThisNext"
-        if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.iPrevThisNext input has less than three items:\r\n%s" arr.ToNiceStringLong
+        if isNull arr then nullExn "iPrevThisNext"
+        if arr.Length < 3 then fail arr "iPrevThisNext: input has less than three items"
         seq {
             0, arr.[arr.Length - 1], arr.[0], arr.[1]
 
@@ -290,7 +265,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The new result Array.</returns>
     let inline rotate amount (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "rotate"
+        if isNull arr then nullExn "rotate"
         let r = Array.zeroCreate (arr.Length)
         for i = 0 to arr.Length - 1 do
             r.[i] <- arr.[negIdxLooped (i - amount) arr.Length]
@@ -303,7 +278,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The new result Array.</returns>
     let inline rotateUpTill (condition: 'T -> bool) (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "rotateUpTill"
+        if isNull arr then nullExn "rotateUpTill"
         if arr.Length = 0 then
             arr
         elif condition arr.[0] then
@@ -311,7 +286,7 @@ module Array =
         else
             let rec findBackIdx i =
                 if i = -1 then
-                    ArgumentOutOfRangeException.Raise "Array.rotateUpTill: no item in the list meets the condition:\r\n%s" arr.ToNiceStringLong
+                    fail arr "rotateUpTill: no item in the list meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -335,7 +310,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The new result Array.</returns>
     let inline rotateUpTillLast (condition: 'T -> bool) (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "rotateUpTillLast"
+        if isNull arr then nullExn "rotateUpTillLast"
         if arr.Length = 0 then
             arr
         elif condition arr.[arr.Length - 1] then
@@ -343,7 +318,7 @@ module Array =
         else
             let rec findBackIdx i =
                 if i = -1 then
-                    ArgumentOutOfRangeException.Raise "Array.rotateUpTill: no item in the list meets the condition:\r\n%s" arr.ToNiceStringLong
+                    fail arr "rotateUpTill: no item in the list meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -369,7 +344,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The new result Array.</returns>
     let inline rotateDownTill (condition: 'T -> bool) (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "rotateDownTill"
+        if isNull arr then nullExn "rotateDownTill"
         if arr.Length = 0 then
             arr
         elif condition arr.[0] then
@@ -378,7 +353,7 @@ module Array =
             let k = arr.Length
             let rec findIdx i =
                 if i = k then
-                    ArgumentOutOfRangeException.Raise "Array.rotateDownTill: no item in the list meets the condition:\r\n%s" arr.ToNiceStringLong
+                    fail arr "rotateDownTill: no item in the list meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -402,7 +377,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The new result Array.</returns>
     let inline rotateDownTillLast (condition: 'T -> bool) (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "rotateDownTillLast"
+        if isNull arr then nullExn "rotateDownTillLast"
         if arr.Length = 0 then
             arr
         elif condition arr.[0] then
@@ -411,7 +386,7 @@ module Array =
             let k = arr.Length
             let rec findIdx i =
                 if i = k then
-                    ArgumentOutOfRangeException.Raise "Array.rotateDownTill: no item in the list meets the condition:\r\n%s" arr.ToNiceStringLong
+                    fail arr "rotateDownTill: no item in the list meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -432,40 +407,40 @@ module Array =
     /// Returns true if the given Array has just one item.
     /// Same as  Array.hasOne
     let inline isSingleton (arr: 'T[]) : bool =
-        if isNullSeq arr then nullExn "isSingleton"
+        if isNull arr then nullExn "isSingleton"
         arr.Length = 1
 
     /// Returns true if the given Array has just one item.
     /// Same as  Array.isSingleton
     let inline hasOne (arr: 'T[]) : bool =
-        if isNullSeq arr then nullExn "hasOne"
+        if isNull arr then nullExn "hasOne"
         arr.Length = 1
 
     /// Returns true if the given Array is not empty.
     let inline isNotEmpty (arr: 'T[]) : bool =
-        if isNullSeq arr then nullExn "isNotEmpty"
+        if isNull arr then nullExn "isNotEmpty"
         arr.Length <> 0
 
     /// Returns true if the given Array has count items.
     let inline hasItems count (arr: 'T[]) : bool =
-        if isNullSeq arr then nullExn "hasItems"
+        if isNull arr then nullExn "hasItems"
         arr.Length = count
 
     /// Returns true if the given Array has equal or more than count items.
     let inline hasMinimumItems count (arr: 'T[]) : bool =
-        if isNullSeq arr then nullExn "hasMinimumItems"
+        if isNull arr then nullExn "hasMinimumItems"
         arr.Length >= count
 
     /// Returns true if the given Array has equal or less than count items.
     let inline hasMaximumItems count (arr: 'T[]) : bool =
-        if isNullSeq arr then nullExn "hasMaximumItems"
+        if isNull arr then nullExn "hasMaximumItems"
         arr.Length <= count
 
     /// Swap the values of two given indices in Array
     let inline swap i j (arr: 'T[]) : unit =
-        if isNullSeq arr then nullExn "swap"
+        if isNull arr then nullExn "swap"
         if i < 0 || j < 0 || i >= arr.Length || j >= arr.Length then
-            ArgumentOutOfRangeException.Raise "Array.swap: index i=%d and j=%d can't be less than 0 or bigger than last index %d " i j (arr.Length - 1)
+            fail arr "swap: index i=%d and j=%d can't be less than 0 or bigger than last index %d " i j (arr.Length - 1)
         if i <> j then
             let ti = arr.[i]
             arr.[i] <- arr.[j]
@@ -478,7 +453,7 @@ module Array =
 
         (*
         let inline simple cmpF (arr:Array<'T>) =
-            if arr.Length < 1 then ArgumentOutOfRangeException.Raise "Array.MinMax.simple: Count must be at least one: %s"  arr.ToNiceStringLong
+            if arr.Length < 1 then fail arr "MinMax.simple: Count must be at least one: %s"  arr.ToNiceStringLong
             let mutable m = arr.[0]
             for i=1 to arr.Length-1 do
                 if cmpF arr.[i] m then m <- arr.[i]
@@ -486,7 +461,7 @@ module Array =
         *)
 
         let inline simple2 cmpF (arr: 'T[]) =
-            if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.MinMax.simple2: Count must be at least two: %s" arr.ToNiceStringLong
+            if arr.Length < 2 then fail arr "MinMax.simple2: Count must be at least two"
             let mutable m1 = arr.[0]
             let mutable m2 = arr.[1]
             for i = 1 to arr.Length - 1 do
@@ -530,7 +505,7 @@ module Array =
                 2, 1, 0
 
         let inline simple3 cmpF (arr: 'T[]) =
-            if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.MinMax.simple3: Count must be at least three: %s" arr.ToNiceStringLong
+            if arr.Length < 3 then fail arr "MinMax.simple3: Count must be at least three"
             let e1 = arr.[0]
             let e2 = arr.[1]
             let e3 = arr.[2]
@@ -550,7 +525,7 @@ module Array =
             m1, m2, m3
 
         let inline indexByFun cmpF func (arr: 'T[]) =
-            if arr.Length < 1 then ArgumentOutOfRangeException.Raise "Array.MinMax.indexByFun: Count must be at least one: %s" arr.ToNiceStringLong
+            if arr.Length < 1 then fail arr "MinMax.indexByFun: Count must be at least one"
             let mutable f = func arr.[0]
             let mutable mf = f
             let mutable ii = 0
@@ -562,7 +537,7 @@ module Array =
             ii
 
         let inline index2ByFun cmpF func (arr: 'T[]) =
-            if arr.Length < 2 then ArgumentOutOfRangeException.Raise "Array.MinMax.index2ByFun: Count must be at least two: %s" arr.ToNiceStringLong
+            if arr.Length < 2 then fail arr "MinMax.index2ByFun: Count must be at least two"
             let mutable i1 = 0
             let mutable i2 = 1
             let mutable mf1 = func arr.[i1]
@@ -581,7 +556,7 @@ module Array =
             i1, i2
 
         let inline index3ByFun (cmpOp: 'U -> 'U -> bool) (byFun: 'T -> 'U) (arr: 'T[]) =
-            if arr.Length < 3 then ArgumentOutOfRangeException.Raise "Array.MinMax.index3ByFun: Count must be at least three: %s" arr.ToNiceStringLong
+            if arr.Length < 3 then fail arr "MinMax.index3ByFun: Count must be at least three"
             // sort first 3
             let mutable i1, i2, i3 = indexOfSort3By byFun cmpOp arr.[0] arr.[1] arr.[2] // otherwise would fail on sorting first 3, test on Array([5;6;3;1;2;0])|> Array.max3
             let mutable e1 = byFun arr.[i1]
@@ -618,32 +593,32 @@ module Array =
     /// <summary>Returns the index of the smallest of all elements of the Array, compared via Operators.max on the function result.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the input Array is empty.</exception>
     /// <returns>The index of the smallest element.</returns>
     let inline minIndexBy (projection: 'T -> 'Key) (arr: 'T[]) : int =
-        if isNullSeq arr then nullExn "minIndexBy"
+        if isNull arr then nullExn "minIndexBy"
         arr |> MinMax.indexByFun (<) projection
 
     /// <summary>Returns the index of the greatest of all elements of the Array, compared via Operators.max on the function result.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the input Array is empty.</exception>
     /// <returns>The index of the maximum element.</returns>
     let inline maxIndexBy (projection: 'T -> 'Key) (arr: 'T[]) : int =
-        if isNullSeq arr then nullExn "maxIndexBy"
+        if isNull arr then nullExn "maxIndexBy"
         arr |> MinMax.indexByFun (>) projection
 
 
     /// Returns the smallest and the second smallest element of the Array.
     /// If they are equal then the order is kept
     let inline min2 arr =
-        if isNullSeq arr then nullExn "min2"
+        if isNull arr then nullExn "min2"
         arr |> MinMax.simple2 (<)
 
     /// Returns the biggest and the second biggest element of the Array.
     /// If they are equal then the  order is kept
     let inline max2 arr =
-        if isNullSeq arr then nullExn "max2"
+        if isNull arr then nullExn "max2"
         arr |> MinMax.simple2 (>)
 
     // TODO make consistent xml docstring on below functions:
@@ -652,7 +627,7 @@ module Array =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline min2By f arr =
-        if isNullSeq arr then nullExn "min2By"
+        if isNull arr then nullExn "min2By"
         let i, ii = arr |> MinMax.index2ByFun (<) f
         arr.[i], arr.[ii]
 
@@ -660,7 +635,7 @@ module Array =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline max2By f arr =
-        if isNullSeq arr then nullExn "max2By"
+        if isNull arr then nullExn "max2By"
         let i, ii = arr |> MinMax.index2ByFun (>) f
         arr.[i], arr.[ii]
 
@@ -668,14 +643,14 @@ module Array =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline min2IndicesBy f arr =
-        if isNullSeq arr then nullExn "min2IndicesBy"
+        if isNull arr then nullExn "min2IndicesBy"
         arr |> MinMax.index2ByFun (<) f
 
     /// Returns the indices of the biggest and the second biggest element of the Array.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline max2IndicesBy f arr =
-        if isNullSeq arr then nullExn "max2IndicesBy"
+        if isNull arr then nullExn "max2IndicesBy"
         arr |> MinMax.index2ByFun (>) f
 
 
@@ -683,14 +658,14 @@ module Array =
     /// The first element is the smallest, the second is the second smallest and the third is the third smallest.
     /// If they are equal then the order is kept
     let inline min3 arr =
-        if isNullSeq arr then nullExn "min3"
+        if isNull arr then nullExn "min3"
         arr |> MinMax.simple3 (<)
 
     /// Returns the biggest three elements of the Array.
     /// The first element is the biggest, the second is the second biggest and the third is the third biggest.
     /// If they are equal then the order is kept
     let inline max3 arr =
-        if isNullSeq arr then nullExn "max3"
+        if isNull arr then nullExn "max3"
         arr |> MinMax.simple3 (>)
 
     /// Returns the smallest three elements of the Array.
@@ -698,7 +673,7 @@ module Array =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline min3By f arr =
-        if isNullSeq arr then nullExn "min3By"
+        if isNull arr then nullExn "min3By"
         let i, ii, iii = arr |> MinMax.index3ByFun (<) f
         arr.[i], arr.[ii], arr.[iii]
 
@@ -707,7 +682,7 @@ module Array =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline max3By f arr =
-        if isNullSeq arr then nullExn "max3By"
+        if isNull arr then nullExn "max3By"
         let i, ii, iii = arr |> MinMax.index3ByFun (>) f
         arr.[i], arr.[ii], arr.[iii]
 
@@ -716,7 +691,7 @@ module Array =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline min3IndicesBy f arr =
-        if isNullSeq arr then nullExn "min3IndicesBy"
+        if isNull arr then nullExn "min3IndicesBy"
         arr |> MinMax.index3ByFun (<) f
 
     /// Returns the indices of the three biggest elements of the Array.
@@ -724,20 +699,20 @@ module Array =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
     let inline max3IndicesBy f arr =
-        if isNullSeq arr then nullExn "max3IndicesBy"
+        if isNull arr then nullExn "max3IndicesBy"
         arr |> MinMax.index3ByFun (>) f
 
 
     /// Return the length or count of the collection.
     /// Same as Array.length
     let inline count (arr: 'T[]) : int =
-        if isNullSeq arr then nullExn "count"
+        if isNull arr then nullExn "count"
         arr.Length
 
     /// Counts for how many items of the collection the predicate returns true.
     /// Same as Array.filter and then Array.length
     let inline countIf (predicate: 'T -> bool) (arr: 'T[]) : int = //countBy is something else !!
-        if isNullSeq arr then nullExn "countIf"
+        if isNull arr then nullExn "countIf"
         let mutable k = 0
         for i = 0 to arr.Length - 1 do
             if predicate arr.[i] then k <- k + 1
@@ -747,14 +722,14 @@ module Array =
     /// Builds a new Array from the given ResizeArray.
     /// (Use the asArray function if you want to just cast an ResizeArray to a Array in Fable-JavaScript)
     let inline ofResizeArray (rarr: ResizeArray<'T>) : 'T[] =
-        if isNullSeq rarr then nullExn "ofResizeArray"
+        if isNull rarr then nullExn "ofResizeArray"
         rarr.ToArray()
 
     /// Return a fixed-length Array containing the elements of the input ResizeArray as a copy.
     /// When this function is used in Fable (JavaScript) the ResizeArray is just casted to an Array.
     /// In .NET a new Array is still allocated and the elements are copied.
     let inline asArray (arr: ResizeArray<'T>) : 'T[]=
-        if isNullSeq arr then nullExn "asArray"
+        if isNull arr then nullExn "asArray"
         #if FABLE_COMPILER_JAVASCRIPT
         unbox arr
         #else
@@ -764,7 +739,7 @@ module Array =
     /// Builds a new Array from the given ResizeArray.
     /// In Fable-JavaScript the ResizeArray is just casted to an Array without allocating a new ResizeArray.
     let inline asResizeArray(arr: 'T[]) : ResizeArray<'T> =
-        if isNullSeq arr then nullExn "asResizeArray"
+        if isNull arr then nullExn "asResizeArray"
         #if FABLE_COMPILER_JAVASCRIPT
         unbox arr
         #else
@@ -779,7 +754,7 @@ module Array =
     /// This function always allocates a new ResizeArray and copies the elements.
     /// (Use the asArray function if you want to just cast a Array to an Array in Fable-JavaScript)
     let inline toResizeArray (arr: 'T[]) : ResizeArray<'T> =
-        if isNullSeq arr then nullExn "toArray"
+        if isNull arr then nullExn "toArray"
         let l = ResizeArray<'T>(arr.Length)
         for i = 0 to arr.Length - 1 do
             l.Add arr.[i]
@@ -787,7 +762,7 @@ module Array =
 
     /// Build a Array from the given IList Interface.
     let inline ofIList (arr: IList<'T>) : 'T[] =
-        if isNullSeq arr then nullExn "ofIList"
+        if isNull arr then nullExn "ofIList"
         let l = Array.zeroCreate (arr.Count)
         arr.CopyTo(l, 0)
         l
@@ -796,14 +771,14 @@ module Array =
     /// Applies a function to List
     /// If resulting List meets the resultPredicate it is returned, otherwise the original input is returned.
     let inline applyIfResult (resultPredicate: 'T[] -> bool) (transform: 'T[] ->  'T[]) (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "applyIfResult"
+        if isNull arr then nullExn "applyIfResult"
         let r = transform arr
         if resultPredicate r then r else arr
 
     /// Applies a function to List if it meets the inputPredicate, otherwise just returns input.
     /// If resulting List meets the resultPredicate it is returned, otherwise original input is returned.
     let inline applyIfInputAndResult (inputPredicate: 'T[] -> bool) (resultPredicate: 'T[] -> bool) (transform: 'T[] ->  'T[]) (arr: 'T[]) : 'T[] =
-        if isNullSeq arr then nullExn "applyIfInputAndResult"
+        if isNull arr then nullExn "applyIfInputAndResult"
         if inputPredicate arr then
             let r = transform arr
             if resultPredicate r then r else arr
@@ -814,7 +789,7 @@ module Array =
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
     let duplicates (arr: 'T[]) =
-        if isNullSeq arr then nullExn "duplicates"
+        if isNull arr then nullExn "duplicates"
         let h = HashSet<'T>()
         let t = HashSet<'T>()
         // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
@@ -825,7 +800,7 @@ module Array =
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
     let duplicatesBy (f: 'T -> 'U) (arr: 'T[]) =
-        if isNullSeq arr then nullExn "duplicatesBy"
+        if isNull arr then nullExn "duplicatesBy"
         let h = HashSet<'U>()
         let t = HashSet<'U>()
         // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
@@ -835,9 +810,9 @@ module Array =
 
     /// Checks if a given array matches the content in Array at a given index
     let matches (searchFor:'T[]) atIdx (searchIn:'T[]) :bool =
-        if isNullSeq searchFor then nullExn "Array.matches"
-        if atIdx < 0                then ArgumentOutOfRangeException.Raise "Array.matches: atIdx Index is too small: %d for array of %d items" atIdx searchIn.Length
-        if atIdx >= searchIn.Length then ArgumentOutOfRangeException.Raise "Array.matches: atIdx Index is too big: %d for array of %d items" atIdx searchIn.Length
+        if isNull searchFor then nullExn "matches"
+        if atIdx < 0                then fail searchIn <| sprintf "matches: atIdx Index is too small: %d for array of %d items" atIdx searchIn.Length
+        if atIdx >= searchIn.Length then fail searchIn <| sprintf "matches: atIdx Index is too big: %d for array of %d items" atIdx searchIn.Length
         let fLast = searchFor.Length - 1
         let iLen = searchIn.Length
         let rec find i f = // index in searchIn ,  index in searchFor
@@ -853,10 +828,10 @@ module Array =
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
     let findValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])  :int =
-        if isNullSeq searchIn then nullExn "Array.findValue"
-        if fromIdx < 0                then ArgumentOutOfRangeException.Raise "Array.find: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
-        if tillIdx >= searchIn.Length then ArgumentOutOfRangeException.Raise "Array.find: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
-        if tillIdx < fromIdx          then ArgumentOutOfRangeException.Raise "Array.find: tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" tillIdx fromIdx searchIn.Length
+        if isNull searchIn then nullExn "findValue"
+        if fromIdx < 0                then fail searchIn <| sprintf "findValue: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
+        if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findValue: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
+        if tillIdx < fromIdx          then fail searchIn <| sprintf "findValue: tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" tillIdx fromIdx searchIn.Length
         let rec find i  =
             if  i > tillIdx  then -1 // not found!
             elif searchIn.[i] = searchFor  then i  // found,  exit !
@@ -868,10 +843,10 @@ module Array =
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
     let findLastValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])   :int =
-        if isNullSeq searchIn then nullExn "Array.findLastValue"
-        if fromIdx < 0                then ArgumentOutOfRangeException.Raise "Array.findBack: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
-        if tillIdx >= searchIn.Length then ArgumentOutOfRangeException.Raise "Array.findBack: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
-        if tillIdx < fromIdx          then ArgumentOutOfRangeException.Raise "Array.findBack: tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" tillIdx fromIdx searchIn.Length
+        if isNull searchIn then nullExn "findLastValue"
+        if fromIdx < 0                then fail searchIn <| sprintf "findLastValue: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
+        if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findLastValue: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
+        if tillIdx < fromIdx          then fail searchIn <| sprintf "findLastValue: tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" tillIdx fromIdx searchIn.Length
         let rec find i  =
             if  i < fromIdx  then -1 // not found!
             elif searchIn.[i] = searchFor  then i  // found,  exit !
@@ -883,10 +858,10 @@ module Array =
     /// Give lower and upper bound index for search space.
     /// Returns index of first element or -1 if not found
     let findArray (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[])   :int =
-        if isNullSeq searchIn then nullExn "Array.findArray`"
-        if fromIdx < 0                then ArgumentOutOfRangeException.Raise "Array.findArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
-        if tillIdx >= searchIn.Length then ArgumentOutOfRangeException.Raise "Array.findArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
-        if tillIdx < fromIdx          then ArgumentOutOfRangeException.Raise "Array.findArray (of %d items): tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" searchFor.Length tillIdx fromIdx searchIn.Length
+        if isNull searchIn then nullExn "findArray`"
+        if fromIdx < 0                then fail searchIn <| sprintf "findArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
+        if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
+        if tillIdx < fromIdx          then fail searchIn <| sprintf "findArray (of %d items): tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" searchFor.Length tillIdx fromIdx searchIn.Length
         let fLast = searchFor.Length - 1
         let rec find i f = // index in searchIn ,  index in searchFor
             if  i > tillIdx - fLast + f  then -1 // not found! not enough items left in searchIn array
@@ -901,11 +876,11 @@ module Array =
     /// Find last index where searchFor array occurs in searchIn array. Searching from end.
     /// Give lower and upper bound index for search space.
     /// Returns index of first element  or -1 if not found
-    let findLastArray  (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[])   :int =
-        if isNullSeq searchIn then nullExn "Array.findLastArray"
-        if fromIdx < 0                then ArgumentOutOfRangeException.Raise "Array.findLastArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
-        if tillIdx >= searchIn.Length then ArgumentOutOfRangeException.Raise "Array.findLastArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
-        if tillIdx < fromIdx          then ArgumentOutOfRangeException.Raise "Array.findLastArray (of %d items): tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" searchFor.Length tillIdx fromIdx searchIn.Length
+    let findLastArray (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[])   :int =
+        if isNull searchIn then nullExn "findLastArray"
+        if fromIdx < 0                then fail searchIn <| sprintf "findLastArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
+        if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findLastArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
+        if tillIdx < fromIdx          then fail searchIn <| sprintf "findLastArray (of %d items): tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" searchFor.Length tillIdx fromIdx searchIn.Length
         let fLast = searchFor.Length - 1
         let rec find i f = // index in searchIn ,  index in searchFor
             if  i - f < fromIdx  then -1 // not found! not enough items left in searchIn array
@@ -923,7 +898,7 @@ module Array =
     /// <param name="arr">The input array.</param>
     /// <returns>An array containing the elements for which the given predicate returns true.</returns>
     let filteri (predicate: int -> bool) (arr: 'T[]) =
-        if isNullSeq arr then nullExn "filteri"
+        if isNull arr then nullExn "filteri"
         let res = ResizeArray()
         for i = 0 to arr.Length - 1 do
             if predicate i then
