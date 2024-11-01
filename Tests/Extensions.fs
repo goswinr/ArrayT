@@ -36,8 +36,6 @@ module Extensions =
             Expect.throws (fun () -> a.Set -1 0.0 |> ignore ) "Set -1"
         }
 
-
-
         // -- xs.LastIndex --
         testCase "LastIndex doesn't raises exception on empty Array" <| fun _ ->
             let xs = [||]

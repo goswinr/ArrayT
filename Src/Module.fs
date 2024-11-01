@@ -257,10 +257,10 @@ module Array =
         // allow null values so that Array.singleton None is valid
         [| value |]
 
-    /// <summary>Considers List circular and move elements up for positive integers or down for negative integers.
+    /// <summary>Considers array circular and move elements up for positive integers or down for negative integers.
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
-    /// the amount can even be bigger than the list's size. I will just rotate more than one loop.</summary>
+    /// the amount can even be bigger than the array's size. I will just rotate more than one loop.</summary>
     /// <param name="amount">How many elements to shift forward. Or backward if number is negative</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>The new result Array.</returns>
@@ -271,8 +271,8 @@ module Array =
             r.[i] <- arr.[negIdxLooped (i - amount) arr.Length]
         r
 
-    /// <summary>Considers List circular and move elements up till condition is met for the first item.
-    /// The algorithm takes elements from the end and put them at the start till the first element in the list meets the condition.
+    /// <summary>Considers array circular and move elements up till condition is met for the first item.
+    /// The algorithm takes elements from the end and put them at the start till the first element in the array meets the condition.
     /// If the first element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
     /// <param name="condition">The condition to meet.</param>
     /// <param name="arr">The input Array.</param>
@@ -286,7 +286,7 @@ module Array =
         else
             let rec findBackIdx i =
                 if i = -1 then
-                    fail arr "rotateUpTill: no item in the list meets the condition"
+                    fail arr "rotateUpTill: no item in the array meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -303,8 +303,8 @@ module Array =
                 j <- j + 1
             r
 
-    /// <summary>Considers List circular and move elements up till condition is met for the last item.
-    /// The algorithm takes elements from the end and put them at the start till the last element in the list meets the condition.
+    /// <summary>Considers array circular and move elements up till condition is met for the last item.
+    /// The algorithm takes elements from the end and put them at the start till the last element in the array meets the condition.
     /// If the last element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
     /// <param name="condition">The condition to meet.</param>
     /// <param name="arr">The input Array.</param>
@@ -318,7 +318,7 @@ module Array =
         else
             let rec findBackIdx i =
                 if i = -1 then
-                    fail arr "rotateUpTill: no item in the list meets the condition"
+                    fail arr "rotateUpTill: no item in the array meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -337,8 +337,8 @@ module Array =
 
             r
 
-    /// <summary>Considers List circular and move elements down till condition is met for the first item.
-    /// The algorithm takes elements from the start and put them at the end till the first element in the list meets the condition.
+    /// <summary>Considers array circular and move elements down till condition is met for the first item.
+    /// The algorithm takes elements from the start and put them at the end till the first element in the array meets the condition.
     /// If the first element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
     /// <param name="condition">The condition to meet.</param>
     /// <param name="arr">The input Array.</param>
@@ -353,7 +353,7 @@ module Array =
             let k = arr.Length
             let rec findIdx i =
                 if i = k then
-                    fail arr "rotateDownTill: no item in the list meets the condition"
+                    fail arr "rotateDownTill: no item in the array meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -370,8 +370,8 @@ module Array =
                 j <- j + 1
             r
 
-    /// <summary>Considers List circular and move elements down till condition is met for the last item.
-    /// The algorithm takes elements from the start and put them at the end till the last element in the list meets the condition.
+    /// <summary>Considers array circular and move elements down till condition is met for the last item.
+    /// The algorithm takes elements from the start and put them at the end till the last element in the array meets the condition.
     /// If the last element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
     /// <param name="condition">The condition to meet.</param>
     /// <param name="arr">The input Array.</param>
@@ -386,7 +386,7 @@ module Array =
             let k = arr.Length
             let rec findIdx i =
                 if i = k then
-                    fail arr "rotateDownTill: no item in the list meets the condition"
+                    fail arr "rotateDownTill: no item in the array meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -768,15 +768,35 @@ module Array =
         l
 
 
-    /// Applies a function to List
-    /// If resulting List meets the resultPredicate it is returned, otherwise the original input is returned.
+
+    /// Applies a function to array
+    /// If resulting array meets the resultPredicate it is returned, otherwise the original input is returned.
+    let inline mapIfResult (resultPredicate: 'T[] -> bool) (transform: 'T[] ->  'T[]) (arr: 'T[]) : 'T[] =
+        if isNull arr then nullExn "mapIfResult"
+        let r = transform arr
+        if resultPredicate r then r else arr
+
+    /// Applies a function to array if it meets the inputPredicate, otherwise just returns input.
+    /// If resulting array meets the resultPredicate it is returned, otherwise original input is returned.
+    let inline mapIfInputAndResult (inputPredicate: 'T[] -> bool) (resultPredicate: 'T[] -> bool) (transform: 'T[] ->  'T[]) (arr: 'T[]) : 'T[] =
+        if isNull arr then nullExn "mapIfInputAndResult"
+        if inputPredicate arr then
+            let r = transform arr
+            if resultPredicate r then r else arr
+        else
+            arr
+
+    /// Applies a function to array
+    /// If resulting array meets the resultPredicate it is returned, otherwise the original input is returned.
+    [<Obsolete("Use mapIfResult instead")>]
     let inline applyIfResult (resultPredicate: 'T[] -> bool) (transform: 'T[] ->  'T[]) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "applyIfResult"
         let r = transform arr
         if resultPredicate r then r else arr
 
-    /// Applies a function to List if it meets the inputPredicate, otherwise just returns input.
-    /// If resulting List meets the resultPredicate it is returned, otherwise original input is returned.
+    /// Applies a function to array if it meets the inputPredicate, otherwise just returns input.
+    /// If resulting array meets the resultPredicate it is returned, otherwise original input is returned.
+    [<Obsolete("Use mapIfInputAndResult instead")>]
     let inline applyIfInputAndResult (inputPredicate: 'T[] -> bool) (resultPredicate: 'T[] -> bool) (transform: 'T[] ->  'T[]) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "applyIfInputAndResult"
         if inputPredicate arr then
@@ -784,6 +804,8 @@ module Array =
             if resultPredicate r then r else arr
         else
             arr
+
+
 
     /// Returns all elements that exists more than once in Array.
     /// Each element that exists more than once is only returned once.
@@ -903,5 +925,5 @@ module Array =
         for i = 0 to arr.Length - 1 do
             if predicate i then
                 res.Add(arr.[i])
-        res.ToArray()
+        asArray res
 

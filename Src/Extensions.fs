@@ -86,7 +86,7 @@ module AutoOpenArrayTExtensions =
 
         /// Gets the the only item in the Array.
         /// Fails if the Array does not have exactly one element.
-        member inline xs.FirstAndOnly =
+        member inline xs.FirstAndOnly : 'T =
             if xs.Length = 0 then badGetExn 0 xs "FirstAndOnly"
             if xs.Length > 1 then badGetExn 1 xs "FirstAndOnly, Array is expected to have exactly one item."
             xs.[0]
@@ -225,9 +225,9 @@ module AutoOpenArrayTExtensions =
         /// A string representation of the Array including the count of entries and the first 5 entries.
         /// When used in Fable this member is inlined for reflection to work.
         #if FABLE_COMPILER
-        member inline arr.AsString  =  // inline needed for Fable reflection
+        member inline arr.AsString : string =  // inline needed for Fable reflection
         #else
-        member arr.asString =  // on .NET inline fails because it's using internal DefaultDictUtil
+        member arr.asString  :string =  // on .NET inline fails because it's using internal DefaultDictUtil
         #endif
             let t = toStringInline arr
             $"{t}{contentAsString 5 arr}"
@@ -237,9 +237,9 @@ module AutoOpenArrayTExtensions =
         /// and the specified amount of entries.
         /// When used in Fable this member is inlined for reflection to work.
         #if FABLE_COMPILER
-        member inline arr.ToString (entriesToPrint) =  // inline needed for Fable reflection
+        member inline arr.ToString (entriesToPrint)  : string =  // inline needed for Fable reflection
         #else
-        member arr.ToString (entriesToPrint)  = // on .NET inline fails because it's using internal DefaultDictUtil
+        member arr.ToString (entriesToPrint)  : string  = // on .NET inline fails because it's using internal DefaultDictUtil
         #endif
             let t = toStringInline arr
             $"{t}{contentAsString entriesToPrint arr}"

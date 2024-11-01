@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2024-11-02
+### Added
+- mapIfResult, deprecated applyIfResult
 
 ## [0.21.0] - 2024-11-01
 ### Added
@@ -22,7 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - copy from ResizeArray library 0.19.0
 
 
-[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.21.0...HEAD
+[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.22.0...HEAD
+[0.22.0]: https://github.com/goswinr/ArrayT/compare/0.21.0...0.22.0
 [0.21.0]: https://github.com/goswinr/ArrayT/compare/0.20.0...0.21.0
 [0.20.0]: https://github.com/goswinr/ArrayT/compare/0.19.0...0.20.0
 [0.19.0]: https://github.com/goswinr/ArrayT/releases/tag/0.19.0
