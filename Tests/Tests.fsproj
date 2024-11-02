@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>    <!-- Exe = console app -->
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>preview</LangVersion>
-    <IsTestProject>true</IsTestProject>
+    <IsTestProject>true</IsTestProject> <!-- to exclude from fsdocs -->
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Fable.Mocha" Version="2.17.0" />

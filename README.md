@@ -21,6 +21,8 @@ Otherwise when a function fails on invalid input it will throw a descriptive exc
 I was always annoyed that an IndexOutOfRangeException does not include the actual index that was out of bounds nor the actual size of the array.
 This library fixes that in `array.Get`, `array.Set`, `array.Slice` and other item access functions.
 
+See also https://github.com/goswinr/ResizeArray/ for a similar library for `ResizeArray<'T>`.
+
 ### It Includes:
 
 - A `Array` module that has a additional functions to the  [`Array` module from `FSharp.Core`](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-arraymodule.html).
