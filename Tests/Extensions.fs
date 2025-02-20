@@ -16,6 +16,14 @@ module Extensions =
 
         test "Intro: 9=9" {Expect.equal 9 9 "Intro"}
 
+        test "DebugIndexer" {
+            let aa = [|for i in 0 .. 9 ->  float i |]
+            Expect.equal (aa.DebugIdx.[2]) 2.0 "DebugIndexer 2"
+            Expect.throws (fun () -> aa.DebugIdx.[10] |> ignore ) "DebugIndexer 10"
+            aa.DebugIdx.[2] <- 3.0
+            Expect.equal (aa.[2]) 3.0 "DebugIndexer 2 Item"
+        }
+
         let a = [|for i in 0 .. 9 ->  float i |]
         //let b = Array.init 10 (fun i -> float i)
 

@@ -94,3 +94,30 @@ module UtilArray =
                 (typeof<'T>).Name
             #endif
         raise (ArgumentException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
+
+
+    /// A simple simple Wrapper for an array.
+    /// The sole purpose is to provide a better Exception message when an index is out of range.
+    type DebugIndexer<'T>(arr:'T[]) = // [<Struct>] would fails for setter !
+        member this.Item
+            with get(i) =
+                if i < 0 || i >= arr.Length then badGetExn i arr "DebugIdx.[i]"
+                arr.[i]
+
+            and set(i) (x:'T) =
+                if i < 0 || i >= arr.Length then badSetExn i arr "DebugIdx.[i]" x
+                arr.[i] <- x
+
+        member this.Length = arr.Length
+
+        member this.Array = arr
+
+        override this.ToString() =
+            let t =
+            #if FABLE_COMPILER
+                "'T"
+            #else
+                (typeof<'T>).Name
+            #endif
+            $"DebugIndexer for {toStringCore t arr}{contentAsString 5 arr}"
+

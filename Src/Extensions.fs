@@ -14,8 +14,17 @@ module AutoOpenArrayTExtensions =
 
     type ``[]``<'T>  with //Generic Array
 
+
+        /// Use for Debugging index get/set operations.
+        /// Just replace 'myArray.[3]' with 'myArray.DebugIdx.[3]'
+        /// Throws a nice descriptive Exception if the index is out of range
+        /// including the bad index and the array content.
+        member xs.DebugIdx =
+            new DebugIndexer<'T>(xs)
+
         /// Gets an item at index, same as this.[index] or this.Idx(index)
-        /// Throws a descriptive Exception if the index is out of range.
+        /// Throws a descriptive Exception if the index is out of range
+        /// including the bad index and the Array content.
         /// (Use this.GetNeg(i) member if you want to use negative indices too)
         member inline xs.Get index =
             if index < 0 || index >= xs.Length then badGetExn index xs "Get"

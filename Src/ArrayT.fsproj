@@ -14,10 +14,9 @@
     <Title>ArrayT</Title>
     <Product>ArrayT</Product>
     <PackageId>ArrayT</PackageId>
-    <!-- <Version>0.20.0</Version>  done by Ionide.KeepAChangelog.Tasks
-    <AssemblyVersion>0.20.0</AssemblyVersion>
-    <FileVersion>0.20.0</FileVersion>
-    <PackageReleaseNotes></PackageReleaseNotes> -->
+
+    <!-- <Version>0.20.0</Version>  done by Ionide.KeepAChangelog.Tasks -->
+
     <Authors>GoswinR</Authors>
     <Copyright>Goswin Rothenthal 2021</Copyright>
     <Description>An F# module and extensions library for Array&lt;'T&gt;. Works in Fable too.</Description>
@@ -76,4 +75,10 @@
     <!-- for fsdocs to build locally -->
     <Copy SourceFiles="../README.md" DestinationFiles="../Docs/index.md" ContinueOnError="false"/>
   </Target>
+
+
+  <Target Name="WriteChangelogVersion" AfterTargets="AfterBuild"><!-- for version checks in github tag based actions -->
+    <WriteLinesToFile File="./bin/ChangelogVersion.txt" Lines="@(CurrentReleaseChangelog)" Overwrite="true" ContinueOnError="false" />
+  </Target>
+
 </Project>
