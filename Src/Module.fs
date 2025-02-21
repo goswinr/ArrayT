@@ -768,7 +768,6 @@ module Array =
         l
 
 
-
     /// Applies a function to array
     /// If resulting array meets the resultPredicate it is returned, otherwise the original input is returned.
     let inline mapIfResult (resultPredicate: 'T[] -> bool) (transform: 'T[] ->  'T[]) (arr: 'T[]) : 'T[] =
@@ -804,7 +803,6 @@ module Array =
             if resultPredicate r then r else arr
         else
             arr
-
 
 
     /// Returns all elements that exists more than once in Array.
