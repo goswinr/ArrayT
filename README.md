@@ -18,21 +18,21 @@ It also works in Javascript and Typescript with [Fable](https://fable.io/).
 I was always annoyed that an IndexOutOfRangeException does not include the actual index that was out of bounds nor the actual size of the array.
 This library fixes that in `array.Get`, `array.Set`, `array.Slice` and other item access functions.
 
-This library was designed for use with F# scripting.\
-Functions and methods never return null.\
-Only functions starting with `try...` will return an F# Option.\
+This library was designed for use with F# scripting.<br>
+Functions and methods never return null.<br>
+Only functions starting with `try...` will return an F# Option.<br>
 Otherwise when a function fails on invalid input it will throw a descriptive exception.
 
 See also https://github.com/goswinr/ResizeArray/ for a similar library for `ResizeArray<'T>`.
 
 ### It Includes:
 
-- An `Array` module that has a additional functions to the  `Array` module from [`FSharp.Core`](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-arraymodule.html).\
+- An `Array` module that has a additional functions to the  `Array` module from [`FSharp.Core`](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-arraymodule.html).<br>
 See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-array.html)
 
-- Extension members on `Array` like \
-`.Get(idx)` `.Set(idx,item)` `.First` `.Last` `.SecondLast` `xs.DebugIdx.[i]` and more..\
-With nicer IndexOutOfRangeExceptions that include the bad index and the actual size.\
+- Extension members on `Array` like <br>
+`.Get(idx)` `.Set(idx,item)` `.First` `.Last` `.SecondLast` `xs.DebugIdx.[i]` and more..<br>
+With nicer IndexOutOfRangeExceptions that include the bad index and the actual size.<br>
 See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-autoopenarraytextensions.html)
 
 
