@@ -13,21 +13,21 @@ module Array =
 
 
     /// <summary>Gets an element from an Array. (Use Array.getNeg(i) function if you want to use negative indices too.)</summary>
-    /// <param name="arr">The input Array.</param>
     /// <param name="index">The input index.</param>
+    /// <param name="arr">The input Array.</param>
     /// <returns>The value of the Array at the given index.</returns>
     /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
-    let inline get (arr: 'T[]) index =
+    let inline get index (arr: 'T[]) =
         if isNull arr then nullExn "get"
         arr.Get index
 
 
     /// <summary>Sets an element of a Array. (use Array.setNeg(i) function if you want to use negative indices too)</summary>
-    /// <param name="arr">The input Array.</param>
     /// <param name="index">The input index.</param>
     /// <param name="value">The input value.</param>
+    /// <param name="arr">The input Array.</param>
     /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
-    let inline set (arr: 'T[]) index value =
+    let inline set index value (arr: 'T[]) =
         if isNull arr then nullExn "set"
         arr.Set index value
 

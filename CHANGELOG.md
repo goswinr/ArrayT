@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2025-10-11
+### Changed
+- BREAKING CHANGE: Reorder parameters for Array.get and Array.set
+
+
 ## [0.23.0] - 2025-02-20
 ### Added
 - DebugIdx Extension for nicer Error Messages on index out of bound exceptions
@@ -29,8 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - copy from ResizeArray library 0.19.0
 
 
-[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.23.0...HEAD
+[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.24.0...HEAD
+[0.24.0]: https://github.com/goswinr/ArrayT/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/goswinr/ArrayT/compare/0.22.0...0.23.0
+[0.22.0]: https://github.com/goswinr/ArrayT/compare/0.21.0...0.22.0
 [0.21.0]: https://github.com/goswinr/ArrayT/compare/0.20.0...0.21.0
 [0.20.0]: https://github.com/goswinr/ArrayT/compare/0.19.0...0.20.0
 [0.19.0]: https://github.com/goswinr/ArrayT/releases/tag/0.19.0
