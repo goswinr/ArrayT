@@ -55,7 +55,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.0.100" />    <!-- 6.0 for InlineIfLambda , otherwise the minimum FSharp.Core version would be forced by the SDK used for building it. this would be needlessly too high-->
+    <PackageReference Update="FSharp.Core" Version="10.0.101" />    <!-- 6.0 for InlineIfLambda , otherwise the minimum FSharp.Core version would be forced by the SDK used for building it. this would be needlessly too high-->
     <PackageReference Include="Ionide.KeepAChangelog.Tasks" Version="0.1.8" PrivateAssets="all"  />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
   </ItemGroup>
