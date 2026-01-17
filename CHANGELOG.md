@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.1] - 2026-01-17
+### Fixed
+- Fix bug in `rotateDownTillLast` that checked first element instead of last
+- Fix typo in `firstAndOnly` docstring ("the the" → "the")
+- Fix wrong function name in `toResizeArray` null exception message
+
 ## [0.24.0] - 2025-10-11
 ### Changed
 - BREAKING CHANGE: Reorder parameters for Array.get and Array.set
@@ -34,7 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - copy from ResizeArray library 0.19.0
 
 
-[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.24.0...HEAD
+[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.24.1...HEAD
+[0.24.1]: https://github.com/goswinr/ArrayT/compare/0.24.0...0.24.1
 [0.24.0]: https://github.com/goswinr/ArrayT/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/goswinr/ArrayT/compare/0.22.0...0.23.0
 [0.22.0]: https://github.com/goswinr/ArrayT/compare/0.21.0...0.22.0

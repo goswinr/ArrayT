@@ -5,6 +5,7 @@ open System.Collections.Generic
 
 #nowarn "44" //for opening the hidden but not Obsolete UtilArray module
 open UtilArray
+#warnon "44"
 
 /// Extension methods for Array<'T>.
 /// Like .Last , .IsNotEmpty ,..

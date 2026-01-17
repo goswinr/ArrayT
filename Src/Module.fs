@@ -6,6 +6,7 @@ open System.Collections.Generic
 
 #nowarn "44" //for opening the hidden but not Obsolete UtilArray module
 open UtilArray
+#warnon "44"
 
 /// The main module for functions on Array<'T>.
 /// This module provides additional functions to ones from FSharp.Core.Array module.

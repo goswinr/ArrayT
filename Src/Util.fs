@@ -97,6 +97,7 @@ module UtilArray =
         raise (ArgumentException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
 
+
     /// A simple Wrapper for an array.
     /// The sole purpose is to provide a better Exception message when an index is out of range.
     type DebugIndexer<'T>(arr:'T[]) = // [<Struct>] would fails for setter !
