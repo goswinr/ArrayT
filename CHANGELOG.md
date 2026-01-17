@@ -48,8 +48,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.21.0]: https://github.com/goswinr/ArrayT/compare/0.20.0...0.21.0
 [0.20.0]: https://github.com/goswinr/ArrayT/compare/0.19.0...0.20.0
 [0.19.0]: https://github.com/goswinr/ArrayT/releases/tag/0.19.0
-
-<!--
-use to get tag dates:
-git log --tags --simplify-by-decoration --pretty="format:%ci %d"
--->
