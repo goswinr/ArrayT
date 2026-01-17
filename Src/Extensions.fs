@@ -184,7 +184,7 @@ module AutoOpenArrayTExtensions =
             if xs.Length = 0 then raise <| Exception("Array.FailIfEmpty: " + errorMessage)
             xs
 
-        /// Raises an Exception if the Array has less then count items.
+        /// Raises an Exception if the Array has less than count items.
         /// (Useful for chaining)
         /// Returns the input Array
         member inline xs.FailIfLessThan(count, errorMessage: string) =

@@ -97,7 +97,7 @@ module Array =
         if isNull arr then nullExn "first"
         arr.First
 
-    /// Gets the the only item in the Array.
+    /// Gets the only item in the Array.
     /// Fails if the Array does not have exactly one element.
     let inline firstAndOnly (arr: 'T[]) =
         if isNull arr then nullExn "firstAndOnly"
@@ -380,7 +380,7 @@ module Array =
         if isNull arr then nullExn "rotateDownTillLast"
         if arr.Length = 0 then
             arr
-        elif condition arr.[0] then
+        elif condition arr.[arr.Length - 1] then
             arr.Duplicate()
         else
             let k = arr.Length
@@ -754,7 +754,7 @@ module Array =
     /// This function always allocates a new ResizeArray and copies the elements.
     /// (Use the asArray function if you want to just cast a Array to an Array in Fable-JavaScript)
     let inline toResizeArray (arr: 'T[]) : ResizeArray<'T> =
-        if isNull arr then nullExn "toArray"
+        if isNull arr then nullExn "toResizeArray"
         let l = ResizeArray<'T>(arr.Length)
         for i = 0 to arr.Length - 1 do
             l.Add arr.[i]

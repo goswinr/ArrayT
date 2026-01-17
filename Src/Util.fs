@@ -9,8 +9,8 @@ module UtilArray =
 
 
     /// Converts negative indices to positive ones.
-    /// Correct results from -length up to length-1
-    /// e.g.: -1 is  last item .
+    /// Correct results from -length up to length-1.
+    /// e.g.: -1 is last item.
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline negIdx i len =
         let ii = if i < 0 then len + i else i
@@ -20,7 +20,8 @@ module UtilArray =
 
     /// Any int will give a valid index for given collection size.
     /// Converts negative indices to positive ones and loops to start after last index is reached.
-    /// Returns a valid index for a collection of 'length' items for any integer
+    /// Returns a valid index for a collection of 'length' items for any integer.
+    /// Requires length > 0.
     let inline negIdxLooped i length =
         let t = i % length
         if t >= 0 then t else t + length
@@ -47,7 +48,7 @@ module UtilArray =
 
     /// Returns a string with the content of the array up to 'entriesToPrint' entries.
     /// Includes the index of each entry.
-    /// Includes the last entry.
+    /// Includes the last entry (prints one extra if only one more remains to avoid "...").
     let contentAsString (entriesToPrint) (arr:'T[]) = // on .NET inline fails because it's using internal DefaultDictUtil
         let c = arr.Length
         if c > 0 && entriesToPrint > 0 then
@@ -96,7 +97,7 @@ module UtilArray =
         raise (ArgumentException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
 
-    /// A simple simple Wrapper for an array.
+    /// A simple Wrapper for an array.
     /// The sole purpose is to provide a better Exception message when an index is out of range.
     type DebugIndexer<'T>(arr:'T[]) = // [<Struct>] would fails for setter !
         member this.Item
