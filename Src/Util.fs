@@ -110,9 +110,11 @@ module UtilArray =
                 if i < 0 || i >= arr.Length then badSetExn i arr "DebugIdx.[i]" x
                 arr.[i] <- x
 
-        member this.Length : int = arr.Length
+        member this.Length : int =
+            arr.Length
 
-        member this.Array : 'T[] = arr
+        member this.Array : 'T[] =
+            arr
 
         override this.ToString() : string =
             let t =

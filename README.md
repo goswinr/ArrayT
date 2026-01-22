@@ -1,5 +1,6 @@
 
 ![Logo](https://raw.githubusercontent.com/goswinr/ArrayT/main/Docs/img/logo128.png)
+
 # ArrayT
 
 [![ArrayT on nuget.org](https://img.shields.io/nuget/v/ArrayT)](https://www.nuget.org/packages/ArrayT/)
@@ -25,7 +26,7 @@ Otherwise when a function fails on invalid input it will throw a descriptive exc
 
 See also https://github.com/goswinr/ResizeArray/ for a similar library for `ResizeArray<'T>`.
 
-### It Includes:
+### It Includes
 
 - An `Array` module that has a additional functions to the  `Array` module from [`FSharp.Core`](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-arraymodule.html).<br>
 See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-array.html)
@@ -47,6 +48,7 @@ Just open the namespace
 ```fsharp
 open ArrayT
 ```
+
 this namespace contains:
 
 - a module also called `Array`. It will add additional functions to the `Array` module from `FSharp.Core`.
@@ -63,9 +65,10 @@ let xs = [| 0 .. 88 |]
 
 xs.Get(99)
 ```
+
 throws
 
-```
+```txt
 System.IndexOutOfRangeException: Array.Get: Can't get index 99 from:
 array<Int32> with 89 items:
   0: 0

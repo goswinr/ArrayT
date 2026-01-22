@@ -15,7 +15,6 @@ module AutoOpenArrayTExtensions =
 
     type ``[]``<'T>  with //Generic Array
 
-
         /// Use for Debugging index get/set operations.
         /// Just replace 'myArray.[3]' with 'myArray.DebugIdx.[3]'
         /// Throws a nice descriptive Exception if the index is out of range

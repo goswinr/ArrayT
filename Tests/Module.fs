@@ -108,9 +108,9 @@ module ExtensionOnArray =
 
     let inline (==) (a: 'T[]) b : bool =  a = b
     let inline (<!>) (a: 'T[]) b : bool =  a <>b
-    let inline (=++=) (a: 'T[]* 'T[]) (b: 'T[]* 'T[]) : bool = (fst a == fst b) && (snd a == snd b)
-    let inline (<!!>) (a: 'T[]* 'T[]) (b: 'T[]* 'T[]) : bool = (fst a <!> fst b) || (snd a <!> snd b)
-    let inline (<!!!>) (aaa: 'T[]* 'T[]* 'T[]) (bbb: 'T[]* 'T[]* 'T[]) : bool =
+    let inline (=++=) (a: 'T[] * 'T[]) (b: 'T[] * 'T[]) : bool = (fst a == fst b) && (snd a == snd b)
+    let inline (<!!>) (a: 'T[] * 'T[]) (b: 'T[] * 'T[]) : bool = (fst a <!> fst b) || (snd a <!> snd b)
+    let inline (<!!!>) (aaa: 'T[] * 'T[] * 'T[]) (bbb: 'T[] * 'T[] * 'T[]) : bool =
         let a,b,c = aaa
         let x,y,z = bbb
         (a <!> x) || (b <!> y) || (c <!> z)

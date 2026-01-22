@@ -145,7 +145,8 @@ module Array =
     //------------------------------------------------------------------
     //---------------------prev-this-next ------------------------------
     //------------------------------------------------------------------
-    // these functions below also exist on Seq module in FsEx:
+    // these functions below also exist on Seq module in FsEx project:
+
 
     /// Yields Seq from (first, second)  up to (second-last, last).
     /// Not looped.
@@ -253,7 +254,7 @@ module Array =
     /// <summary>Returns a Array that contains one item only.</summary>
     /// <param name="value">The input item.</param>
     /// <returns>The result Array of one item.</returns>
-    let inline singleton value : 'T[] =
+    let inline singleton (value:'T) : 'T[] =
         // allow null values so that Array.singleton [] is valid
         // allow null values so that Array.singleton None is valid
         [| value |]
@@ -622,7 +623,7 @@ module Array =
         if isNull arr then nullExn "max2"
         arr |> MinMax.simple2 (>)
 
-    // TODO make consistent xml docstring on below functions:
+
 
     /// Returns the smallest and the second smallest element of the Array.
     /// Elements are compared by applying the predicate function first.
@@ -731,8 +732,8 @@ module Array =
     /// In .NET a new Array is still allocated and the elements are copied.
     let inline asArray (arr: ResizeArray<'T>) : 'T[]=
         if isNull arr then nullExn "asArray"
-        #if FABLE_COMPILER_JAVASCRIPT
-        unbox arr
+        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+        unbox<'T[]> arr
         #else
         arr.ToArray()
         #endif
@@ -741,13 +742,14 @@ module Array =
     /// In Fable-JavaScript the ResizeArray is just casted to an Array without allocating a new ResizeArray.
     let inline asResizeArray(arr: 'T[]) : ResizeArray<'T> =
         if isNull arr then nullExn "asResizeArray"
-        #if FABLE_COMPILER_JAVASCRIPT
-        unbox arr
+        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+        unbox<ResizeArray<'T>> arr
         #else
-        let l = ResizeArray<'T>(arr.Length)
-        for i = 0 to arr.Length - 1 do
-            l.Add arr.[i]
-        l
+        ResizeArray<'T>(arr)
+        // let l = ResizeArray<'T>(arr.Length)
+        // for i = 0 to arr.Length - 1 do
+        //     l.Add arr.[i]
+        // l
         #endif
 
 
@@ -756,10 +758,11 @@ module Array =
     /// (Use the asArray function if you want to just cast a Array to an Array in Fable-JavaScript)
     let inline toResizeArray (arr: 'T[]) : ResizeArray<'T> =
         if isNull arr then nullExn "toResizeArray"
-        let l = ResizeArray<'T>(arr.Length)
-        for i = 0 to arr.Length - 1 do
-            l.Add arr.[i]
-        l
+        ResizeArray<'T>(arr)
+        // let l = ResizeArray<'T>(arr.Length)
+        // for i = 0 to arr.Length - 1 do
+        //     l.Add arr.[i]
+        // l
 
     /// Build a Array from the given IList Interface.
     let inline ofIList (arr: IList<'T>) : 'T[] =
