@@ -88,7 +88,10 @@ If you want to use the index notation `xs.[i]` instead of the Get method you can
 
 `xs.DebugIdx.[i]`
 
-
+## Use of AI and LLMs
+All core function are are written by hand to ensure performance and correctness.<br>
+However, AI tools have been used for code review, typo and grammar checking in documentation<br>
+and to generate not all but many of the tests.
 
 
 ## Tests
@@ -112,8 +115,8 @@ for JS testing with Fable.Mocha and TS verification:
 npm test
 ```
 
-### License
+## License
 [MIT](https://github.com/goswinr/ArrayT/blob/main/LICENSE.md)
 
-### Changelog
+## Changelog
 see [CHANGELOG.md](https://github.com/goswinr/ArrayT/blob/main/CHANGELOG.md)
