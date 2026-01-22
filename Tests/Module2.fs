@@ -17,7 +17,7 @@ open System.Collections.Generic
 module Module2 =
  open Exceptions
 
- let tests : Test =
+ let tests =
     testList "extensions Tests" [
 
 
