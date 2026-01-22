@@ -19,9 +19,12 @@ module Array =
     /// <returns>The value of the Array at the given index.</returns>
     /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
     let inline get index (arr: 'T[]) : 'T =
+        #if UNCHECKED
+            getUnCkd index arr
+        #else
         if isNull arr then nullExn "get"
         arr.Get index
-
+        #endif
 
     /// <summary>Sets an element of a Array. (use Array.setNeg(i) function if you want to use negative indices too)</summary>
     /// <param name="index">The input index.</param>
@@ -29,8 +32,12 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
     let inline set index value (arr: 'T[]) : unit =
-        if isNull arr then nullExn "set"
-        arr.Set index value
+        #if UNCHECKED
+            setUnCkd index value arr
+        #else
+            if isNull arr then nullExn "set"
+            arr.Set index value
+        #endif
 
 
     //---------------------------------------------------

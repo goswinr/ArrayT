@@ -27,21 +27,33 @@ module AutoOpenArrayTExtensions =
         /// including the bad index and the Array content.
         /// (Use this.GetNeg(i) member if you want to use negative indices too)
         member inline xs.Get index : 'T =
-            if index < 0 || index >= xs.Length then badGetExn index xs "Get"
-            xs.[index]
+            #if UNCHECKED
+                getUnCkd index xs
+            #else
+                if index < 0 || index >= xs.Length then badGetExn index xs "Get"
+                xs.[index]
+            #endif
 
         /// Gets an item at index, same as this.[index] or this.Get(index)
         /// Throws a descriptive Exception if the index is out of range.
         /// (Use this.GetNeg(i) member if you want to use negative indices too)
         member inline xs.Idx index : 'T =
-            if index < 0 || index >= xs.Length then badGetExn index xs "Idx"
-            xs.[index]
+            #if UNCHECKED
+                getUnCkd index xs
+            #else
+                if index < 0 || index >= xs.Length then badGetExn index xs "Idx"
+                xs.[index]
+            #endif
 
         /// Sets an item at index
         /// (Use this.SetNeg(i) member if you want to use negative indices too)
         member inline xs.Set index value : unit =
-            if index < 0 || index >= xs.Length then badSetExn index xs "Set" value
-            xs.[index] <- value
+            #if UNCHECKED
+                setUnCkd index value xs
+            #else
+                if index < 0 || index >= xs.Length then badSetExn index xs "Set" value
+                xs.[index] <- value
+            #endif
 
 
         /// Gets the index of the last item in the Array.

@@ -3,9 +3,30 @@ namespace ArrayT
 open System
 open System.Collections.Generic
 
+#if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+open Fable.Core.JsInterop
+#endif
+
 
 [<Obsolete("Not Obsolete but hidden, needs to be visible for inlining")>]
 module UtilArray =
+
+    /// Gets the value at index i, skipping bounds check in compiled JS code.
+    let inline getUnCkd (i:int) (arr:'T[]) : 'T =
+        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+            emitJsExpr (arr,i) "$0[$1]"
+        #else
+            arr.[i]
+        #endif
+
+
+    /// Sets the value at index i, skipping bounds check in compiled JS code.
+    let inline setUnCkd (i:int) (v:'T) (arr:'T[]) : unit =
+        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+            emitJsStatement (arr,i,v) "$0[$1] = $2"
+        #else
+            arr.[i] <- v
+        #endif
 
 
     /// Converts negative indices to positive ones.
