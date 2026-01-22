@@ -11,7 +11,7 @@ module Extensions =
     open Expecto
     #endif
 
-    let tests =
+    let tests : Test =
       testList "extensions Tests" [
 
         test "Intro: 9=9" {Expect.equal 9 9 "Intro"}

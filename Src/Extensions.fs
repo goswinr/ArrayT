@@ -20,27 +20,27 @@ module AutoOpenArrayTExtensions =
         /// Just replace 'myArray.[3]' with 'myArray.DebugIdx.[3]'
         /// Throws a nice descriptive Exception if the index is out of range
         /// including the bad index and the array content.
-        member xs.DebugIdx =
+        member xs.DebugIdx : DebugIndexer<'T> =
             new DebugIndexer<'T>(xs)
 
         /// Gets an item at index, same as this.[index] or this.Idx(index)
         /// Throws a descriptive Exception if the index is out of range
         /// including the bad index and the Array content.
         /// (Use this.GetNeg(i) member if you want to use negative indices too)
-        member inline xs.Get index =
+        member inline xs.Get index : 'T =
             if index < 0 || index >= xs.Length then badGetExn index xs "Get"
             xs.[index]
 
         /// Gets an item at index, same as this.[index] or this.Get(index)
         /// Throws a descriptive Exception if the index is out of range.
         /// (Use this.GetNeg(i) member if you want to use negative indices too)
-        member inline xs.Idx index =
+        member inline xs.Idx index : 'T =
             if index < 0 || index >= xs.Length then badGetExn index xs "Idx"
             xs.[index]
 
         /// Sets an item at index
         /// (Use this.SetNeg(i) member if you want to use negative indices too)
-        member inline xs.Set index value =
+        member inline xs.Set index value : unit =
             if index < 0 || index >= xs.Length then badSetExn index xs "Set" value
             xs.[index] <- value
 
@@ -48,7 +48,7 @@ module AutoOpenArrayTExtensions =
         /// Gets the index of the last item in the Array.
         /// Equal to this.Length - 1
         /// Returns -1 for empty Array.
-        member inline xs.LastIndex =
+        member inline xs.LastIndex : int =
             // don't fail so that a loop for i=0 to xs.LastIndex will work for empty Array
             //if xs.Length = 0 then IndexOutOfRangeException.Raise "array.LastIndex: Failed to get LastIndex of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
             xs.Length - 1
@@ -56,20 +56,20 @@ module AutoOpenArrayTExtensions =
         /// Get (or set) the last item in the Array.
         /// Equal to this.[this.Length - 1]
         member inline xs.Last
-            with get () =
+            with get () : 'T =
                 if xs.Length = 0 then badGetExn xs.LastIndex xs "Last"
                 xs.[xs.Length - 1]
-            and set (v: 'T) =
+            and set (v: 'T) : unit =
                 if xs.Length = 0 then badSetExn xs.LastIndex xs "Last" v
                 xs.[xs.Length - 1] <- v
 
         /// Get (or set) the second last item in the Array.
         /// Equal to this.[this.Length - 2]
         member inline xs.SecondLast
-            with get () =
+            with get () : 'T =
                 if xs.Length < 2 then badGetExn (xs.Length - 2) xs "SecondLast"
                 xs.[xs.Length - 2]
-            and set (v: 'T) =
+            and set (v: 'T) : unit =
                 if xs.Length < 2 then badSetExn (xs.Length - 2) xs "SecondLast" v
                 xs.[xs.Length - 2] <- v
 
@@ -77,20 +77,20 @@ module AutoOpenArrayTExtensions =
         /// Get (or set) the third last item in the Array.
         /// Equal to this.[this.Length - 3]
         member inline xs.ThirdLast
-            with get () =
+            with get () : 'T =
                 if xs.Length < 3 then badGetExn (xs.Length - 3) xs "ThirdLast"
                 xs.[xs.Length - 3]
-            and set (v: 'T) =
+            and set (v: 'T) : unit =
                 if xs.Length < 3 then badSetExn (xs.Length - 3) xs "ThirdLast" v
                 xs.[xs.Length - 3] <- v
 
         /// Get (or set) the first item in the Array.
         /// Equal to this.[0]
         member inline xs.First
-            with get () =
+            with get () : 'T =
                 if xs.Length = 0 then badGetExn 0 xs "First"
                 xs.[0]
-            and set (v: 'T) =
+            and set (v: 'T) : unit =
                 if xs.Length = 0 then badSetExn 0 xs "First" v
                 xs.[0] <- v
 
@@ -105,47 +105,47 @@ module AutoOpenArrayTExtensions =
         /// Get (or set) the second item in the Array.
         /// Equal to this.[1]
         member inline xs.Second
-            with get () =
+            with get () : 'T =
                 if xs.Length < 2 then badGetExn 1 xs "Second"
                 xs.[1]
-            and set (v: 'T) =
+            and set (v: 'T) : unit =
                 if xs.Length < 2 then badSetExn 1 xs "Second" v
                 xs.[1] <- v
 
         /// Get (or set) the third item in the Array.
         /// Equal to this.[2]
         member inline xs.Third
-            with get () =
+            with get () : 'T =
                 if xs.Length < 3 then badGetExn 2 xs "Third"
                 xs.[2]
-            and set (v: 'T) =
+            and set (v: 'T) : unit =
                 if xs.Length < 3 then badSetExn 2 xs "Third" v
                 xs.[2] <- v
 
         /// Checks if this.Length = 0
-        member inline xs.IsEmpty =
+        member inline xs.IsEmpty : bool =
             xs.Length = 0
 
 
         /// Checks if this.Length = 1
-        member inline xs.IsSingleton =
+        member inline xs.IsSingleton : bool =
             xs.Length = 1
 
         /// Checks if this.Length > 0
         /// Same as xs.HasItems
-        member inline xs.IsNotEmpty =
+        member inline xs.IsNotEmpty : bool =
             xs.Length > 0
 
         /// Checks if this.Length > 0
         /// Same as xs.IsNotEmpty
-        member inline xs.HasItems =
+        member inline xs.HasItems : bool =
             xs.Length > 0
 
 
         /// Gets an item in the Array by index.
         /// Allows for negative index too ( -1 is last item,  like Python)
         /// (From the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-        member inline xs.GetNeg index =
+        member inline xs.GetNeg index : 'T =
             let len = xs.Length
             let ii = if index < 0 then len + index else index
             if ii < 0 || ii >= len then badGetExn index xs "GetNeg"
@@ -154,7 +154,7 @@ module AutoOpenArrayTExtensions =
         /// Sets an item in the Array by index.
         /// Allows for negative index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-        member inline xs.SetNeg index value =
+        member inline xs.SetNeg index value : unit =
             let len = xs.Length
             let ii = if index < 0 then len + index else index
             if ii < 0 || ii >= len then badSetExn index xs "SetNeg" value
@@ -162,7 +162,7 @@ module AutoOpenArrayTExtensions =
 
         /// Any index will return a value.
         /// Array is treated as an endless loop in positive and negative direction
-        member inline xs.GetLooped index =
+        member inline xs.GetLooped index : 'T =
             let len = xs.Length
             if len = 0 then badGetExn index xs "GetLooped"
             let t = index % len
@@ -171,7 +171,7 @@ module AutoOpenArrayTExtensions =
 
         /// Any index will set a value.
         /// Array is treated as an endless loop in positive and negative direction
-        member inline xs.SetLooped index value =
+        member inline xs.SetLooped index value : unit =
             let len = xs.Length
             if len = 0 then badSetExn index xs "SetLooped" value
             let t = index % len
@@ -181,14 +181,14 @@ module AutoOpenArrayTExtensions =
         /// Raises an Exception if the Array is empty
         /// (Useful for chaining)
         /// Returns the input Array
-        member inline xs.FailIfEmpty (errorMessage: string) =
+        member inline xs.FailIfEmpty (errorMessage: string) : 'T[] =
             if xs.Length = 0 then raise <| Exception("Array.FailIfEmpty: " + errorMessage)
             xs
 
         /// Raises an Exception if the Array has less than count items.
         /// (Useful for chaining)
         /// Returns the input Array
-        member inline xs.FailIfLessThan(count, errorMessage: string) =
+        member inline xs.FailIfLessThan(count, errorMessage: string) : 'T[] =
             if xs.Length < count then raise <| Exception($"Array.FailIfLessThan {count}: {errorMessage}")
             xs
 

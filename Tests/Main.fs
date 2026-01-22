@@ -14,7 +14,7 @@ module Main =
 
     open Expecto
     [<EntryPoint>]
-    let main argv =
+    let main argv : int =
         runTestsWithCLIArgs [] [||] Tests.Extensions.tests
         |||
         runTestsWithCLIArgs [] [||] Tests.Module2.tests
