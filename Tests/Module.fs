@@ -13,21 +13,21 @@ open System.Collections.Generic
 
 type Assert =
 
-    static member AreEqual(expected : 'T[], actual : 'T[], message : string) =
+    static member AreEqual(expected : 'T[], actual : 'T[], message : string) : unit =
         if  expected <> actual then
             failwithf  "%s: AreEqual Expected \r\n%A \r\nbut got \r\n%A" message expected actual
 
-    static member AreNotEqual(expected : 'T[], actual : 'T[], message : string) =
+    static member AreNotEqual(expected : 'T[], actual : 'T[], message : string) : unit =
         if expected = actual then
             failwithf "%s: AreNotEqual expected \r\n%A \r\n NOT to equal \r\n%A" message expected actual
             Exception message |> raise
 
-    static member AreEqual(expected : 'T[], actual : 'T[]) =
+    static member AreEqual(expected : 'T[], actual : 'T[]) : unit =
         if  expected <> actual then
             failwithf "AreEqual expected \r\n%A \r\nbut got \r\n%A" expected actual
 
 
-    static member AreEqual(expected : 'T option, actual : 'T option) =
+    static member AreEqual(expected : 'T option, actual : 'T option) : unit =
         match expected, actual with
         | None, None -> ()
         | None, Some _
@@ -35,26 +35,26 @@ type Assert =
         | Some e, Some a ->
             if not <| e.Equals(a) then failwithf "AreEqual expected \r\n%A \r\nbut got \r\n%A" expected actual
 
-    static member AreEqual(expected : float, actual : float) =
+    static member AreEqual(expected : float, actual : float) : unit =
         //use a tolerance the first 12 digits for float comparisons
         let tol = abs expected * 1e-12 + abs actual * 1e-12
         if abs(expected-actual) > tol then
             failwithf "AreEqual expected \r\n%A \r\nbut got \r\n%A" expected actual
 
-    static member AreEqual(expected : string, actual : string) =
+    static member AreEqual(expected : string, actual : string) : unit =
         if expected <> actual then
             failwithf "AreEqual expected \r\n%A \r\nbut got \r\n%A" expected actual
 
 
-    static member Fail(message : string) = Exception(message) |> raise
+    static member Fail(message : string) : unit = Exception(message) |> raise
 
-    static member Fail() = Assert.Fail("")
+    static member Fail() : unit = Assert.Fail("")
 
-    static member True(condition : bool) =
+    static member True(condition : bool) : unit =
         if not condition then
             Exception("Assertion failed: Expected true but got false") |> raise
 
-    static member False(condition) =
+    static member False(condition) : unit =
         if condition then
             Exception("Assertion failed: Expected false but got true") |> raise
 
@@ -63,7 +63,7 @@ module Exceptions =
 
     /// Check that the lambda throws an exception of the given type. Otherwise
     /// calls Assert.Fail()
-    let CheckThrowsExn<'a when 'a :> exn> (f : unit -> unit) =
+    let CheckThrowsExn<'a when 'a :> exn> (f : unit -> unit) : unit =
         #if FABLE_COMPILER
             Expect.throws f "CheckThrowsExn"
         #else
@@ -75,7 +75,7 @@ module Exceptions =
             | e -> sprintf "Expected %O exception, got: %O" typeof<'a> e |> Assert.Fail
         #endif
 
-    let private CheckThrowsExn2<'a when 'a :> exn> _s (f : unit -> unit) =
+    let private CheckThrowsExn2<'a when 'a :> exn> _s (f : unit -> unit) : unit =
 
         #if FABLE_COMPILER
             Expect.throws f "CheckThrowsExn2"
@@ -95,10 +95,10 @@ module Exceptions =
         #endif
 
 
-    let throwsRange   f = CheckThrowsExn<IndexOutOfRangeException>    f
+    let throwsRange   f : unit = CheckThrowsExn<IndexOutOfRangeException>    f
 
-    let throwsNull f = CheckThrowsExn<ArgumentNullException>    f
-    let throwsArg f = CheckThrowsExn<ArgumentException>    f
+    let throwsNull f : unit = CheckThrowsExn<ArgumentNullException>    f
+    let throwsArg f : unit = CheckThrowsExn<ArgumentException>    f
 
 
 
@@ -106,16 +106,16 @@ module Exceptions =
 module ExtensionOnArray =
 
 
-    let inline (==) (a: 'T[]) b =  a = b
-    let inline (<!>) (a: 'T[]) b =  a <>b
-    let inline (=++=) (a: 'T[]* 'T[]) (b: 'T[]* 'T[]) = (fst a == fst b) && (snd a == snd b)
-    let inline (<!!>) (a: 'T[]* 'T[]) (b: 'T[]* 'T[]) = (fst a <!> fst b) || (snd a <!> snd b)
-    let inline (<!!!>) (aaa: 'T[]* 'T[]* 'T[]) (bbb: 'T[]* 'T[]* 'T[]) =
+    let inline (==) (a: 'T[]) b : bool =  a = b
+    let inline (<!>) (a: 'T[]) b : bool =  a <>b
+    let inline (=++=) (a: 'T[]* 'T[]) (b: 'T[]* 'T[]) : bool = (fst a == fst b) && (snd a == snd b)
+    let inline (<!!>) (a: 'T[]* 'T[]) (b: 'T[]* 'T[]) : bool = (fst a <!> fst b) || (snd a <!> snd b)
+    let inline (<!!!>) (aaa: 'T[]* 'T[]* 'T[]) (bbb: 'T[]* 'T[]* 'T[]) : bool =
         let a,b,c = aaa
         let x,y,z = bbb
         (a <!> x) || (b <!> y) || (c <!> z)
 
-    let inline (=+=) (aa:'T[][]) (bb:'T[][]) =
+    let inline (=+=) (aa:'T[][]) (bb:'T[][]) : bool =
         let rec eq i =
             if i < aa.Length then
                 let a = aa.[i]
@@ -127,7 +127,7 @@ module ExtensionOnArray =
         eq 0
 
 
-    let eqi (rarr1: ('K* 'T[])[]) (rarr2: ('K* 'T[])[]) =
+    let eqi (rarr1: ('K* 'T[])[]) (rarr2: ('K* 'T[])[]) : bool =
         if rarr1.Length <> rarr2.Length then false
         else
             let rec eq i =
@@ -140,5 +140,5 @@ module ExtensionOnArray =
                     true
             eq 0
 
-    let inline (<*>) a b = not <| eqi a b
+    let inline (<*>) a b : bool = not <| eqi a b
     //let inline (=*=) a b = eqi a b

@@ -18,7 +18,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The value of the Array at the given index.</returns>
     /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
-    let inline get index (arr: 'T[]) =
+    let inline get index (arr: 'T[]) : 'T =
         if isNull arr then nullExn "get"
         arr.Get index
 
@@ -28,7 +28,7 @@ module Array =
     /// <param name="value">The input value.</param>
     /// <param name="arr">The input Array.</param>
     /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the index is negative or the input Array does not contain enough elements.</exception>
-    let inline set index value (arr: 'T[]) =
+    let inline set index value (arr: 'T[]) : unit =
         if isNull arr then nullExn "set"
         arr.Set index value
 
@@ -40,14 +40,14 @@ module Array =
     /// Raises an Exception if the Array is empty.
     /// (Useful for chaining)
     /// Returns the input Array
-    let inline failIfEmpty (errorMessage: string) (arr: 'T[]) =
+    let inline failIfEmpty (errorMessage: string) (arr: 'T[]) : 'T[] =
         if arr.Length = 0 then raise <| Exception("Array.FailIfEmpty: " + errorMessage)
         arr
 
     /// Raises an Exception if the Array has less then count items.
     /// (Useful for chaining)
     /// Returns the input Array
-    let failIfLessThan (count) (errorMessage: string) (arr: 'T[]) =
+    let failIfLessThan (count) (errorMessage: string) (arr: 'T[]) : 'T[] =
         if arr.Length < count then raise <| Exception($"Array.FailIfLessThan {count}: {errorMessage}")
         arr
 
@@ -55,7 +55,7 @@ module Array =
     /// Gets an item in the Array by index.
     /// Allows for negative index too ( -1 is last item,  like Python)
     /// (a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    let inline getNeg index (arr: 'T[]) =
+    let inline getNeg index (arr: 'T[]) : 'T =
         if isNull arr then nullExn "getNeg"
         arr.GetNeg index
 
@@ -63,56 +63,56 @@ module Array =
     /// Sets an item in the Array by index.
     /// Allows for negative index too ( -1 is last item,  like Python)
     /// (a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    let inline setNeg index value (arr: 'T[]) =
+    let inline setNeg index value (arr: 'T[]) : unit =
         if isNull arr then nullExn "setNeg"
         arr.SetNeg index value
 
     /// Any index will return a value.
     /// Array is treated as an endless loop in positive and negative direction
-    let inline getLooped index (arr: 'T[]) =
+    let inline getLooped index (arr: 'T[]) : 'T =
         if isNull arr then nullExn "getLooped"
         arr.GetLooped index
 
     /// Any index will set a value.
     /// Array is treated as an endless loop in positive and negative direction
-    let inline setLooped index value (arr: 'T[]) =
+    let inline setLooped index value (arr: 'T[]) : unit =
         if isNull arr then nullExn "setLooped"
         arr.SetLooped index value
 
 
     /// Gets the second last item in the Array.
     /// Same as this.[this.Length - 2]
-    let inline secondLast (arr: 'T[]) =
+    let inline secondLast (arr: 'T[]) : 'T =
         if isNull arr then nullExn "secondLast"
         arr.SecondLast
 
     /// Gets the third last item in the Array.
     /// Same as this.[this.Length - 3]
-    let inline thirdLast (arr: 'T[]) =
+    let inline thirdLast (arr: 'T[]) : 'T =
         if isNull arr then nullExn "thirdLast"
         arr.ThirdLast
 
     /// Gets the first item in the Array.
     /// Same as this.[0]
-    let inline first (arr: 'T[]) =
+    let inline first (arr: 'T[]) : 'T =
         if isNull arr then nullExn "first"
         arr.First
 
     /// Gets the only item in the Array.
     /// Fails if the Array does not have exactly one element.
-    let inline firstAndOnly (arr: 'T[]) =
+    let inline firstAndOnly (arr: 'T[]) : 'T =
         if isNull arr then nullExn "firstAndOnly"
         arr.FirstAndOnly
 
     /// Gets the second item in the Array.
     /// Same as this.[1]
-    let inline second (arr: 'T[]) =
+    let inline second (arr: 'T[]) : 'T =
         if isNull arr then nullExn "second"
         arr.Second
 
     /// Gets the third item in the Array.
     /// Same as this.[2]
-    let inline third (arr: 'T[]) =
+    let inline third (arr: 'T[]) : 'T =
         if isNull arr then nullExn "third"
         arr.Third
 
@@ -150,7 +150,7 @@ module Array =
     /// Yields Seq from (first, second)  up to (second-last, last).
     /// Not looped.
     /// The resulting seq is one element shorter than the input Array.
-    let windowed2 (arr: 'T[]) =
+    let windowed2 (arr: 'T[]) : seq<'T * 'T> =
         if isNull arr then nullExn "windowed2"
         if arr.Length < 2 then fail arr "windowed2: input has less than two items"
         seq {
@@ -160,7 +160,7 @@ module Array =
 
     /// Yields looped Seq from (first, second)  up to (last, first).
     /// The resulting seq has the same element count as the input Array.
-    let thisNext (arr: 'T[]) =
+    let thisNext (arr: 'T[]) : seq<'T * 'T> =
         if isNull arr then nullExn "thisNext"
         if arr.Length < 2 then fail arr "thisNext: input has less than two items"
         seq {
@@ -171,7 +171,7 @@ module Array =
 
     /// Yields looped Seq from (last,first)  up to (second-last, last).
     /// The resulting seq has the same element count as the input Array.
-    let prevThis (arr: 'T[]) =
+    let prevThis (arr: 'T[]) : seq<'T * 'T> =
         if isNull arr then nullExn "prevThis"
         if arr.Length < 2 then fail arr "prevThis: input has less than two items"
         seq {
@@ -183,7 +183,7 @@ module Array =
     /// Yields Seq from (first, second, third)  up to (third-last, second-last, last).
     /// Not looped.
     /// The resulting seq is two elements shorter than the input Array.
-    let windowed3 (arr: 'T[]) =
+    let windowed3 (arr: 'T[]) : seq<'T * 'T * 'T> =
         if isNull arr then nullExn "windowed3"
         if arr.Length < 3 then fail arr "windowed3: input has less than three items"
         seq {
@@ -193,7 +193,7 @@ module Array =
 
     /// Yields looped Seq of  from (last, first, second)  up to (second-last, last, first).
     /// The resulting seq has the same element count as the input Array.
-    let prevThisNext (arr: 'T[]) =
+    let prevThisNext (arr: 'T[]) : seq<'T * 'T * 'T> =
         if isNull arr then nullExn "prevThisNext"
         if arr.Length < 3 then fail arr "prevThisNext: input has less than three items"
         seq {
@@ -206,7 +206,7 @@ module Array =
     /// Yields Seq from (0,first, second)  up to (lastIndex-1 , second-last, last).
     /// Not looped.
     /// The resulting seq is one element shorter than the input Array.
-    let windowed2i (arr: 'T[]) =
+    let windowed2i (arr: 'T[]) : seq<int * 'T * 'T> =
         if isNull arr then nullExn "windowed2i"
         if arr.Length < 2 then fail arr "windowed2i: input has less than two items"
         seq {
@@ -216,7 +216,7 @@ module Array =
 
     /// Yields looped Seq  from (0,first, second)  up to (lastIndex, last, first).
     /// The resulting seq has the same element count as the input Array.
-    let iThisNext (arr: 'T[]) =
+    let iThisNext (arr: 'T[]) : seq<int * 'T * 'T> =
         if isNull arr then nullExn "iThisNext"
         if arr.Length < 2 then fail arr "iThisNext input has less than two items"
         seq {
@@ -228,7 +228,7 @@ module Array =
     /// Yields Seq from (1, first, second, third)  up to (lastIndex-1 , third-last, second-last, last).
     /// Not looped.
     /// The resulting seq is two elements shorter than the input Array.
-    let windowed3i (arr: 'T[]) =
+    let windowed3i (arr: 'T[]) : seq<int * 'T * 'T * 'T> =
         if isNull arr then nullExn "windowed3i"
         if arr.Length < 3 then fail arr "windowed3i: input has less than three items"
         seq {
@@ -238,7 +238,7 @@ module Array =
 
     /// Yields looped Seq from (1, last, first, second)  up to (lastIndex, second-last, last, first)
     /// The resulting seq has the same element count as the input Array.
-    let iPrevThisNext (arr: 'T[]) =
+    let iPrevThisNext (arr: 'T[]) : seq<int * 'T * 'T * 'T> =
         if isNull arr then nullExn "iPrevThisNext"
         if arr.Length < 3 then fail arr "iPrevThisNext: input has less than three items"
         seq {
@@ -253,7 +253,7 @@ module Array =
     /// <summary>Returns a Array that contains one item only.</summary>
     /// <param name="value">The input item.</param>
     /// <returns>The result Array of one item.</returns>
-    let inline singleton value =
+    let inline singleton value : 'T[] =
         // allow null values so that Array.singleton [] is valid
         // allow null values so that Array.singleton None is valid
         [| value |]
@@ -461,7 +461,7 @@ module Array =
             m
         *)
 
-        let inline simple2 cmpF (arr: 'T[]) =
+        let inline simple2 cmpF (arr: 'T[]) : 'T * 'T =
             if arr.Length < 2 then fail arr "MinMax.simple2: Count must be at least two"
             let mutable m1 = arr.[0]
             let mutable m2 = arr.[1]
@@ -476,7 +476,7 @@ module Array =
 
 
         /// If any are equal then the  order is kept by using ( a=b || ) since the compare operate does not include the equal test
-        let inline sort3 cmp a b c =
+        let inline sort3 cmp a b c : 'T * 'T * 'T =
             if a = b || cmp a b then
                 if cmp b c then a, b, c
                 else if cmp a c then a, c, b
@@ -490,7 +490,7 @@ module Array =
 
 
         /// If any are equal then the  order is kept by using ( a=b || ) since the compare operate does not include the equal test
-        let inline indexOfSort3By f cmp aa bb cc =
+        let inline indexOfSort3By f cmp aa bb cc : int * int * int =
             let a = f aa
             let b = f bb
             let c = f cc
@@ -505,7 +505,7 @@ module Array =
             else
                 2, 1, 0
 
-        let inline simple3 cmpF (arr: 'T[]) =
+        let inline simple3 cmpF (arr: 'T[]) : 'T * 'T * 'T =
             if arr.Length < 3 then fail arr "MinMax.simple3: Count must be at least three"
             let e1 = arr.[0]
             let e2 = arr.[1]
@@ -525,7 +525,7 @@ module Array =
                     m3 <- this
             m1, m2, m3
 
-        let inline indexByFun cmpF func (arr: 'T[]) =
+        let inline indexByFun cmpF func (arr: 'T[]) : int =
             if arr.Length < 1 then fail arr "MinMax.indexByFun: Count must be at least one"
             let mutable f = func arr.[0]
             let mutable mf = f
@@ -537,7 +537,7 @@ module Array =
                     mf <- f
             ii
 
-        let inline index2ByFun cmpF func (arr: 'T[]) =
+        let inline index2ByFun cmpF func (arr: 'T[]) : int * int =
             if arr.Length < 2 then fail arr "MinMax.index2ByFun: Count must be at least two"
             let mutable i1 = 0
             let mutable i2 = 1
@@ -556,7 +556,7 @@ module Array =
                     mf2 <- f
             i1, i2
 
-        let inline index3ByFun (cmpOp: 'U -> 'U -> bool) (byFun: 'T -> 'U) (arr: 'T[]) =
+        let inline index3ByFun (cmpOp: 'U -> 'U -> bool) (byFun: 'T -> 'U) (arr: 'T[]) : int * int * int =
             if arr.Length < 3 then fail arr "MinMax.index3ByFun: Count must be at least three"
             // sort first 3
             let mutable i1, i2, i3 = indexOfSort3By byFun cmpOp arr.[0] arr.[1] arr.[2] // otherwise would fail on sorting first 3, test on Array([5;6;3;1;2;0])|> Array.max3
@@ -612,13 +612,13 @@ module Array =
 
     /// Returns the smallest and the second smallest element of the Array.
     /// If they are equal then the order is kept
-    let inline min2 arr =
+    let inline min2 arr : 'T * 'T =
         if isNull arr then nullExn "min2"
         arr |> MinMax.simple2 (<)
 
     /// Returns the biggest and the second biggest element of the Array.
     /// If they are equal then the  order is kept
-    let inline max2 arr =
+    let inline max2 arr : 'T * 'T =
         if isNull arr then nullExn "max2"
         arr |> MinMax.simple2 (>)
 
@@ -627,7 +627,7 @@ module Array =
     /// Returns the smallest and the second smallest element of the Array.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline min2By f arr =
+    let inline min2By f arr : 'T * 'T =
         if isNull arr then nullExn "min2By"
         let i, ii = arr |> MinMax.index2ByFun (<) f
         arr.[i], arr.[ii]
@@ -635,7 +635,7 @@ module Array =
     /// Returns the biggest and the second biggest element of the Array.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline max2By f arr =
+    let inline max2By f arr : 'T * 'T =
         if isNull arr then nullExn "max2By"
         let i, ii = arr |> MinMax.index2ByFun (>) f
         arr.[i], arr.[ii]
@@ -643,14 +643,14 @@ module Array =
     /// Returns the indices of the smallest and the second smallest element of the Array.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline min2IndicesBy f arr =
+    let inline min2IndicesBy f arr : int * int =
         if isNull arr then nullExn "min2IndicesBy"
         arr |> MinMax.index2ByFun (<) f
 
     /// Returns the indices of the biggest and the second biggest element of the Array.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline max2IndicesBy f arr =
+    let inline max2IndicesBy f arr : int * int =
         if isNull arr then nullExn "max2IndicesBy"
         arr |> MinMax.index2ByFun (>) f
 
@@ -658,14 +658,14 @@ module Array =
     /// Returns the smallest three elements of the Array.
     /// The first element is the smallest, the second is the second smallest and the third is the third smallest.
     /// If they are equal then the order is kept
-    let inline min3 arr =
+    let inline min3 arr : 'T * 'T * 'T =
         if isNull arr then nullExn "min3"
         arr |> MinMax.simple3 (<)
 
     /// Returns the biggest three elements of the Array.
     /// The first element is the biggest, the second is the second biggest and the third is the third biggest.
     /// If they are equal then the order is kept
-    let inline max3 arr =
+    let inline max3 arr : 'T * 'T * 'T =
         if isNull arr then nullExn "max3"
         arr |> MinMax.simple3 (>)
 
@@ -673,7 +673,7 @@ module Array =
     /// The first element is the smallest, the second is the second smallest and the third is the third smallest.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline min3By f arr =
+    let inline min3By f arr : 'T * 'T * 'T =
         if isNull arr then nullExn "min3By"
         let i, ii, iii = arr |> MinMax.index3ByFun (<) f
         arr.[i], arr.[ii], arr.[iii]
@@ -682,7 +682,7 @@ module Array =
     /// The first element is the biggest, the second is the second biggest and the third is the third biggest.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline max3By f arr =
+    let inline max3By f arr : 'T * 'T * 'T =
         if isNull arr then nullExn "max3By"
         let i, ii, iii = arr |> MinMax.index3ByFun (>) f
         arr.[i], arr.[ii], arr.[iii]
@@ -691,7 +691,7 @@ module Array =
     /// The first element is the index of the smallest, the second is the index of the second smallest and the third is the index of the third smallest.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline min3IndicesBy f arr =
+    let inline min3IndicesBy f arr : int * int * int =
         if isNull arr then nullExn "min3IndicesBy"
         arr |> MinMax.index3ByFun (<) f
 
@@ -699,7 +699,7 @@ module Array =
     /// The first element is the index of the biggest, the second is the index of the second biggest and the third is the index of the third biggest.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the order is kept
-    let inline max3IndicesBy f arr =
+    let inline max3IndicesBy f arr : int * int * int =
         if isNull arr then nullExn "max3IndicesBy"
         arr |> MinMax.index3ByFun (>) f
 
@@ -809,7 +809,7 @@ module Array =
     /// Returns all elements that exists more than once in Array.
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
-    let duplicates (arr: 'T[]) =
+    let duplicates (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "duplicates"
         let h = HashSet<'T>()
         let t = HashSet<'T>()
@@ -820,7 +820,7 @@ module Array =
     /// Returns all elements that exists more than once in Array.
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
-    let duplicatesBy (f: 'T -> 'U) (arr: 'T[]) =
+    let duplicatesBy (f: 'T -> 'U) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "duplicatesBy"
         let h = HashSet<'U>()
         let t = HashSet<'U>()
@@ -830,7 +830,7 @@ module Array =
 
 
     /// Checks if a given array matches the content in Array at a given index
-    let matches (searchFor:'T[]) atIdx (searchIn:'T[]) :bool =
+    let matches (searchFor:'T[]) atIdx (searchIn:'T[]) : bool =
         if isNull searchFor then nullExn "matches"
         if atIdx < 0                then fail searchIn <| sprintf "matches: atIdx Index is too small: %d for array of %d items" atIdx searchIn.Length
         if atIdx >= searchIn.Length then fail searchIn <| sprintf "matches: atIdx Index is too big: %d for array of %d items" atIdx searchIn.Length
@@ -848,7 +848,7 @@ module Array =
     /// Find first index where searchFor occurs in searchIn array.
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
-    let findValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])  :int =
+    let findValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[]) : int =
         if isNull searchIn then nullExn "findValue"
         if fromIdx < 0                then fail searchIn <| sprintf "findValue: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findValue: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
@@ -863,7 +863,7 @@ module Array =
     /// Find last index where searchFor occurs in searchIn array. Searching from end.
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
-    let findLastValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])   :int =
+    let findLastValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[]) : int =
         if isNull searchIn then nullExn "findLastValue"
         if fromIdx < 0                then fail searchIn <| sprintf "findLastValue: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findLastValue: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
@@ -878,7 +878,7 @@ module Array =
     /// Find first index where searchFor array occurs in searchIn array.
     /// Give lower and upper bound index for search space.
     /// Returns index of first element or -1 if not found
-    let findArray (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[])   :int =
+    let findArray (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[]) : int =
         if isNull searchIn then nullExn "findArray`"
         if fromIdx < 0                then fail searchIn <| sprintf "findArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
@@ -897,7 +897,7 @@ module Array =
     /// Find last index where searchFor array occurs in searchIn array. Searching from end.
     /// Give lower and upper bound index for search space.
     /// Returns index of first element  or -1 if not found
-    let findLastArray (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[])   :int =
+    let findLastArray (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[]) : int =
         if isNull searchIn then nullExn "findLastArray"
         if fromIdx < 0                then fail searchIn <| sprintf "findLastArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findLastArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
@@ -918,7 +918,7 @@ module Array =
     /// <param name="predicate">The function to test the current index.</param>
     /// <param name="arr">The input array.</param>
     /// <returns>An array containing the elements for which the given predicate returns true.</returns>
-    let filteri (predicate: int -> bool) (arr: 'T[]) =
+    let filteri (predicate: int -> bool) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "filteri"
         let res = ResizeArray()
         for i = 0 to arr.Length - 1 do
