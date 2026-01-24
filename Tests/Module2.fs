@@ -934,7 +934,7 @@ module Module2 =
             throwsNull (fun () -> Array.asArray ra |> ignore)
 
         testCase "Array.ofIList creates array from IList" <| fun _ ->
-            let list : IList<int> = [1; 2; 3] :> IList<int>
+            let list : IList<int> = ResizeArray<int>([1; 2; 3])
             let result = Array.ofIList list
             Expect.isTrue (result = [|1; 2; 3|]) "ofIList"
 
