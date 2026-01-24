@@ -177,7 +177,30 @@ module Extensions =
             Expect.equal xs.Second 6 "Expected Second to be changed to the new value"
 
         //---- xs.Third ----
-        // Similar tests can be written for Third
+        testCase "Third getter raises exception on Array with less than 3 items" <| fun _ ->
+            let xs = [| 1; 2|]
+            let testCode = fun () -> xs.Third |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "Third setter raises exception on Array with less than 3 items" <| fun _ ->
+            let xs = [| 1; 2|]
+            let testCode = fun () -> xs.Third <- 1
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "Third getter returns third item on Array with 3 or more items" <| fun _ ->
+            let xs = [| 1; 2; 3; 4; 5|]
+            let thirdItem = xs.Third
+            Expect.equal thirdItem 3 "Expected Third to be equal to the third item in the Array"
+
+        testCase "Third setter changes third item on Array with 3 or more items" <| fun _ ->
+            let xs = [| 1; 2; 3; 4; 5|]
+            xs.Third <- 6
+            Expect.equal xs.Third 6 "Expected Third to be changed to the new value"
+
+        testCase "Third getter on empty Array raises exception" <| fun _ ->
+            let xs : int[] = [||]
+            let testCode = fun () -> xs.Third |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
 
         //---- xs.IsEmpty ----
         testCase "IsEmpty returns true for empty Array" <| fun _ ->
@@ -264,5 +287,178 @@ module Extensions =
             let s = a.ToString(3).Replace("\r\n", "\n").Trim()
             let expected = "array<Int32> with 6 items:\n  0: 1\n  1: 2\n  2: 3\n  ...\n  5: 6"
             Expect.equal s expected "toString entries"
+
+        //---- xs.FailIfEmpty ----
+        testCase "FailIfEmpty returns array when not empty" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let result = xs.FailIfEmpty("should not throw")
+            Expect.equal xs result "Expected same array to be returned"
+
+        testCase "FailIfEmpty throws on empty Array" <| fun _ ->
+            let xs : int[] = [||]
+            let testCode = fun () -> xs.FailIfEmpty("is empty") |> ignore
+            Expect.throws testCode "Expected an Exception on empty array"
+
+        //---- xs.FailIfLessThan ----
+        testCase "FailIfLessThan returns array when count is sufficient" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let result = xs.FailIfLessThan(3, "should not throw")
+            Expect.equal xs result "Expected same array to be returned"
+
+        testCase "FailIfLessThan throws when count is insufficient" <| fun _ ->
+            let xs = [| 1; 2|]
+            let testCode = fun () -> xs.FailIfLessThan(3, "too few") |> ignore
+            Expect.throws testCode "Expected an Exception when array has too few items"
+
+        testCase "FailIfLessThan returns array when count exceeds minimum" <| fun _ ->
+            let xs = [| 1; 2; 3; 4; 5|]
+            let result = xs.FailIfLessThan(3, "should not throw")
+            Expect.equal xs result "Expected same array to be returned"
+
+        //---- xs.HasItems ----
+        testCase "HasItems returns true for non-empty Array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            Expect.isTrue xs.HasItems "Expected HasItems to be true for a non-empty Array"
+
+        testCase "HasItems returns false for empty Array" <| fun _ ->
+            let xs : int[] = [||]
+            Expect.isFalse xs.HasItems "Expected HasItems to be false for an empty Array"
+
+        //---- Immutability tests for extension members ----
+        testCase "Get does not modify input array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let original = xs.Duplicate()
+            let _ = xs.Get 1
+            Expect.isTrue (xs = original) "Get should not modify input array"
+
+        testCase "GetNeg does not modify input array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let original = xs.Duplicate()
+            let _ = xs.GetNeg -1
+            Expect.isTrue (xs = original) "GetNeg should not modify input array"
+
+        testCase "GetLooped does not modify input array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let original = xs.Duplicate()
+            let _ = xs.GetLooped 5
+            Expect.isTrue (xs = original) "GetLooped should not modify input array"
+
+        testCase "Duplicate creates independent copy" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let dup = xs.Duplicate()
+            dup.[0] <- 99
+            Expect.equal xs.[0] 1 "Original array should not be modified when duplicate is changed"
+
+        testCase "Slice does not modify input array" <| fun _ ->
+            let xs = [| 1; 2; 3; 4; 5|]
+            let original = xs.Duplicate()
+            let _ = xs.Slice(1, 3)
+            Expect.isTrue (xs = original) "Slice should not modify input array"
+
+        testCase "First getter does not modify input array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let original = xs.Duplicate()
+            let _ = xs.First
+            Expect.isTrue (xs = original) "First getter should not modify input array"
+
+        testCase "Last getter does not modify input array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let original = xs.Duplicate()
+            let _ = xs.Last
+            Expect.isTrue (xs = original) "Last getter should not modify input array"
+
+        //---- Additional edge cases ----
+        testCase "DebugIndexer throws on negative index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let testCode = fun () -> xs.DebugIdx.[-1] |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "Idx gets item at index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            Expect.equal (xs.Idx 1) 2 "Idx should return the item at index"
+
+        testCase "Idx throws on invalid index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let testCode = fun () -> xs.Idx 3 |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "GetNeg with boundary negative index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            Expect.equal (xs.GetNeg -3) 1 "GetNeg -3 should return first item"
+
+        testCase "GetNeg throws when negative index is too large" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let testCode = fun () -> xs.GetNeg -4 |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "SetNeg with boundary negative index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            xs.SetNeg -3 99
+            Expect.equal xs.[0] 99 "SetNeg -3 should set first item"
+
+        testCase "SetNeg throws when negative index is too large" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let testCode = fun () -> xs.SetNeg -4 99
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "GetLooped with large positive index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            Expect.equal (xs.GetLooped 100) (xs.[100 % 3]) "GetLooped should wrap large positive index"
+
+        testCase "GetLooped with large negative index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let expected = xs.[((-100 % 3) + 3) % 3]
+            Expect.equal (xs.GetLooped -100) expected "GetLooped should wrap large negative index"
+
+        testCase "SetLooped with large positive index" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            xs.SetLooped 100 99
+            Expect.equal xs.[100 % 3] 99 "SetLooped should wrap large positive index"
+
+        testCase "Slice with negative start and positive end" <| fun _ ->
+            let xs = [| 1; 2; 3; 4; 5|]
+            let result = xs.Slice(-3, 4)
+            Expect.isTrue (result = [|3; 4; 5|]) "Slice should work with mixed indices"
+
+        testCase "Slice throws when start is after end" <| fun _ ->
+            let xs = [| 1; 2; 3; 4; 5|]
+            let testCode = fun () -> xs.Slice(3, 1) |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "Slice throws when indices are out of bounds" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            let testCode1 = fun () -> xs.Slice(5, 6) |> ignore
+            let testCode2 = fun () -> xs.Slice(0, 5) |> ignore
+            Expect.throws testCode1 "Expected an IndexOutOfRangeException for start out of bounds"
+            Expect.throws testCode2 "Expected an IndexOutOfRangeException for end out of bounds"
+
+        testCase "IsSingleton returns false for empty Array" <| fun _ ->
+            let xs : int[] = [||]
+            Expect.isFalse xs.IsSingleton "Expected IsSingleton to be false for an empty Array"
+
+        testCase "LastIndex returns correct value for various arrays" <| fun _ ->
+            Expect.equal [|1|].LastIndex 0 "Single item array should have LastIndex 0"
+            Expect.equal [|1;2;3|].LastIndex 2 "Three item array should have LastIndex 2"
+
+        testCase "FirstAndOnly fails on empty Array" <| fun _ ->
+            let xs : int[] = [||]
+            let testCode = fun () -> xs.FirstAndOnly |> ignore
+            Expect.throws testCode "Expected an IndexOutOfRangeException"
+
+        testCase "SecondLast on two item Array" <| fun _ ->
+            let xs = [| 1; 2|]
+            Expect.equal xs.SecondLast 1 "SecondLast on two item array should return first item"
+
+        testCase "ThirdLast on three item Array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            Expect.equal xs.ThirdLast 1 "ThirdLast on three item array should return first item"
+
+        testCase "Second on two item Array" <| fun _ ->
+            let xs = [| 1; 2|]
+            Expect.equal xs.Second 2 "Second on two item array should return second item"
+
+        testCase "Third on three item Array" <| fun _ ->
+            let xs = [| 1; 2; 3|]
+            Expect.equal xs.Third 3 "Third on three item array should return third item"
 
     ]
