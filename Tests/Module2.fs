@@ -746,9 +746,9 @@ module Module2 =
         testCase "Array.min3IndicesBy returns indices of three smallest" <| fun _ ->
             let xs = [|"apple"; "be"; "cat"; "do"; "e"|]
             let i1, i2, i3 = Array.min3IndicesBy String.length xs
-            Expect.equal i1 1 "min3IndicesBy first"
-            Expect.equal i2 3 "min3IndicesBy second"
-            Expect.equal i3 4 "min3IndicesBy third"
+            Expect.equal i1 4 "min3IndicesBy first"
+            Expect.equal i2 1 "min3IndicesBy second"
+            Expect.equal i3 3 "min3IndicesBy third"
 
         testCase "Array.min3IndicesBy throws on null array" <| fun _ ->
             let xs : string[] = null
