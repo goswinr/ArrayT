@@ -9,6 +9,7 @@ module Main =
     open Fable.Mocha
     Mocha.runTests Tests.Extensions.tests |> ignore
     Mocha.runTests Tests.Module2.tests |> ignore
+    Mocha.runTests Tests.FableParity.tests |> ignore
 
     #else
 
@@ -18,6 +19,8 @@ module Main =
         runTestsWithCLIArgs [] [||] Tests.Extensions.tests
         |||
         runTestsWithCLIArgs [] [||] Tests.Module2.tests
+        |||
+        runTestsWithCLIArgs [] [||] Tests.FableParity.tests
 
 
     #endif

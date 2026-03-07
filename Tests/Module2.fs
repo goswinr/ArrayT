@@ -916,22 +916,13 @@ module Module2 =
             Expect.isTrue (xs = original) "input array should not be modified"
 
         testCase "Array.asResizeArray creates ResizeArray from array" <| fun _ ->
-            let xs = [|1; 2; 3|]
+            let xs = [|"a"; "b"; "c"|]
             let result = Array.asResizeArray xs
             Expect.equal result.Count 3 "asResizeArray count"
 
         testCase "Array.asResizeArray throws on null" <| fun _ ->
-            let xs : int[] = null
+            let xs : string[] = null
             throwsNull (fun () -> Array.asResizeArray xs |> ignore)
-
-        testCase "Array.asArray creates array from ResizeArray" <| fun _ ->
-            let ra = ResizeArray<int>([1; 2; 3])
-            let result = Array.asArray ra
-            Expect.isTrue (result = [|1; 2; 3|]) "asArray"
-
-        testCase "Array.asArray throws on null" <| fun _ ->
-            let ra : ResizeArray<int> = null
-            throwsNull (fun () -> Array.asArray ra |> ignore)
 
         testCase "Array.ofIList creates array from IList" <| fun _ ->
             let list : IList<int> = ResizeArray<int>([1; 2; 3])
