@@ -1,7 +1,7 @@
 namespace Tests
 open ArrayT
 
-#if FABLE_COMPILER
+#if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
 open Fable.Mocha
 #else
 open Expecto
@@ -64,7 +64,7 @@ module Exceptions =
     /// Check that the lambda throws an exception of the given type. Otherwise
     /// calls Assert.Fail()
     let CheckThrowsExn<'a when 'a :> exn> (f : unit -> unit) : unit =
-        #if FABLE_COMPILER
+        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             Expect.throws f "CheckThrowsExn"
         #else
             try
@@ -77,7 +77,7 @@ module Exceptions =
 
     let private CheckThrowsExn2<'a when 'a :> exn> _s (f : unit -> unit) : unit =
 
-        #if FABLE_COMPILER
+        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             Expect.throws f "CheckThrowsExn2"
         #else
 

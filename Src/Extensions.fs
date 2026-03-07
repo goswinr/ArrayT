@@ -258,24 +258,22 @@ module AutoOpenArrayTExtensions =
 
         /// Creates a new Array with the same items as the input Array.
         /// Shallow copy only.
-        /// this.Clone() :?> 'T array
         member inline this.Duplicate(): 'T array =
-            #if FABLE_COMPILER
-            Array.init this.Length (fun i -> this.[i])
-            #else
-            this.Clone() :?> 'T array
-            #endif
+            Array.copy this
 
-
+        /// Creates a new Array with the same items as the input Array.
+        /// Shallow copy only.
+        member inline this.Copy(): 'T array =
+            Array.copy this
 
         /// <summary>A string representation of the Array including the count of entries and the first 5 entries.
         /// When used in Fable this member is inlined for reflection to work.</summary>
         /// <returns>A formatted string representation of the array.</returns>
-        #if FABLE_COMPILER
+    #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
         member inline arr.AsString : string =  // inline needed for Fable reflection
-        #else
+    #else
         member arr.asString  :string =  // on .NET inline fails because it's using internal DefaultDictUtil
-        #endif
+    #endif
             let t = toStringInline arr
             $"{t}{contentAsString 5 arr}"
 
@@ -285,10 +283,10 @@ module AutoOpenArrayTExtensions =
         /// When used in Fable this member is inlined for reflection to work.</summary>
         /// <param name="entriesToPrint">The number of entries to display in the string representation.</param>
         /// <returns>A formatted string representation of the array.</returns>
-        #if FABLE_COMPILER
+    #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
         member inline arr.ToString (entriesToPrint)  : string =  // inline needed for Fable reflection
-        #else
+    #else
         member arr.ToString (entriesToPrint)  : string  = // on .NET inline fails because it's using internal DefaultDictUtil
-        #endif
+    #endif
             let t = toStringInline arr
             $"{t}{contentAsString entriesToPrint arr}"

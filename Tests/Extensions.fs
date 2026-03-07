@@ -5,7 +5,7 @@ module Extensions =
     open ArrayT
 
 
-    #if FABLE_COMPILER
+    #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
     open Fable.Mocha
     #else
     open Expecto

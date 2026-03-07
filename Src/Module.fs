@@ -8,6 +8,28 @@ open System.Collections.Generic
 open UtilArray
 #warnon "44"
 
+
+(*
+module ResizeArray =
+
+    /// <summary>An optimized alternative to the <code>toArray</code> function for use in Fable (JavaScript).
+    /// F# Array and ResizeArray are both represented as JavaScript arrays in Fable.
+    /// So this function does not allocate a new array but just casts the ResizeArray to an Array.
+    /// In .NET runtime a new Array is still allocated and the elements are copied.</summary>
+    /// <remarks>Numeric arrays are optimized as TypedArrays in Fable, so this function only works on reference types.</remarks>
+    /// <param name="arr">The input ResizeArray.</param>
+    /// <returns>A fixed-length array.</returns>
+    let inline asArray (arr: ResizeArray<'T>) : 'T[] when 'T : not struct =
+        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+            if isNull arr then nullExn "asArray"
+            unbox<'T[]> arr
+        #else
+            if isNull arr then nullExn "asArray"
+            arr.ToArray()
+        #endif
+*)
+
+
 /// The main module for functions on Array<'T>.
 /// This module provides additional functions to ones from FSharp.Core.Array module.
 module Array =
@@ -840,56 +862,39 @@ module Array =
         k
 
 
-    /// <summary>Builds a new Array from the given ResizeArray.
-    /// (Use the asArray function if you want to just cast an ResizeArray to a Array in Fable-JavaScript)</summary>
+    /// <summary>Builds a new Array from the given ResizeArray.</summary>
     /// <param name="rarr">The input ResizeArray.</param>
     /// <returns>A new array containing the elements from the ResizeArray.</returns>
     let inline ofResizeArray (rarr: ResizeArray<'T>) : 'T[] =
         if isNull rarr then nullExn "ofResizeArray"
         rarr.ToArray()
 
-    /// <summary>Return a fixed-length Array containing the elements of the input ResizeArray as a copy.
-    /// When this function is used in Fable (JavaScript) the ResizeArray is just casted to an Array.
-    /// In .NET a new Array is still allocated and the elements are copied.</summary>
-    /// <param name="arr">The input ResizeArray.</param>
-    /// <returns>A fixed-length array.</returns>
-    let inline asArray (arr: ResizeArray<'T>) : 'T[]=
-        if isNull arr then nullExn "asArray"
-        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-        unbox<'T[]> arr
-        #else
-        arr.ToArray()
-        #endif
 
-    /// <summary>Builds a new Array from the given ResizeArray.
-    /// In Fable-JavaScript the ResizeArray is just casted to an Array without allocating a new ResizeArray.</summary>
+    /// <summary>an optimized alternative to the <code>toResizeArray</code> function for use in Fable (JavaScript).
+    /// F# Array and ResizeArray are both represented as JavaScript arrays in Fable.
+    /// So this function does not allocate a new ResizeArray but just casts the Array to a ResizeArray.
+    /// In .NET runtime a new ResizeArray is still allocated and the elements are copied.</summary>
+    /// <remarks>Numeric arrays are optimized as TypedArrays in Fable, so this function only works on reference types.</remarks>
     /// <param name="arr">The input Array.</param>
     /// <returns>A ResizeArray containing the same elements.</returns>
-    let inline asResizeArray(arr: 'T[]) : ResizeArray<'T> =
-        if isNull arr then nullExn "asResizeArray"
+    let inline asResizeArray(arr: 'T[]) : ResizeArray<'T> when 'T : not struct =
         #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-        unbox<ResizeArray<'T>> arr
+            if isNull arr then nullExn "asResizeArray"
+            unbox<ResizeArray<'T>> arr
         #else
-        ResizeArray<'T>(arr)
-        // let l = ResizeArray<'T>(arr.Length)
-        // for i = 0 to arr.Length - 1 do
-        //     l.Add arr.[i]
-        // l
+            if isNull arr then nullExn "asResizeArray"
+            ResizeArray<'T> arr
         #endif
 
 
     /// <summary>Return a fixed-length Array containing the elements of the input Array as a copy.
-    /// This function always allocates a new ResizeArray and copies the elements.
-    /// (Use the asArray function if you want to just cast a Array to an Array in Fable-JavaScript)</summary>
+    /// This function always allocates a new ResizeArray and copies the elements.</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>A ResizeArray containing a copy of the Array elements.</returns>
     let inline toResizeArray (arr: 'T[]) : ResizeArray<'T> =
         if isNull arr then nullExn "toResizeArray"
         ResizeArray<'T>(arr)
-        // let l = ResizeArray<'T>(arr.Length)
-        // for i = 0 to arr.Length - 1 do
-        //     l.Add arr.[i]
-        // l
+
 
     /// <summary>Build a Array from the given IList Interface.</summary>
     /// <param name="arr">The input IList.</param>
@@ -1087,10 +1092,12 @@ module Array =
     /// <returns>An array containing the elements for which the given predicate returns true.</returns>
     let filteri (predicate: int -> bool) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "filteri"
-        if isNull arr then nullExn "filteri"
         let res = ResizeArray()
         for i = 0 to arr.Length - 1 do
             if predicate i then
                 res.Add(arr.[i])
-        asArray res
+        res.ToArray()
+
+
+
 

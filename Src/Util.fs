@@ -122,7 +122,7 @@ module UtilArray =
     /// <returns>Never returns (always raises).</returns>
     let badGetExn (i:int) (arr:'T[]) (funcName:string) : 'a =
         let t =
-            #if FABLE_COMPILER
+            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
                 "'T"
             #else
                 (typeof<'T>).Name
@@ -137,7 +137,7 @@ module UtilArray =
     /// <returns>Never returns (always raises).</returns>
     let badSetExn (i:int) (arr:'T[]) (funcName:string) (doingSet:'T) : 'a =
         let t =
-            #if FABLE_COMPILER
+            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
                 "'T"
             #else
                 (typeof<'T>).Name
@@ -150,7 +150,7 @@ module UtilArray =
     /// <returns>Never returns (always raises).</returns>
     let fail (arr:'T[]) (funcAndReason:string) : 'a =
         let t =
-            #if FABLE_COMPILER
+            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
                 "'T"
             #else
                 (typeof<'T>).Name
@@ -186,7 +186,7 @@ module UtilArray =
 
         override this.ToString() : string =
             let t =
-            #if FABLE_COMPILER
+            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
                 "'T"
             #else
                 (typeof<'T>).Name
