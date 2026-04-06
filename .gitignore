@@ -3,10 +3,9 @@ bin/
 obj/
 fable_modules/
 node_modules/
-js/
-ts/
-# *.js
-# *.ts
+_js/
+_ts/
+_tscBuild/
 
 # FSharp.Formatting
 .fsdocs/
