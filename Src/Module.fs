@@ -44,8 +44,8 @@ module Array =
         #if UNCHECKED
             getUnCkd index arr
         #else
-        if isNull arr then nullExn "get"
-        arr.Get index
+            if isNull arr then nullExn "get"
+            arr.Get index
         #endif
 
     /// <summary>Sets an element of a Array. (use Array.setNeg(i) function if you want to use negative indices too)</summary>
@@ -60,6 +60,31 @@ module Array =
             if isNull arr then nullExn "set"
             arr.Set index value
         #endif
+
+    // /// Just Array.zeroCreate<'T> in .NET, but when `UNCHECKED` is defined and used in Fable, it emits `new Array(len)`
+    // /// without initializing the items to their default value.
+    // /// Values are `undefined` in JavaScript
+    // /// Not safe on numbers, Fable emits TypedArrays for numeric arrays.
+    // let inline undefCreate<'T when 'T : not struct> (len:int) : 'T [] =
+    //     #if UNCHECKED && (FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT)
+    //         Fable.Core.JsInterop.emitJsExpr (len) "new Array($0)"
+    //     #else
+    //         Array.zeroCreate<'T> len
+    //     #endif
+
+
+    /// Just Array.zeroCreate<'T> in .NET, but when used in Fable and `UNCHECKED` is defined it emits `new Array(len)`
+    /// without filling the array with items of their default value.
+    /// Values are `undefined` in JavaScript
+    /// Not safe on numbers, Fable emits TypedArrays for numeric arrays. And those do not get filled in Fable anyway.
+    let inline zeroCreateUndef<'T when 'T : not struct> (len:int) : 'T [] =
+        #if UNCHECKED && (FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT)
+            Fable.Core.JsInterop.emitJsExpr (len) "new Array($0)"
+        #else
+            Array.zeroCreate<'T> len
+        #endif
+
+
 
 
     //---------------------------------------------------
