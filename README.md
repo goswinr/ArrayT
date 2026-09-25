@@ -32,7 +32,7 @@ See also https://github.com/goswinr/ResizeArray/ for a similar library for `Resi
 See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-array.html)
 
 - Extension members on `Array` like <br>
-`.Get(idx)` `.Set(idx,item)` `.First` `.Last` `.SecondLast` `xs.DebugIdx.[i]` and more..<br>
+`.Get idx` `.Set idx item` `.First` `.Last` `.SecondLast` `xs.DebugIdx.[i]` and more..<br>
 With nicer IndexOutOfRangeExceptions that include the bad index and the actual size.<br>
 See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-autoopenarraytextensions.html)
 
@@ -89,8 +89,9 @@ instead of the usual unhelpful `System.IndexOutOfRangeException: Index was outsi
 The same applies to `Set`:
 
 ```fsharp
-xs.Set(99, 0)
-// throws: Array.Set: Can't set index 99 to value '0' in array<Int32> with 89 items.
+xs.Set 99 0
+// throws: Array.Set: Can't set index 99 to 0 on:
+// array<Int32> with 89 items: ...
 ```
 
 If you want to use bracket notation `xs.[i]` with these descriptive errors, use the `DebugIdx` member:
@@ -139,7 +140,7 @@ let arr = [| "a"; "b"; "c"; "d"; "e" |]
 
 arr.GetNeg(-1)    // "e" (last)
 arr.GetNeg(-2)    // "d" (second last)
-arr.SetNeg(-1, "z")
+arr.SetNeg -1 "z"
 
 // Module functions
 arr |> Array.getNeg -1   // "e"
@@ -193,9 +194,9 @@ Shift elements circularly:
 ```fsharp
 let arr = [| 1; 2; 3; 4; 5 |]
 
-arr |> Array.rotate 1    // [| 2; 3; 4; 5; 1 |]  (rotate up by 1)
-arr |> Array.rotate -1   // [| 5; 1; 2; 3; 4 |]  (rotate down by 1)
-arr |> Array.rotate 2    // [| 3; 4; 5; 1; 2 |]  (rotate up by 2)
+arr |> Array.rotate 1    // [| 5; 1; 2; 3; 4 |]  (rotate up by 1)
+arr |> Array.rotate -1   // [| 2; 3; 4; 5; 1 |]  (rotate down by 1)
+arr |> Array.rotate 2    // [| 4; 5; 1; 2; 3 |]  (rotate up by 2)
 
 // Rotate until a condition is met
 [| 3; 1; 4; 1; 5 |] |> Array.rotateUpTill (fun x -> x = 5)
@@ -345,14 +346,16 @@ arr.AsString
 //   2: 3
 //   3: 4
 //   4: 5
-//   ..."
+//   ...
+//   6: 7"
 
-arr.ToString(3)   // show only first 3 entries
+arr.ToString(3)   // show only first 3 entries (and the last one)
 // "array<Int32> with 7 items:
 //   0: 1
 //   1: 2
 //   2: 3
-//   ..."
+//   ...
+//   6: 7"
 ```
 
 ## Use of AI and LLMs
