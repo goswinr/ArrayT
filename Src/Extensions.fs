@@ -267,26 +267,25 @@ module AutoOpenArrayTExtensions =
             Array.copy this
 
         /// <summary>A string representation of the Array including the count of entries and the first 5 entries.
-        /// When used in Fable this member is inlined for reflection to work.</summary>
+        /// This member is inlined so that the type name can be resolved by reflection in Fable too.</summary>
         /// <returns>A formatted string representation of the array.</returns>
-    #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
         member inline arr.AsString : string =  // inline needed for Fable reflection
-    #else
-        member arr.asString  :string =  // on .NET inline fails because it's using internal DefaultDictUtil
-    #endif
             let t = toStringInline arr
             $"{t}{contentAsString 5 arr}"
+
+        /// <summary>Use arr.AsString instead.
+        /// A string representation of the Array including the count of entries and the first 5 entries.</summary>
+        /// <returns>A formatted string representation of the array.</returns>
+        [<Obsolete("Use arr.AsString instead, that name works on .NET and in Fable.")>]
+        member inline arr.asString : string =
+            arr.AsString
 
 
         /// <summary>A string representation of the Array including the count of entries
         /// and the specified amount of entries.
-        /// When used in Fable this member is inlined for reflection to work.</summary>
+        /// This member is inlined so that the type name can be resolved by reflection in Fable too.</summary>
         /// <param name="entriesToPrint">The number of entries to display in the string representation.</param>
         /// <returns>A formatted string representation of the array.</returns>
-    #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-        member inline arr.ToString (entriesToPrint)  : string =  // inline needed for Fable reflection
-    #else
-        member arr.ToString (entriesToPrint)  : string  = // on .NET inline fails because it's using internal DefaultDictUtil
-    #endif
+        member inline arr.ToString (entriesToPrint: int) : string =  // inline needed for Fable reflection
             let t = toStringInline arr
             $"{t}{contentAsString entriesToPrint arr}"

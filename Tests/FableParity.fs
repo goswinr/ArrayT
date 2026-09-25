@@ -14,6 +14,10 @@ open System.Collections.Generic
 module FableParity =
  open Exceptions
 
+#nowarn "44" // to test the obsolete asString alias
+ let private obsoleteAsString (xs: int[]) : string = xs.asString
+#warnon "44"
+
  let tests =
     testList ("Fable Parity Tests", [
 
@@ -928,50 +932,38 @@ module FableParity =
         )
 
         //--------------------------------------------------------------------------------------------------------------------
-        //------------------------------------------AsString / ToString (different names in Fable)-----------------------------
-        // In Fable: member name is AsString (capital A) and inline
-        // In .NET: member name is asString (lowercase a) and not inline
-        // Both should produce similar output format
+        //------------------------------------------AsString / ToString------------------------------------------------------
+        // Both are inline so that the type name can be resolved by reflection in Fable too.
+        // Both should produce the same output format on .NET and in Fable.
         //--------------------------------------------------------------------------------------------------------------------
 
-        test ("AsString/asString on int array", fun _ ->
+        test ("AsString on int array", fun _ ->
             let xs = [| 1; 2; 3 |]
-            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
-            #else
-            let s = xs.asString
-            #endif
             assertThat (s.Contains("3")) (tag "should contain count" >> isTrue)
         )
 
-        test ("AsString/asString on empty int array", fun _ ->
+        test ("AsString on empty int array", fun _ ->
             let xs : int[] = [||]
-            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
-            #else
-            let s = xs.asString
-            #endif
             assertThat (s.Contains("empty")) (tag "should contain empty" >> isTrue)
         )
 
-        test ("AsString/asString on string array", fun _ ->
+        test ("AsString on string array", fun _ ->
             let xs = [| "hello"; "world" |]
-            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
-            #else
-            let s = xs.asString
-            #endif
             assertThat (s.Contains("2")) (tag "should contain count" >> isTrue)
         )
 
-        test ("AsString/asString on single element", fun _ ->
+        test ("AsString on single element", fun _ ->
             let xs = [| 42 |]
-            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
-            #else
-            let s = xs.asString
-            #endif
             assertThat (s.Contains("1")) (tag "should contain count 1" >> isTrue)
+        )
+
+        test ("obsolete asString alias gives the same result as AsString", fun _ ->
+            let xs = [| 1; 2; 3; 4; 5; 6; 7 |]
+            assertThat (obsoleteAsString xs) (tag "asString = AsString" >> isEqualTo xs.AsString)
         )
 
         test ("ToString(n) on int array", fun _ ->
