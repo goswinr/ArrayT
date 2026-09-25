@@ -28,7 +28,7 @@ See also https://github.com/goswinr/ResizeArray/ for a similar library for `Resi
 
 ### It Includes
 
-- An `Array` module that has a additional functions to the  `Array` module from [`FSharp.Core`](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-arraymodule.html).<br>
+- An `Array` module that adds functions to the `Array` module from [`FSharp.Core`](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-arraymodule.html).<br>
 See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-array.html)
 
 - Extension members on `Array` like <br>
@@ -359,7 +359,7 @@ arr.ToString(3)   // show only first 3 entries (and the last one)
 ```
 
 ## Use of AI and LLMs
-All core function are are written by hand to ensure performance and correctness.<br>
+All core functions are written by hand to ensure performance and correctness.<br>
 However, AI tools have been used for code review, typo and grammar checking in documentation<br>
 and to generate not all but many of the tests.
 
