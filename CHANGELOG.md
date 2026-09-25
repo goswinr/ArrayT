@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clearer error message from `arr.FirstAndOnly` and `Array.firstAndOnly` when the Array does not have exactly one item.
 
 ## [0.26.1] - 2026-09-07
+### Added
+- `Array.zeroCreateUndef`: `Array.zeroCreate` that skips filling the items in Fable when `UNCHECKED` is defined.
+### Changed
+- Target frameworks are now net8.0 and net472 (was net6.0 and net472).
 ### Fixed
 - Packaging: the Fable content glob is no longer recursive, so the package no longer ships generated obj AssemblyInfo files, only the real source files.
 
@@ -36,6 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.25.0] - 2026-01-24
 ### Added
 - better xml docstrings
+### Changed
+- Target frameworks are now net6.0 and net472 instead of netstandard2.0.
 
 ## [0.24.2] - 2026-01-24
 ### Fixed
@@ -79,7 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [Unreleased]: https://github.com/goswinr/ArrayT/compare/0.26.1...HEAD
 [0.26.1]: https://github.com/goswinr/ArrayT/compare/0.26.0...0.26.1
 [0.26.0]: https://github.com/goswinr/ArrayT/compare/0.25.0...0.26.0
-<!-- [0.25.0]: https://github.com/goswinr/ArrayT/compare/0.24.2...0.25.0 -->
+[0.25.0]: https://github.com/goswinr/ArrayT/compare/0.24.1...0.25.0
 <!-- [0.24.2]: https://github.com/goswinr/ArrayT/compare/0.24.1...0.24.2 -->
 [0.24.1]: https://github.com/goswinr/ArrayT/compare/0.24.0...0.24.1
 [0.24.0]: https://github.com/goswinr/ArrayT/compare/0.23.0...0.24.0
