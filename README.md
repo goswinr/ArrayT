@@ -4,9 +4,8 @@
 # ArrayT
 
 [![ArrayT on nuget.org](https://img.shields.io/nuget/v/ArrayT)](https://www.nuget.org/packages/ArrayT/)
-[![Build Status](https://github.com/goswinr/ArrayT/actions/workflows/build.yml/badge.svg)](https://github.com/goswinr/ArrayT/actions/workflows/build.yml)
+[![Build and Test Status](https://github.com/goswinr/ArrayT/actions/workflows/build.yml/badge.svg)](https://github.com/goswinr/ArrayT/actions/workflows/build.yml)
 [![Docs Build Status](https://github.com/goswinr/ArrayT/actions/workflows/docs.yml/badge.svg)](https://github.com/goswinr/ArrayT/actions/workflows/docs.yml)
-[![Test Status](https://github.com/goswinr/ArrayT/actions/workflows/test.yml/badge.svg)](https://github.com/goswinr/ArrayT/actions/workflows/test.yml)
 
 [![license](https://img.shields.io/github/license/goswinr/ArrayT)](LICENSE.md)
 ![code size](https://img.shields.io/github/languages/code-size/goswinr/ArrayT.svg)

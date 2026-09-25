@@ -1,4 +1,4 @@
-name: Build
+name: Build and Test
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +26,27 @@ jobs:
 
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
+
+      # tests use Scriptorium, the same test suite runs on .NET and on JS via Fable
+
+      - name: Run tests .NET
+        run: dotnet run --configuration Release --no-build
+        working-directory: ./Tests
+
+      # run JS tests (Fable compiles the tests to JS and runs them with node, then verifies TS compilation):
+
+      - name: Restore .NET tools (Fable)
+        run: dotnet tool restore
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24.x'
+
+      - name: Clean Install npm dependencies
+        run: npm ci
+        working-directory: ./Tests
+
+      - name: Run tests JS
+        run: npm test
+        working-directory: ./Tests
