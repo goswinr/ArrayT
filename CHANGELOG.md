@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - `arr.AsString` now has the same name on .NET and in Fable. The old .NET-only `arr.asString` still works but is marked obsolete.
 - `arr.AsString` and `arr.ToString(n)` are now inline on .NET too.
+### Removed
+- The unused internal helper `UtilArray.negIdx`.
 ### Fixed
 - Error messages of `Array.trim` and `Array.swap` showed a literal `%d` instead of the actual values.
 - `arr.Slice` and `Array.slice` now report an out-of-range negative end index as such, instead of "start index is bigger than end index".

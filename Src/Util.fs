@@ -1,7 +1,6 @@
 namespace ArrayT
 
 open System
-open System.Collections.Generic
 
 #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
 open Fable.Core.JsInterop
@@ -35,19 +34,6 @@ module UtilArray =
             arr.[i] <- v
         #endif
 
-
-    /// <summary>Converts negative indices to positive ones.
-    /// Correct results from -length up to length-1.
-    /// e.g.: -1 is last item.
-    /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)</summary>
-    /// <param name="i">The index to convert (can be negative).</param>
-    /// <param name="len">The length of the array.</param>
-    /// <returns>The converted positive index.</returns>
-    let inline negIdx i len : int =
-        let ii = if i < 0 then len + i else i
-        if ii < 0 || ii >= len then
-            raise <| IndexOutOfRangeException $"UtilArray.negIdx: Bad index {i} for items count {len}."
-        ii
 
     /// <summary>Any int will give a valid index for given collection size.
     /// Converts negative indices to positive ones and loops to start after last index is reached.
@@ -93,7 +79,7 @@ module UtilArray =
     /// <param name="entriesToPrint">The maximum number of entries to display.</param>
     /// <param name="arr">The input array.</param>
     /// <returns>A formatted string showing array contents.</returns>
-    let contentAsString (entriesToPrint) (arr:'T[]) : string = // on .NET inline fails because it's using internal DefaultDictUtil
+    let contentAsString (entriesToPrint) (arr:'T[]) : string = // not inline, it is only used for exception messages and ToString
         let c = arr.Length
         if c > 0 && entriesToPrint > 0 then
             let b = Text.StringBuilder()

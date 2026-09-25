@@ -2,32 +2,10 @@ namespace ArrayT
 
 open System
 open System.Collections.Generic
-//open NiceString
 
 #nowarn "44" //for opening the hidden but not Obsolete UtilArray module
 open UtilArray
 #warnon "44"
-
-
-(*
-module ResizeArray =
-
-    /// <summary>An optimized alternative to the <code>toArray</code> function for use in Fable (JavaScript).
-    /// F# Array and ResizeArray are both represented as JavaScript arrays in Fable.
-    /// So this function does not allocate a new array but just casts the ResizeArray to an Array.
-    /// In .NET runtime a new Array is still allocated and the elements are copied.</summary>
-    /// <remarks>Numeric arrays are optimized as TypedArrays in Fable, so this function only works on reference types.</remarks>
-    /// <param name="arr">The input ResizeArray.</param>
-    /// <returns>A fixed-length array.</returns>
-    let inline asArray (arr: ResizeArray<'T>) : 'T[] when 'T : not struct =
-        #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-            if isNull arr then nullExn "asArray"
-            unbox<'T[]> arr
-        #else
-            if isNull arr then nullExn "asArray"
-            arr.ToArray()
-        #endif
-*)
 
 
 /// The main module for functions on Array<'T>.
@@ -60,18 +38,6 @@ module Array =
             if isNull arr then nullExn "set"
             arr.Set index value
         #endif
-
-    // /// Just Array.zeroCreate<'T> in .NET, but when `UNCHECKED` is defined and used in Fable, it emits `new Array(len)`
-    // /// without initializing the items to their default value.
-    // /// Values are `undefined` in JavaScript
-    // /// Not safe on numbers, Fable emits TypedArrays for numeric arrays.
-    // let inline undefCreate<'T when 'T : not struct> (len:int) : 'T [] =
-    //     #if UNCHECKED && (FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT)
-    //         Fable.Core.JsInterop.emitJsExpr (len) "new Array($0)"
-    //     #else
-    //         Array.zeroCreate<'T> len
-    //     #endif
-
 
     /// Just Array.zeroCreate<'T> in .NET, but when used in Fable and `UNCHECKED` is defined it emits `new Array(len)`
     /// without filling the array with items of their default value.
@@ -583,16 +549,6 @@ module Array =
 
     // internal, only for finding MinMax values
     module private MinMax =
-        //TODO test keeping of order if equal !
-
-        (*
-        let inline simple cmpF (arr:Array<'T>) =
-            if arr.Length < 1 then fail arr "MinMax.simple: Count must be at least one: %s"  arr.ToNiceStringLong
-            let mutable m = arr.[0]
-            for i=1 to arr.Length-1 do
-                if cmpF arr.[i] m then m <- arr.[i]
-            m
-        *)
 
         // funcName is the name of the public function, for the error message
         let inline simple2 (funcName: string) cmpF (arr: 'T[]) : 'T * 'T =
@@ -716,14 +672,6 @@ module Array =
                     i3 <- i
                     e3 <- f
             i1, i2, i3
-
-    (* covered by part copied from Array module:
-        let min arr =     arr |> MinMax.simple (<)
-        let max arr =     arr |> MinMax.simple (>)
-        let minBy f arr = let i = arr |> MinMax.indexByFun (<) f in arr.[i]
-        let maxBy f arr = let i = arr |> MinMax.indexByFun (>) f in arr.[i]
-        *)
-
 
     /// <summary>Returns the index of the smallest of all elements of the Array, compared via Operators.min on the function result.
     /// If several elements are equally small, the index of the first one is returned.</summary>
@@ -992,7 +940,6 @@ module Array =
         let h = HashSet<'T>()
         let t = HashSet<'T>()
         // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
-        //arr.FindAll(System.Predicate(fun x -> if h.Add x then false else t.Add x))
         arr |> Array.filter (fun x -> if h.Add x then false else t.Add x)
 
     /// <summary>Returns all elements whose projected value exists more than once in Array.
@@ -1007,7 +954,6 @@ module Array =
         let h = HashSet<'U>()
         let t = HashSet<'U>()
         // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
-        //arr.FindAll(System.Predicate(fun x -> let y = f x in if h.Add y then false else t.Add y))
         arr |> Array.filter (fun x -> let y = f x in if h.Add y then false else t.Add y)
 
 

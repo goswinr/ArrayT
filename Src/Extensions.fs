@@ -1,7 +1,6 @@
 namespace ArrayT
 
 open System
-open System.Collections.Generic
 
 #nowarn "44" //for opening the hidden but not Obsolete UtilArray module
 open UtilArray
@@ -67,7 +66,6 @@ module AutoOpenArrayTExtensions =
         /// Returns -1 for empty Array.
         member inline xs.LastIndex : int =
             // don't fail so that a loop for i=0 to xs.LastIndex will work for empty Array
-            //if xs.Length = 0 then IndexOutOfRangeException.Raise "array.LastIndex: Failed to get LastIndex of empty %s" xs.ToNiceStringLong // Array<%s>" (typeof<'T>).FullName
             xs.Length - 1
 
         /// <summary>Get (or set) the last item in the Array.
