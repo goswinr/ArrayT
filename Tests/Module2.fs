@@ -317,6 +317,21 @@ module Module2 =
             throwsRange (fun () -> Array.slice 3 1 xs |> ignore)
         )
 
+        test ("Array.slice returns empty array when end index is one less than start index", fun _ ->
+            let xs = [|1; 2; 3; 4; 5|]
+            assertThat (Array.slice 3 2 xs = [||]) (tag "slice 3 2" >> isTrue)
+            assertThat (Array.slice 0 -6 xs = [||]) (tag "slice 0 -6, like trim 0 5" >> isTrue)
+        )
+
+        test ("Array.slice error messages name the offending index", fun _ ->
+            let xs = [|1; 2; 3; 4; 5|]
+            throwsWith ["Start index 3 is bigger than end index 1"] (fun () -> Array.slice 3 1 xs |> ignore)
+            throwsWith ["End index -99 is out of range"] (fun () -> Array.slice 1 -99 xs |> ignore)
+            throwsWith ["End index -6 is out of range"] (fun () -> Array.slice 1 -6 xs |> ignore)
+            throwsWith ["End index 5 is out of range"] (fun () -> Array.slice 1 5 xs |> ignore)
+            throwsWith ["Start index -6 is out of range"] (fun () -> Array.slice -6 2 xs |> ignore)
+        )
+
         test ("Array.slice throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.slice 0 1 xs |> ignore)

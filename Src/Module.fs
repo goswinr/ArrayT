@@ -204,6 +204,7 @@ module Array =
     /// <summary>Slice the Array given start and end index.
     /// Allows for negative indices too. ( -1 is last item, like Python)
     /// The resulting Array includes the end index.
+    /// If the end index is one less than the start index an empty Array is returned.
     /// Raises an IndexOutOfRangeException if indices are out of range.
     /// If you don't want an exception to be raised for index overflow or overlap use Array.trim.
     /// (A negative index can also be done with '^' prefix. E.g. ^0 for the last item, when F# Language preview features are enabled.)</summary>

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `arr.AsString` and `arr.ToString(n)` are now inline on .NET too.
 ### Fixed
 - Error messages of `Array.trim` and `Array.swap` showed a literal `%d` instead of the actual values.
+- `arr.Slice` and `Array.slice` now report an out-of-range negative end index as such, instead of "start index is bigger than end index".
 
 ## [0.26.1] - 2026-09-07
 ### Fixed

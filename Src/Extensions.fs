@@ -225,6 +225,7 @@ module AutoOpenArrayTExtensions =
 
         /// <summary>Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
+        /// If the end index is one less than the start index an empty array is returned.
         /// The built in slicing notation (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
         /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.</summary>
         /// <param name="startIdx">The start index (inclusive, can be negative).</param>
@@ -236,20 +237,19 @@ module AutoOpenArrayTExtensions =
             // member inline this.GetSlice(startIdx, endIdx) =
 
             let count = this.Length
-            let st  = if startIdx< 0 then count + startIdx        else startIdx
-            let len = if endIdx  < 0 then count + endIdx - st + 1 else endIdx - st + 1
+            let st  = if startIdx < 0 then count + startIdx else startIdx
+            let en  = if endIdx   < 0 then count + endIdx   else endIdx
+            let len = en - st + 1 // zero if end is one less than start, like Array.trim when all items are trimmed
 
             if st < 0 || st > count - 1 then
                 let err = $"Array.Slice: Start index {startIdx} is out of range. Allowed values are -{count} up to {count-1} for Array of {count} items"
                 raise (IndexOutOfRangeException(err))
 
-            if st+len > count then
+            if en > count - 1 || (len < 0 && en < 0) then
                 let err = $"Array.Slice: End index {endIdx} is out of range. Allowed values are -{count} up to {count-1} for Array of {count} items"
                 raise (IndexOutOfRangeException(err))
 
             if len < 0 then
-                // let en = if endIdx<0 then count+endIdx else endIdx
-                // let err = sprintf "Array.Slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for Array of %d items" startIdx st endIdx en  count
                 let err = $"Array.Slice: Start index {startIdx} is bigger than end index {endIdx} for Array of {count} items"
                 raise (IndexOutOfRangeException(err))
 
