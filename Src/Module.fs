@@ -609,8 +609,8 @@ module Array =
         /// If any are equal then the  order is kept by using ( a=b || ) since the compare operate does not include the equal test
         let inline sort3 cmp a b c : 'T * 'T * 'T =
             if a = b || cmp a b then
-                if cmp b c then a, b, c
-                else if cmp a c then a, c, b
+                if b = c || cmp b c then a, b, c
+                else if a = c || cmp a c then a, c, b
                 else c, a, b
             else if a = c || cmp a c then
                 b, a, c
@@ -626,8 +626,8 @@ module Array =
             let b = f bb
             let c = f cc
             if a = b || cmp a b then
-                if cmp b c then 0, 1, 2
-                else if cmp a c then 0, 2, 1
+                if b = c || cmp b c then 0, 1, 2
+                else if a = c || cmp a c then 0, 2, 1
                 else 2, 0, 1
             else if a = c || cmp a c then
                 1, 0, 2

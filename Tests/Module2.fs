@@ -928,6 +928,22 @@ module Module2 =
             assertThat i3 (tag "max3IndicesBy third" >> isEqualTo 4)
         )
 
+        test ("Array.min3IndicesBy and max3IndicesBy keep the original order on ties", fun _ ->
+            assertThat (Array.min3IndicesBy id [|1; 2; 2|]) (tag "min3IndicesBy 1,2,2" >> isEqualTo (0, 1, 2))
+            assertThat (Array.min3IndicesBy id [|1; 2; 1|]) (tag "min3IndicesBy 1,2,1" >> isEqualTo (0, 2, 1))
+            assertThat (Array.min3IndicesBy id [|2; 1; 1|]) (tag "min3IndicesBy 2,1,1" >> isEqualTo (1, 2, 0))
+            assertThat (Array.min3IndicesBy id [|1; 1; 1; 1|]) (tag "min3IndicesBy all equal" >> isEqualTo (0, 1, 2))
+            assertThat (Array.max3IndicesBy id [|2; 1; 1|]) (tag "max3IndicesBy 2,1,1" >> isEqualTo (0, 1, 2))
+            assertThat (Array.max3IndicesBy id [|2; 1; 2|]) (tag "max3IndicesBy 2,1,2" >> isEqualTo (0, 2, 1))
+        )
+
+        test ("Array.min3By and max3By keep the original order on ties", fun _ ->
+            let xs = [|(1, "a"); (2, "b"); (2, "c")|]
+            assertThat (Array.min3By fst xs) (tag "min3By" >> isEqualTo ((1, "a"), (2, "b"), (2, "c")))
+            let ys = [|(2, "a"); (1, "b"); (2, "c")|]
+            assertThat (Array.max3By fst ys) (tag "max3By" >> isEqualTo ((2, "a"), (2, "c"), (1, "b")))
+        )
+
         test ("Array.max3IndicesBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.max3IndicesBy String.length xs |> ignore)
