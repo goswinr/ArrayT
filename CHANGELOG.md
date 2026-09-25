@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error messages of the min and max functions named internal helpers like `Array.MinMax.indexByFun` instead of the public function.
 - The docs of `Array.minIndexBy` and `maxIndexBy` named the wrong exception type.
 - Error messages of `Array.rotateUpTillLast` and `rotateDownTillLast` named the wrong function.
+- The docstring of `Array.toResizeArray` said it returns a fixed-length Array.
 - Clearer error message from `arr.FirstAndOnly` and `Array.firstAndOnly` when the Array does not have exactly one item.
 
 ## [0.26.1] - 2026-09-07

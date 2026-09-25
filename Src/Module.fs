@@ -918,8 +918,9 @@ module Array =
         #endif
 
 
-    /// <summary>Return a fixed-length Array containing the elements of the input Array as a copy.
-    /// This function always allocates a new ResizeArray and copies the elements.</summary>
+    /// <summary>Builds a new ResizeArray that contains a copy of the elements of the input Array.
+    /// This function always allocates a new ResizeArray and copies the elements.
+    /// (In Fable, Array.asResizeArray avoids the copy for reference types.)</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>A ResizeArray containing a copy of the Array elements.</returns>
     let inline toResizeArray (arr: 'T[]) : ResizeArray<'T> =
