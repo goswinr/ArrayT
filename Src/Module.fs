@@ -98,6 +98,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The input Array if not empty.</returns>
     let inline failIfEmpty (errorMessage: string) (arr: 'T[]) : 'T[] =
+        if isNull arr then nullExn "failIfEmpty"
         if arr.Length = 0 then raise <| Exception("Array.FailIfEmpty: " + errorMessage)
         arr
 
@@ -109,6 +110,7 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The input Array if it has enough items.</returns>
     let failIfLessThan (count:int) (errorMessage: string) (arr: 'T[]) : 'T[] =
+        if isNull arr then nullExn "failIfLessThan"
         if arr.Length < count then raise <| Exception($"Array.FailIfLessThan {count}: {errorMessage}")
         arr
 

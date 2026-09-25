@@ -1282,6 +1282,12 @@ module Module2 =
             assertThat (fun () -> Array.failIfLessThan 3 "too few" xs |> ignore) (tag "should throw when too few" >> throws)
         )
 
+        test ("Array.failIfEmpty and failIfLessThan throw on null array", fun _ ->
+            let xs : int[] = null
+            throwsNull (fun () -> Array.failIfEmpty "is null" xs |> ignore)
+            throwsNull (fun () -> Array.failIfLessThan 3 "is null" xs |> ignore)
+        )
+
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Search/Match functions----------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
