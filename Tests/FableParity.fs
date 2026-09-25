@@ -657,6 +657,12 @@ module FableParity =
             throwsRange (fun () -> [| 1; 2 |].FirstAndOnly |> ignore)
         )
 
+        test ("FirstAndOnly error message says exactly one item is expected", fun _ ->
+            throwsWith ["Array.FirstAndOnly: Expected exactly one item in:"; "2 items"] (fun () -> [| 1; 2 |].FirstAndOnly |> ignore)
+            let empty : int[] = [||]
+            throwsWith ["Array.FirstAndOnly: Expected exactly one item in:"; "empty array"] (fun () -> empty.FirstAndOnly |> ignore)
+        )
+
         test ("FirstAndOnly on reference types", fun _ ->
             assertThat [| "only" |].FirstAndOnly (tag "FirstAndOnly string" >> isEqualTo "only")
             let xs : string[] = [||]

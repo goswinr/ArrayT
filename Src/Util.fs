@@ -145,6 +145,20 @@ module UtilArray =
             #endif
         raise (IndexOutOfRangeException($"Array.{funcName}: Can't set index {i} to {doingSet} on:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
+    /// <summary>Raises an IndexOutOfRangeException when the array does not have the expected number of items.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <param name="funcName">The name of the function that failed.</param>
+    /// <param name="expected">A description of the expected item count, e.g. "exactly one item".</param>
+    /// <returns>Never returns (always raises).</returns>
+    let badCountExn (arr:'T[]) (funcName:string) (expected:string) : 'a =
+        let t =
+            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+                "'T"
+            #else
+                (typeof<'T>).Name
+            #endif
+        raise (IndexOutOfRangeException($"Array.{funcName}: Expected {expected} in:\n{toStringCore t arr}{contentAsString 5 arr}"))
+
     /// <summary>Raises an ArgumentException with a descriptive message about array operation failure.</summary>
     /// <param name="arr">The input array.</param>
     /// <param name="funcAndReason">A string describing the function and reason for failure.</param>

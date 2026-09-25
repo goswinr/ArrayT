@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Array.matches`, `findArray` and `findLastArray` now raise descriptive exceptions for an empty or null search pattern (and `matches` for a null `searchIn`) instead of a bare `IndexOutOfRangeException` or `NullReferenceException`.
 - `arr.ToString(Int32.MaxValue)` printed "..." and the last item twice, and `Array.trim` failed for very large trim counts, both because of an integer overflow.
 - `Array.failIfEmpty` and `Array.failIfLessThan` now raise an `ArgumentNullException` for a null input instead of a `NullReferenceException`.
+- Clearer error message from `arr.FirstAndOnly` and `Array.firstAndOnly` when the Array does not have exactly one item.
 
 ## [0.26.1] - 2026-09-07
 ### Fixed

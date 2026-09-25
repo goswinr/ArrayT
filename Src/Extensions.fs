@@ -111,11 +111,10 @@ module AutoOpenArrayTExtensions =
                 if xs.Length = 0 then badSetExn 0 xs "First" v
                 xs.[0] <- v
 
-        /// Gets the the only item in the Array.
+        /// Gets the only item in the Array.
         /// Fails if the Array does not have exactly one element.
         member inline xs.FirstAndOnly : 'T =
-            if xs.Length = 0 then badGetExn 0 xs "FirstAndOnly"
-            if xs.Length > 1 then badGetExn 1 xs "FirstAndOnly, Array is expected to have exactly one item."
+            if xs.Length <> 1 then badCountExn xs "FirstAndOnly" "exactly one item"
             xs.[0]
 
 
