@@ -2,11 +2,8 @@ namespace Tests
 
 open ArrayT
 
-#if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-open Fable.Mocha
-#else
-open Expecto
-#endif
+open Scriptorium.Nib.Assertion
+open type Scriptorium.Quill.Test
 
 open System
 open System.Collections.Generic
@@ -18,7 +15,7 @@ module FableParity =
  open Exceptions
 
  let tests =
-    testList "Fable Parity Tests" [
+    testList ("Fable Parity Tests", [
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------asResizeArray-------------------------------------------------------------
@@ -26,126 +23,143 @@ module FableParity =
         // In .NET: new ResizeArray is allocated and elements copied
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "asResizeArray with reference type array" <| fun _ ->
+        test ("asResizeArray with reference type array", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 3 "count should be 3"
-            Expect.equal result.[0] "a" "first element"
-            Expect.equal result.[1] "b" "second element"
-            Expect.equal result.[2] "c" "third element"
+            assertThat result.Count (tag "count should be 3" >> isEqualTo 3)
+            assertThat result.[0] (tag "first element" >> isEqualTo "a")
+            assertThat result.[1] (tag "second element" >> isEqualTo "b")
+            assertThat result.[2] (tag "third element" >> isEqualTo "c")
+        )
 
-        testCase "asResizeArray with empty reference type array" <| fun _ ->
+        test ("asResizeArray with empty reference type array", fun _ ->
             let xs : string[] = [||]
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 0 "empty array should give empty ResizeArray"
+            assertThat result.Count (tag "empty array should give empty ResizeArray" >> isEqualTo 0)
+        )
 
-        testCase "asResizeArray with single element" <| fun _ ->
+        test ("asResizeArray with single element", fun _ ->
             let xs = [| "only" |]
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 1 "count should be 1"
-            Expect.equal result.[0] "only" "single element"
+            assertThat result.Count (tag "count should be 1" >> isEqualTo 1)
+            assertThat result.[0] (tag "single element" >> isEqualTo "only")
+        )
 
-        testCase "asResizeArray with null strings in array" <| fun _ ->
+        test ("asResizeArray with null strings in array", fun _ ->
             let xs = [| "a"; null; "c" |]
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 3 "count should be 3"
-            Expect.equal result.[0] "a" "first element"
-            Expect.isTrue (isNull result.[1]) "null element should be preserved"
-            Expect.equal result.[2] "c" "third element"
+            assertThat result.Count (tag "count should be 3" >> isEqualTo 3)
+            assertThat result.[0] (tag "first element" >> isEqualTo "a")
+            assertThat result.[1] (tag "null element should be preserved" >> isNull)
+            assertThat result.[2] (tag "third element" >> isEqualTo "c")
+        )
 
-        testCase "asResizeArray with duplicate reference elements" <| fun _ ->
+        test ("asResizeArray with duplicate reference elements", fun _ ->
             let xs = [| "dup"; "dup"; "other"; "dup" |]
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 4 "count should be 4"
-            Expect.equal result.[0] "dup" "first dup"
-            Expect.equal result.[1] "dup" "second dup"
-            Expect.equal result.[3] "dup" "fourth dup"
+            assertThat result.Count (tag "count should be 4" >> isEqualTo 4)
+            assertThat result.[0] (tag "first dup" >> isEqualTo "dup")
+            assertThat result.[1] (tag "second dup" >> isEqualTo "dup")
+            assertThat result.[3] (tag "fourth dup" >> isEqualTo "dup")
+        )
 
-        testCase "asResizeArray throws on null array" <| fun _ ->
+        test ("asResizeArray throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.asResizeArray xs |> ignore)
+        )
 
-        testCase "asResizeArray preserves element order" <| fun _ ->
+        test ("asResizeArray preserves element order", fun _ ->
             let xs = [| "z"; "a"; "m"; "b" |]
             let result = Array.asResizeArray xs
-            Expect.equal result.[0] "z" "order[0]"
-            Expect.equal result.[1] "a" "order[1]"
-            Expect.equal result.[2] "m" "order[2]"
-            Expect.equal result.[3] "b" "order[3]"
+            assertThat result.[0] (tag "order[0]" >> isEqualTo "z")
+            assertThat result.[1] (tag "order[1]" >> isEqualTo "a")
+            assertThat result.[2] (tag "order[2]" >> isEqualTo "m")
+            assertThat result.[3] (tag "order[3]" >> isEqualTo "b")
+        )
 
-        testCase "asResizeArray with large reference array" <| fun _ ->
+        test ("asResizeArray with large reference array", fun _ ->
             let xs = Array.init 1000 (fun i -> sprintf "item%d" i)
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 1000 "count should be 1000"
-            Expect.equal result.[0] "item0" "first"
-            Expect.equal result.[999] "item999" "last"
+            assertThat result.Count (tag "count should be 1000" >> isEqualTo 1000)
+            assertThat result.[0] (tag "first" >> isEqualTo "item0")
+            assertThat result.[999] (tag "last" >> isEqualTo "item999")
+        )
 
-        testCase "asResizeArray result is iterable" <| fun _ ->
+        test ("asResizeArray result is iterable", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let result = Array.asResizeArray xs
             let mutable sum = ""
             for item in result do
                 sum <- sum + item
-            Expect.equal sum "abc" "iteration should work"
+            assertThat sum (tag "iteration should work" >> isEqualTo "abc")
+        )
 
-        testCase "asResizeArray result supports Add" <| fun _ ->
+        test ("asResizeArray result supports Add", fun _ ->
             let xs = [| "a"; "b" |]
             let result = Array.asResizeArray xs
             result.Add("c")
-            Expect.equal result.Count 3 "count after Add"
-            Expect.equal result.[2] "c" "added element"
+            assertThat result.Count (tag "count after Add" >> isEqualTo 3)
+            assertThat result.[2] (tag "added element" >> isEqualTo "c")
+        )
 
-        testCase "asResizeArray result supports Remove" <| fun _ ->
+        test ("asResizeArray result supports Remove", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let result = Array.asResizeArray xs
             let removed = result.Remove("b")
-            Expect.isTrue removed "Remove should return true"
-            Expect.equal result.Count 2 "count after Remove"
+            assertThat removed (tag "Remove should return true" >> isTrue)
+            assertThat result.Count (tag "count after Remove" >> isEqualTo 2)
+        )
 
-        testCase "asResizeArray result supports IndexOf" <| fun _ ->
+        test ("asResizeArray result supports IndexOf", fun _ ->
             let xs = [| "first"; "second"; "third" |]
             let result = Array.asResizeArray xs
-            Expect.equal (result.IndexOf("second")) 1 "IndexOf second"
-            Expect.equal (result.IndexOf("missing")) -1 "IndexOf missing"
+            assertThat (result.IndexOf("second")) (tag "IndexOf second" >> isEqualTo 1)
+            assertThat (result.IndexOf("missing")) (tag "IndexOf missing" >> isEqualTo -1)
+        )
 
-        testCase "asResizeArray result supports Contains" <| fun _ ->
+        test ("asResizeArray result supports Contains", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let result = Array.asResizeArray xs
-            Expect.isTrue (result.Contains("b")) "Contains existing"
-            Expect.isFalse (result.Contains("d")) "Contains missing"
+            assertThat (result.Contains("b")) (tag "Contains existing" >> isTrue)
+            assertThat (result.Contains("d")) (tag "Contains missing" >> isFalse)
+        )
 
-        testCase "asResizeArray with all null elements" <| fun _ ->
+        test ("asResizeArray with all null elements", fun _ ->
             let xs : string[] = [| null; null; null |]
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 3 "count should be 3"
-            Expect.isTrue (isNull result.[0]) "null[0]"
-            Expect.isTrue (isNull result.[1]) "null[1]"
-            Expect.isTrue (isNull result.[2]) "null[2]"
+            assertThat result.Count (tag "count should be 3" >> isEqualTo 3)
+            assertThat result.[0] (tag "null[0]" >> isNull)
+            assertThat result.[1] (tag "null[1]" >> isNull)
+            assertThat result.[2] (tag "null[2]" >> isNull)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------toResizeArray (for comparison)---------------------------------------------
         // toResizeArray always allocates a copy; verify same observable behavior as asResizeArray
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "toResizeArray with reference type array gives same results as asResizeArray" <| fun _ ->
+        test ("toResizeArray with reference type array gives same results as asResizeArray", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let fromTo = Array.toResizeArray xs
             let fromAs = Array.asResizeArray xs
-            Expect.equal fromTo.Count fromAs.Count "counts should match"
+            assertThat fromTo.Count (tag "counts should match" >> isEqualTo fromAs.Count)
             for i in 0 .. xs.Length - 1 do
-                Expect.equal fromTo.[i] fromAs.[i] (sprintf "element[%d]" i)
+                assertThat fromTo.[i] (tag (sprintf "element[%d]" i) >> isEqualTo fromAs.[i])
+        )
 
-        testCase "toResizeArray with empty reference type array" <| fun _ ->
+        test ("toResizeArray with empty reference type array", fun _ ->
             let xs : string[] = [||]
             let result = Array.toResizeArray xs
-            Expect.equal result.Count 0 "empty"
+            assertThat result.Count (tag "empty" >> isEqualTo 0)
+        )
 
-        testCase "toResizeArray with null strings" <| fun _ ->
+        test ("toResizeArray with null strings", fun _ ->
             let xs = [| null; "b"; null |]
             let result = Array.toResizeArray xs
-            Expect.isTrue (isNull result.[0]) "null[0]"
-            Expect.equal result.[1] "b" "b[1]"
-            Expect.isTrue (isNull result.[2]) "null[2]"
+            assertThat result.[0] (tag "null[0]" >> isNull)
+            assertThat result.[1] (tag "b[1]" >> isEqualTo "b")
+            assertThat result.[2] (tag "null[2]" >> isNull)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------badGetExn (tested via Get/Idx extensions)----------------------------------
@@ -154,647 +168,764 @@ module FableParity =
         // Both should throw IndexOutOfRangeException with same behavior
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Get throws on empty int array" <| fun _ ->
+        test ("Get throws on empty int array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.Get 0 |> ignore)
+        )
 
-        testCase "Get throws on empty string array" <| fun _ ->
+        test ("Get throws on empty string array", fun _ ->
             let xs : string[] = [||]
             throwsRange (fun () -> xs.Get 0 |> ignore)
+        )
 
-        testCase "Get throws on out of range for value types" <| fun _ ->
+        test ("Get throws on out of range for value types", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.Get 3 |> ignore)
             throwsRange (fun () -> xs.Get -1 |> ignore)
             throwsRange (fun () -> xs.Get 100 |> ignore)
+        )
 
-        testCase "Get throws on out of range for reference types" <| fun _ ->
+        test ("Get throws on out of range for reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             throwsRange (fun () -> xs.Get 3 |> ignore)
             throwsRange (fun () -> xs.Get -1 |> ignore)
             throwsRange (fun () -> xs.Get 100 |> ignore)
+        )
 
-        testCase "Get works for value types" <| fun _ ->
+        test ("Get works for value types", fun _ ->
             let xs = [| 10; 20; 30 |]
-            Expect.equal (xs.Get 0) 10 "int[0]"
-            Expect.equal (xs.Get 1) 20 "int[1]"
-            Expect.equal (xs.Get 2) 30 "int[2]"
+            assertThat (xs.Get 0) (tag "int[0]" >> isEqualTo 10)
+            assertThat (xs.Get 1) (tag "int[1]" >> isEqualTo 20)
+            assertThat (xs.Get 2) (tag "int[2]" >> isEqualTo 30)
+        )
 
-        testCase "Get works for reference types" <| fun _ ->
+        test ("Get works for reference types", fun _ ->
             let xs = [| "hello"; "world" |]
-            Expect.equal (xs.Get 0) "hello" "string[0]"
-            Expect.equal (xs.Get 1) "world" "string[1]"
+            assertThat (xs.Get 0) (tag "string[0]" >> isEqualTo "hello")
+            assertThat (xs.Get 1) (tag "string[1]" >> isEqualTo "world")
+        )
 
-        testCase "Get works for float (value type)" <| fun _ ->
+        test ("Get works for float (value type)", fun _ ->
             let xs = [| 1.5; 2.5; 3.5 |]
-            Expect.equal (xs.Get 0) 1.5 "float[0]"
-            Expect.equal (xs.Get 2) 3.5 "float[2]"
+            assertThat (xs.Get 0) (tag "float[0]" >> isEqualTo 1.5)
+            assertThat (xs.Get 2) (tag "float[2]" >> isEqualTo 3.5)
+        )
 
-        testCase "Get works for bool (value type)" <| fun _ ->
+        test ("Get works for bool (value type)", fun _ ->
             let xs = [| true; false; true |]
-            Expect.equal (xs.Get 0) true "bool[0]"
-            Expect.equal (xs.Get 1) false "bool[1]"
+            assertThat (xs.Get 0) (tag "bool[0]" >> isEqualTo true)
+            assertThat (xs.Get 1) (tag "bool[1]" >> isEqualTo false)
+        )
 
-        testCase "Get with single element array" <| fun _ ->
+        test ("Get with single element array", fun _ ->
             let xs = [| 42 |]
-            Expect.equal (xs.Get 0) 42 "single element"
+            assertThat (xs.Get 0) (tag "single element" >> isEqualTo 42)
             throwsRange (fun () -> xs.Get 1 |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------badSetExn (tested via Set extension)--------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Set throws on empty int array" <| fun _ ->
+        test ("Set throws on empty int array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.Set 0 99)
+        )
 
-        testCase "Set throws on empty string array" <| fun _ ->
+        test ("Set throws on empty string array", fun _ ->
             let xs : string[] = [||]
             throwsRange (fun () -> xs.Set 0 "x")
+        )
 
-        testCase "Set throws on out of range for value types" <| fun _ ->
+        test ("Set throws on out of range for value types", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.Set 3 99)
             throwsRange (fun () -> xs.Set -1 99)
+        )
 
-        testCase "Set throws on out of range for reference types" <| fun _ ->
+        test ("Set throws on out of range for reference types", fun _ ->
             let xs = [| "a"; "b" |]
             throwsRange (fun () -> xs.Set 2 "x")
             throwsRange (fun () -> xs.Set -1 "x")
+        )
 
-        testCase "Set works for value types" <| fun _ ->
+        test ("Set works for value types", fun _ ->
             let xs = [| 10; 20; 30 |]
             xs.Set 1 99
-            Expect.equal xs.[1] 99 "set int"
+            assertThat xs.[1] (tag "set int" >> isEqualTo 99)
+        )
 
-        testCase "Set works for reference types" <| fun _ ->
+        test ("Set works for reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             xs.Set 1 "z"
-            Expect.equal xs.[1] "z" "set string"
+            assertThat xs.[1] (tag "set string" >> isEqualTo "z")
+        )
 
-        testCase "Set null to reference type array" <| fun _ ->
+        test ("Set null to reference type array", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             xs.Set 1 null
-            Expect.isTrue (isNull xs.[1]) "set null"
+            assertThat xs.[1] (tag "set null" >> isNull)
+        )
 
-        testCase "Set with single element array" <| fun _ ->
+        test ("Set with single element array", fun _ ->
             let xs = [| 42 |]
             xs.Set 0 99
-            Expect.equal xs.[0] 99 "set single element"
+            assertThat xs.[0] (tag "set single element" >> isEqualTo 99)
             throwsRange (fun () -> xs.Set 1 99)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Idx extension (uses badGetExn)---------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Idx throws on empty array value type" <| fun _ ->
+        test ("Idx throws on empty array value type", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.Idx 0 |> ignore)
+        )
 
-        testCase "Idx throws on empty array reference type" <| fun _ ->
+        test ("Idx throws on empty array reference type", fun _ ->
             let xs : string[] = [||]
             throwsRange (fun () -> xs.Idx 0 |> ignore)
+        )
 
-        testCase "Idx works for value and reference types" <| fun _ ->
+        test ("Idx works for value and reference types", fun _ ->
             let ints = [| 1; 2; 3 |]
-            Expect.equal (ints.Idx 0) 1 "int Idx 0"
-            Expect.equal (ints.Idx 2) 3 "int Idx 2"
+            assertThat (ints.Idx 0) (tag "int Idx 0" >> isEqualTo 1)
+            assertThat (ints.Idx 2) (tag "int Idx 2" >> isEqualTo 3)
             let strs = [| "x"; "y" |]
-            Expect.equal (strs.Idx 0) "x" "string Idx 0"
-            Expect.equal (strs.Idx 1) "y" "string Idx 1"
+            assertThat (strs.Idx 0) (tag "string Idx 0" >> isEqualTo "x")
+            assertThat (strs.Idx 1) (tag "string Idx 1" >> isEqualTo "y")
+        )
 
-        testCase "Idx out of range" <| fun _ ->
+        test ("Idx out of range", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.Idx 3 |> ignore)
             throwsRange (fun () -> xs.Idx -1 |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------DebugIndexer (uses badGetExn/badSetExn)------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "DebugIdx get on empty value type array" <| fun _ ->
+        test ("DebugIdx get on empty value type array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.DebugIdx.[0] |> ignore)
+        )
 
-        testCase "DebugIdx get on empty reference type array" <| fun _ ->
+        test ("DebugIdx get on empty reference type array", fun _ ->
             let xs : string[] = [||]
             throwsRange (fun () -> xs.DebugIdx.[0] |> ignore)
+        )
 
-        testCase "DebugIdx set on empty value type array" <| fun _ ->
+        test ("DebugIdx set on empty value type array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.DebugIdx.[0] <- 1)
+        )
 
-        testCase "DebugIdx set on empty reference type array" <| fun _ ->
+        test ("DebugIdx set on empty reference type array", fun _ ->
             let xs : string[] = [||]
             throwsRange (fun () -> xs.DebugIdx.[0] <- "x")
+        )
 
-        testCase "DebugIdx get works for value types" <| fun _ ->
+        test ("DebugIdx get works for value types", fun _ ->
             let xs = [| 10; 20; 30 |]
-            Expect.equal (xs.DebugIdx.[0]) 10 "int DebugIdx[0]"
-            Expect.equal (xs.DebugIdx.[2]) 30 "int DebugIdx[2]"
+            assertThat (xs.DebugIdx.[0]) (tag "int DebugIdx[0]" >> isEqualTo 10)
+            assertThat (xs.DebugIdx.[2]) (tag "int DebugIdx[2]" >> isEqualTo 30)
+        )
 
-        testCase "DebugIdx get works for reference types" <| fun _ ->
+        test ("DebugIdx get works for reference types", fun _ ->
             let xs = [| "hello"; "world" |]
-            Expect.equal (xs.DebugIdx.[0]) "hello" "string DebugIdx[0]"
-            Expect.equal (xs.DebugIdx.[1]) "world" "string DebugIdx[1]"
+            assertThat (xs.DebugIdx.[0]) (tag "string DebugIdx[0]" >> isEqualTo "hello")
+            assertThat (xs.DebugIdx.[1]) (tag "string DebugIdx[1]" >> isEqualTo "world")
+        )
 
-        testCase "DebugIdx set works for value types" <| fun _ ->
+        test ("DebugIdx set works for value types", fun _ ->
             let xs = [| 10; 20; 30 |]
             xs.DebugIdx.[1] <- 99
-            Expect.equal xs.[1] 99 "set int via DebugIdx"
+            assertThat xs.[1] (tag "set int via DebugIdx" >> isEqualTo 99)
+        )
 
-        testCase "DebugIdx set works for reference types" <| fun _ ->
+        test ("DebugIdx set works for reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             xs.DebugIdx.[1] <- "z"
-            Expect.equal xs.[1] "z" "set string via DebugIdx"
+            assertThat xs.[1] (tag "set string via DebugIdx" >> isEqualTo "z")
+        )
 
-        testCase "DebugIdx set null on reference type" <| fun _ ->
+        test ("DebugIdx set null on reference type", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             xs.DebugIdx.[1] <- null
-            Expect.isTrue (isNull xs.[1]) "set null via DebugIdx"
+            assertThat xs.[1] (tag "set null via DebugIdx" >> isNull)
+        )
 
-        testCase "DebugIdx out of range negative index" <| fun _ ->
+        test ("DebugIdx out of range negative index", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.DebugIdx.[-1] |> ignore)
             throwsRange (fun () -> xs.DebugIdx.[-1] <- 99)
+        )
 
-        testCase "DebugIdx out of range positive index" <| fun _ ->
+        test ("DebugIdx out of range positive index", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.DebugIdx.[3] |> ignore)
             throwsRange (fun () -> xs.DebugIdx.[3] <- 99)
+        )
 
-        testCase "DebugIdx with single element" <| fun _ ->
+        test ("DebugIdx with single element", fun _ ->
             let xs = [| "only" |]
-            Expect.equal (xs.DebugIdx.[0]) "only" "single element get"
+            assertThat (xs.DebugIdx.[0]) (tag "single element get" >> isEqualTo "only")
             xs.DebugIdx.[0] <- "changed"
-            Expect.equal xs.[0] "changed" "single element set"
+            assertThat xs.[0] (tag "single element set" >> isEqualTo "changed")
             throwsRange (fun () -> xs.DebugIdx.[1] |> ignore)
+        )
 
-        testCase "DebugIdx Length property" <| fun _ ->
+        test ("DebugIdx Length property", fun _ ->
             let xs = [| 1; 2; 3 |]
-            Expect.equal xs.DebugIdx.Length 3 "DebugIdx.Length"
+            assertThat xs.DebugIdx.Length (tag "DebugIdx.Length" >> isEqualTo 3)
             let empty : int[] = [||]
-            Expect.equal empty.DebugIdx.Length 0 "DebugIdx.Length empty"
+            assertThat empty.DebugIdx.Length (tag "DebugIdx.Length empty" >> isEqualTo 0)
+        )
 
-        testCase "DebugIdx Array property" <| fun _ ->
+        test ("DebugIdx Array property", fun _ ->
             let xs = [| 1; 2; 3 |]
             let arr = xs.DebugIdx.Array
-            Expect.isTrue (Object.ReferenceEquals(xs, arr)) "DebugIdx.Array should return same array"
+            assertThat (Object.ReferenceEquals(xs, arr)) (tag "DebugIdx.Array should return same array" >> isTrue)
+        )
 
-        testCase "DebugIdx with duplicates" <| fun _ ->
+        test ("DebugIdx with duplicates", fun _ ->
             let xs = [| 5; 5; 5 |]
-            Expect.equal (xs.DebugIdx.[0]) 5 "dup[0]"
-            Expect.equal (xs.DebugIdx.[1]) 5 "dup[1]"
-            Expect.equal (xs.DebugIdx.[2]) 5 "dup[2]"
+            assertThat (xs.DebugIdx.[0]) (tag "dup[0]" >> isEqualTo 5)
+            assertThat (xs.DebugIdx.[1]) (tag "dup[1]" >> isEqualTo 5)
+            assertThat (xs.DebugIdx.[2]) (tag "dup[2]" >> isEqualTo 5)
             xs.DebugIdx.[1] <- 99
-            Expect.equal xs.[0] 5 "dup unchanged[0]"
-            Expect.equal xs.[1] 99 "dup changed[1]"
-            Expect.equal xs.[2] 5 "dup unchanged[2]"
+            assertThat xs.[0] (tag "dup unchanged[0]" >> isEqualTo 5)
+            assertThat xs.[1] (tag "dup changed[1]" >> isEqualTo 99)
+            assertThat xs.[2] (tag "dup unchanged[2]" >> isEqualTo 5)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------fail function (tested via module functions)--------------------------------
         // fail is used internally by various Array module functions
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.first throws on empty int array" <| fun _ ->
+        test ("Array.first throws on empty int array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.first xs |> ignore)
+        )
 
-        testCase "Array.first throws on empty string array" <| fun _ ->
+        test ("Array.first throws on empty string array", fun _ ->
             let xs : string[] = [||]
             throwsRange (fun () -> Array.first xs |> ignore)
+        )
 
-        testCase "Array.first throws on null" <| fun _ ->
+        test ("Array.first throws on null", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.first xs |> ignore)
+        )
 
-        testCase "Array.first works for value types" <| fun _ ->
-            Expect.equal (Array.first [| 10; 20; 30 |]) 10 "first int"
+        test ("Array.first works for value types", fun _ ->
+            assertThat (Array.first [| 10; 20; 30 |]) (tag "first int" >> isEqualTo 10)
+        )
 
-        testCase "Array.first works for reference types" <| fun _ ->
-            Expect.equal (Array.first [| "a"; "b" |]) "a" "first string"
+        test ("Array.first works for reference types", fun _ ->
+            assertThat (Array.first [| "a"; "b" |]) (tag "first string" >> isEqualTo "a")
+        )
 
-        testCase "Array.first with single element" <| fun _ ->
-            Expect.equal (Array.first [| 42 |]) 42 "first single int"
-            Expect.equal (Array.first [| "only" |]) "only" "first single string"
+        test ("Array.first with single element", fun _ ->
+            assertThat (Array.first [| 42 |]) (tag "first single int" >> isEqualTo 42)
+            assertThat (Array.first [| "only" |]) (tag "first single string" >> isEqualTo "only")
+        )
 
-        testCase "Array.first with null element at position 0" <| fun _ ->
+        test ("Array.first with null element at position 0", fun _ ->
             let xs = [| null; "b" |]
-            Expect.isTrue (isNull (Array.first xs)) "first null element"
+            assertThat (Array.first xs) (tag "first null element" >> isNull)
+        )
 
-        testCase "Array.secondLast throws on arrays with less than 2 items" <| fun _ ->
+        test ("Array.secondLast throws on arrays with less than 2 items", fun _ ->
             throwsRange (fun () -> Array.secondLast ([||] : int[]) |> ignore)
             throwsRange (fun () -> Array.secondLast [| 1 |] |> ignore)
+        )
 
-        testCase "Array.secondLast works for value and reference types" <| fun _ ->
-            Expect.equal (Array.secondLast [| 1; 2; 3 |]) 2 "secondLast int"
-            Expect.equal (Array.secondLast [| "a"; "b"; "c" |]) "b" "secondLast string"
+        test ("Array.secondLast works for value and reference types", fun _ ->
+            assertThat (Array.secondLast [| 1; 2; 3 |]) (tag "secondLast int" >> isEqualTo 2)
+            assertThat (Array.secondLast [| "a"; "b"; "c" |]) (tag "secondLast string" >> isEqualTo "b")
+        )
 
-        testCase "Array.thirdLast throws on arrays with less than 3 items" <| fun _ ->
+        test ("Array.thirdLast throws on arrays with less than 3 items", fun _ ->
             throwsRange (fun () -> Array.thirdLast ([||] : int[]) |> ignore)
             throwsRange (fun () -> Array.thirdLast [| 1 |] |> ignore)
             throwsRange (fun () -> Array.thirdLast [| 1; 2 |] |> ignore)
+        )
 
-        testCase "Array.thirdLast works for value and reference types" <| fun _ ->
-            Expect.equal (Array.thirdLast [| 1; 2; 3; 4 |]) 2 "thirdLast int"
-            Expect.equal (Array.thirdLast [| "a"; "b"; "c" |]) "a" "thirdLast string"
+        test ("Array.thirdLast works for value and reference types", fun _ ->
+            assertThat (Array.thirdLast [| 1; 2; 3; 4 |]) (tag "thirdLast int" >> isEqualTo 2)
+            assertThat (Array.thirdLast [| "a"; "b"; "c" |]) (tag "thirdLast string" >> isEqualTo "a")
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------GetNeg/SetNeg extensions (use negIdx from Util.fs)-------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "GetNeg on value types" <| fun _ ->
+        test ("GetNeg on value types", fun _ ->
             let xs = [| 10; 20; 30; 40; 50 |]
-            Expect.equal (xs.GetNeg -1) 50 "GetNeg -1"
-            Expect.equal (xs.GetNeg -2) 40 "GetNeg -2"
-            Expect.equal (xs.GetNeg -5) 10 "GetNeg -5"
-            Expect.equal (xs.GetNeg 0) 10 "GetNeg 0"
-            Expect.equal (xs.GetNeg 4) 50 "GetNeg 4"
+            assertThat (xs.GetNeg -1) (tag "GetNeg -1" >> isEqualTo 50)
+            assertThat (xs.GetNeg -2) (tag "GetNeg -2" >> isEqualTo 40)
+            assertThat (xs.GetNeg -5) (tag "GetNeg -5" >> isEqualTo 10)
+            assertThat (xs.GetNeg 0) (tag "GetNeg 0" >> isEqualTo 10)
+            assertThat (xs.GetNeg 4) (tag "GetNeg 4" >> isEqualTo 50)
+        )
 
-        testCase "GetNeg on reference types" <| fun _ ->
+        test ("GetNeg on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
-            Expect.equal (xs.GetNeg -1) "c" "GetNeg -1 ref"
-            Expect.equal (xs.GetNeg -3) "a" "GetNeg -3 ref"
-            Expect.equal (xs.GetNeg 0) "a" "GetNeg 0 ref"
+            assertThat (xs.GetNeg -1) (tag "GetNeg -1 ref" >> isEqualTo "c")
+            assertThat (xs.GetNeg -3) (tag "GetNeg -3 ref" >> isEqualTo "a")
+            assertThat (xs.GetNeg 0) (tag "GetNeg 0 ref" >> isEqualTo "a")
+        )
 
-        testCase "GetNeg throws on empty array" <| fun _ ->
+        test ("GetNeg throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.GetNeg 0 |> ignore)
             throwsRange (fun () -> xs.GetNeg -1 |> ignore)
+        )
 
-        testCase "GetNeg throws on too-large negative index" <| fun _ ->
+        test ("GetNeg throws on too-large negative index", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.GetNeg -4 |> ignore)
+        )
 
-        testCase "GetNeg throws on too-large positive index" <| fun _ ->
+        test ("GetNeg throws on too-large positive index", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.GetNeg 3 |> ignore)
+        )
 
-        testCase "GetNeg with single element" <| fun _ ->
+        test ("GetNeg with single element", fun _ ->
             let xs = [| 42 |]
-            Expect.equal (xs.GetNeg 0) 42 "GetNeg 0 single"
-            Expect.equal (xs.GetNeg -1) 42 "GetNeg -1 single"
+            assertThat (xs.GetNeg 0) (tag "GetNeg 0 single" >> isEqualTo 42)
+            assertThat (xs.GetNeg -1) (tag "GetNeg -1 single" >> isEqualTo 42)
             throwsRange (fun () -> xs.GetNeg -2 |> ignore)
             throwsRange (fun () -> xs.GetNeg 1 |> ignore)
+        )
 
-        testCase "SetNeg on value types" <| fun _ ->
+        test ("SetNeg on value types", fun _ ->
             let xs = [| 10; 20; 30 |]
             xs.SetNeg -1 99
-            Expect.equal xs.[2] 99 "SetNeg -1"
+            assertThat xs.[2] (tag "SetNeg -1" >> isEqualTo 99)
             xs.SetNeg -3 88
-            Expect.equal xs.[0] 88 "SetNeg -3"
+            assertThat xs.[0] (tag "SetNeg -3" >> isEqualTo 88)
             xs.SetNeg 1 77
-            Expect.equal xs.[1] 77 "SetNeg 1"
+            assertThat xs.[1] (tag "SetNeg 1" >> isEqualTo 77)
+        )
 
-        testCase "SetNeg on reference types" <| fun _ ->
+        test ("SetNeg on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             xs.SetNeg -1 "z"
-            Expect.equal xs.[2] "z" "SetNeg -1 ref"
+            assertThat xs.[2] (tag "SetNeg -1 ref" >> isEqualTo "z")
+        )
 
-        testCase "SetNeg throws on empty array" <| fun _ ->
+        test ("SetNeg throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.SetNeg 0 1)
             throwsRange (fun () -> xs.SetNeg -1 1)
+        )
 
-        testCase "SetNeg throws on too-large negative index" <| fun _ ->
+        test ("SetNeg throws on too-large negative index", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.SetNeg -4 99)
+        )
 
-        testCase "SetNeg throws on too-large positive index" <| fun _ ->
+        test ("SetNeg throws on too-large positive index", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.SetNeg 3 99)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------GetLooped/SetLooped extensions---------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "GetLooped on value types wraps around" <| fun _ ->
+        test ("GetLooped on value types wraps around", fun _ ->
             let xs = [| 10; 20; 30 |]
-            Expect.equal (xs.GetLooped 0) 10 "GetLooped 0"
-            Expect.equal (xs.GetLooped 3) 10 "GetLooped 3 (wraps)"
-            Expect.equal (xs.GetLooped 4) 20 "GetLooped 4"
-            Expect.equal (xs.GetLooped 5) 30 "GetLooped 5"
-            Expect.equal (xs.GetLooped 6) 10 "GetLooped 6 (wraps again)"
+            assertThat (xs.GetLooped 0) (tag "GetLooped 0" >> isEqualTo 10)
+            assertThat (xs.GetLooped 3) (tag "GetLooped 3 (wraps)" >> isEqualTo 10)
+            assertThat (xs.GetLooped 4) (tag "GetLooped 4" >> isEqualTo 20)
+            assertThat (xs.GetLooped 5) (tag "GetLooped 5" >> isEqualTo 30)
+            assertThat (xs.GetLooped 6) (tag "GetLooped 6 (wraps again)" >> isEqualTo 10)
+        )
 
-        testCase "GetLooped on reference types" <| fun _ ->
+        test ("GetLooped on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
-            Expect.equal (xs.GetLooped 3) "a" "GetLooped wraps ref"
-            Expect.equal (xs.GetLooped 4) "b" "GetLooped wraps ref+1"
+            assertThat (xs.GetLooped 3) (tag "GetLooped wraps ref" >> isEqualTo "a")
+            assertThat (xs.GetLooped 4) (tag "GetLooped wraps ref+1" >> isEqualTo "b")
+        )
 
-        testCase "GetLooped with negative indices" <| fun _ ->
+        test ("GetLooped with negative indices", fun _ ->
             let xs = [| 10; 20; 30 |]
-            Expect.equal (xs.GetLooped -1) 30 "GetLooped -1"
-            Expect.equal (xs.GetLooped -2) 20 "GetLooped -2"
-            Expect.equal (xs.GetLooped -3) 10 "GetLooped -3"
-            Expect.equal (xs.GetLooped -4) 30 "GetLooped -4 (wraps)"
+            assertThat (xs.GetLooped -1) (tag "GetLooped -1" >> isEqualTo 30)
+            assertThat (xs.GetLooped -2) (tag "GetLooped -2" >> isEqualTo 20)
+            assertThat (xs.GetLooped -3) (tag "GetLooped -3" >> isEqualTo 10)
+            assertThat (xs.GetLooped -4) (tag "GetLooped -4 (wraps)" >> isEqualTo 30)
+        )
 
-        testCase "GetLooped throws on empty array" <| fun _ ->
+        test ("GetLooped throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.GetLooped 0 |> ignore)
+        )
 
-        testCase "GetLooped with single element" <| fun _ ->
+        test ("GetLooped with single element", fun _ ->
             let xs = [| 42 |]
-            Expect.equal (xs.GetLooped 0) 42 "GetLooped single 0"
-            Expect.equal (xs.GetLooped 1) 42 "GetLooped single 1"
-            Expect.equal (xs.GetLooped -1) 42 "GetLooped single -1"
-            Expect.equal (xs.GetLooped 1000) 42 "GetLooped single 1000"
+            assertThat (xs.GetLooped 0) (tag "GetLooped single 0" >> isEqualTo 42)
+            assertThat (xs.GetLooped 1) (tag "GetLooped single 1" >> isEqualTo 42)
+            assertThat (xs.GetLooped -1) (tag "GetLooped single -1" >> isEqualTo 42)
+            assertThat (xs.GetLooped 1000) (tag "GetLooped single 1000" >> isEqualTo 42)
+        )
 
-        testCase "SetLooped on value types wraps around" <| fun _ ->
+        test ("SetLooped on value types wraps around", fun _ ->
             let xs = [| 10; 20; 30 |]
             xs.SetLooped 3 99
-            Expect.equal xs.[0] 99 "SetLooped 3 wraps to 0"
+            assertThat xs.[0] (tag "SetLooped 3 wraps to 0" >> isEqualTo 99)
+        )
 
-        testCase "SetLooped with negative index" <| fun _ ->
+        test ("SetLooped with negative index", fun _ ->
             let xs = [| 10; 20; 30 |]
             xs.SetLooped -1 99
-            Expect.equal xs.[2] 99 "SetLooped -1"
+            assertThat xs.[2] (tag "SetLooped -1" >> isEqualTo 99)
+        )
 
-        testCase "SetLooped throws on empty array" <| fun _ ->
+        test ("SetLooped throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> xs.SetLooped 0 99)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Last/First/Second/Third extensions with various types----------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Last on reference types with null elements" <| fun _ ->
+        test ("Last on reference types with null elements", fun _ ->
             let xs = [| "a"; null |]
-            Expect.isTrue (isNull xs.Last) "Last should be null"
+            assertThat xs.Last (tag "Last should be null" >> isNull)
+        )
 
-        testCase "First on reference types with null elements" <| fun _ ->
+        test ("First on reference types with null elements", fun _ ->
             let xs = [| null; "b" |]
-            Expect.isTrue (isNull xs.First) "First should be null"
+            assertThat xs.First (tag "First should be null" >> isNull)
+        )
 
-        testCase "Last/First on float array" <| fun _ ->
+        test ("Last/First on float array", fun _ ->
             let xs = [| 1.1; 2.2; 3.3 |]
-            Expect.equal xs.First 1.1 "First float"
-            Expect.equal xs.Last 3.3 "Last float"
+            assertThat xs.First (tag "First float" >> isEqualTo 1.1)
+            assertThat xs.Last (tag "Last float" >> isEqualTo 3.3)
+        )
 
-        testCase "Last/First on bool array" <| fun _ ->
+        test ("Last/First on bool array", fun _ ->
             let xs = [| true; false |]
-            Expect.equal xs.First true "First bool"
-            Expect.equal xs.Last false "Last bool"
+            assertThat xs.First (tag "First bool" >> isEqualTo true)
+            assertThat xs.Last (tag "Last bool" >> isEqualTo false)
+        )
 
-        testCase "Last/First setters with reference types" <| fun _ ->
+        test ("Last/First setters with reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             xs.First <- "z"
             xs.Last <- "y"
-            Expect.equal xs.[0] "z" "First set ref"
-            Expect.equal xs.[2] "y" "Last set ref"
+            assertThat xs.[0] (tag "First set ref" >> isEqualTo "z")
+            assertThat xs.[2] (tag "Last set ref" >> isEqualTo "y")
+        )
 
-        testCase "Last/First setters with null" <| fun _ ->
+        test ("Last/First setters with null", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             xs.First <- null
             xs.Last <- null
-            Expect.isTrue (isNull xs.[0]) "First set null"
-            Expect.isTrue (isNull xs.[2]) "Last set null"
+            assertThat xs.[0] (tag "First set null" >> isNull)
+            assertThat xs.[2] (tag "Last set null" >> isNull)
+        )
 
-        testCase "SecondLast/ThirdLast on reference types" <| fun _ ->
+        test ("SecondLast/ThirdLast on reference types", fun _ ->
             let xs = [| "a"; "b"; "c"; "d" |]
-            Expect.equal xs.SecondLast "c" "SecondLast ref"
-            Expect.equal xs.ThirdLast "b" "ThirdLast ref"
+            assertThat xs.SecondLast (tag "SecondLast ref" >> isEqualTo "c")
+            assertThat xs.ThirdLast (tag "ThirdLast ref" >> isEqualTo "b")
+        )
 
-        testCase "Second/Third on reference types" <| fun _ ->
+        test ("Second/Third on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
-            Expect.equal xs.Second "b" "Second ref"
-            Expect.equal xs.Third "c" "Third ref"
+            assertThat xs.Second (tag "Second ref" >> isEqualTo "b")
+            assertThat xs.Third (tag "Third ref" >> isEqualTo "c")
+        )
 
-        testCase "FirstAndOnly on value types" <| fun _ ->
-            Expect.equal [| 42 |].FirstAndOnly 42 "FirstAndOnly int"
+        test ("FirstAndOnly on value types", fun _ ->
+            assertThat [| 42 |].FirstAndOnly (tag "FirstAndOnly int" >> isEqualTo 42)
             throwsRange (fun () -> [||].FirstAndOnly |> ignore)
             throwsRange (fun () -> [| 1; 2 |].FirstAndOnly |> ignore)
+        )
 
-        testCase "FirstAndOnly on reference types" <| fun _ ->
-            Expect.equal [| "only" |].FirstAndOnly "only" "FirstAndOnly string"
+        test ("FirstAndOnly on reference types", fun _ ->
+            assertThat [| "only" |].FirstAndOnly (tag "FirstAndOnly string" >> isEqualTo "only")
             let xs : string[] = [||]
             throwsRange (fun () -> xs.FirstAndOnly |> ignore)
+        )
 
-        testCase "FirstAndOnly with null element" <| fun _ ->
+        test ("FirstAndOnly with null element", fun _ ->
             let xs : string[] = [| null |]
-            Expect.isTrue (isNull xs.FirstAndOnly) "FirstAndOnly null"
+            assertThat xs.FirstAndOnly (tag "FirstAndOnly null" >> isNull)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Slice with various types---------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Slice on reference type array" <| fun _ ->
+        test ("Slice on reference type array", fun _ ->
             let xs = [| "a"; "b"; "c"; "d"; "e" |]
             let result = xs.Slice(1, 3)
-            Expect.isTrue (result = [| "b"; "c"; "d" |]) "Slice ref"
+            assertThat (result = [| "b"; "c"; "d" |]) (tag "Slice ref" >> isTrue)
+        )
 
-        testCase "Slice with negative indices on reference types" <| fun _ ->
+        test ("Slice with negative indices on reference types", fun _ ->
             let xs = [| "a"; "b"; "c"; "d"; "e" |]
             let result = xs.Slice(-3, -1)
-            Expect.isTrue (result = [| "c"; "d"; "e" |]) "Slice neg ref"
+            assertThat (result = [| "c"; "d"; "e" |]) (tag "Slice neg ref" >> isTrue)
+        )
 
-        testCase "Slice single element" <| fun _ ->
+        test ("Slice single element", fun _ ->
             let xs = [| 1; 2; 3 |]
             let result = xs.Slice(1, 1)
-            Expect.isTrue (result = [| 2 |]) "Slice single element"
+            assertThat (result = [| 2 |]) (tag "Slice single element" >> isTrue)
+        )
 
-        testCase "Slice full array" <| fun _ ->
+        test ("Slice full array", fun _ ->
             let xs = [| 1; 2; 3 |]
             let result = xs.Slice(0, 2)
-            Expect.isTrue (result = [| 1; 2; 3 |]) "Slice full"
+            assertThat (result = [| 1; 2; 3 |]) (tag "Slice full" >> isTrue)
+        )
 
-        testCase "Slice with negative start positive end" <| fun _ ->
+        test ("Slice with negative start positive end", fun _ ->
             let xs = [| "a"; "b"; "c"; "d"; "e" |]
             let result = xs.Slice(-2, 4)
-            Expect.isTrue (result = [| "d"; "e" |]) "Slice mixed indices ref"
+            assertThat (result = [| "d"; "e" |]) (tag "Slice mixed indices ref" >> isTrue)
+        )
 
-        testCase "Slice throws on invalid indices" <| fun _ ->
+        test ("Slice throws on invalid indices", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> xs.Slice(3, 4) |> ignore)
             throwsRange (fun () -> xs.Slice(0, 5) |> ignore)
+        )
 
-        testCase "Slice with start equal to end returns single element" <| fun _ ->
+        test ("Slice with start equal to end returns single element", fun _ ->
             let xs = [| 1; 2; 3 |]
             let result = xs.Slice(2, 2)
-            Expect.isTrue (result = [| 3 |]) "Slice single at end"
+            assertThat (result = [| 3 |]) (tag "Slice single at end" >> isTrue)
+        )
 
-        testCase "Slice throws when start is clearly after end" <| fun _ ->
+        test ("Slice throws when start is clearly after end", fun _ ->
             let xs = [| 1; 2; 3; 4; 5 |]
             throwsRange (fun () -> xs.Slice(3, 1) |> ignore)
+        )
 
-        testCase "Slice with null elements in reference array" <| fun _ ->
+        test ("Slice with null elements in reference array", fun _ ->
             let xs = [| "a"; null; "c"; null; "e" |]
             let result = xs.Slice(1, 3)
-            Expect.equal result.Length 3 "Slice null elements count"
-            Expect.isTrue (isNull result.[0]) "Slice null[0]"
-            Expect.equal result.[1] "c" "Slice null[1]"
-            Expect.isTrue (isNull result.[2]) "Slice null[2]"
+            assertThat result.Length (tag "Slice null elements count" >> isEqualTo 3)
+            assertThat result.[0] (tag "Slice null[0]" >> isNull)
+            assertThat result.[1] (tag "Slice null[1]" >> isEqualTo "c")
+            assertThat result.[2] (tag "Slice null[2]" >> isNull)
+        )
 
-        testCase "Slice with duplicates" <| fun _ ->
+        test ("Slice with duplicates", fun _ ->
             let xs = [| 5; 5; 5; 5; 5 |]
             let result = xs.Slice(1, 3)
-            Expect.isTrue (result = [| 5; 5; 5 |]) "Slice duplicates"
+            assertThat (result = [| 5; 5; 5 |]) (tag "Slice duplicates" >> isTrue)
+        )
 
-        testCase "Slice does not modify original" <| fun _ ->
+        test ("Slice does not modify original", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let original = Array.copy xs
             let result = xs.Slice(0, 1)
             result.[0] <- "z"
-            Expect.equal xs.[0] "a" "original not modified by Slice mutation"
-            Expect.isTrue (xs = original) "original unchanged"
+            assertThat xs.[0] (tag "original not modified by Slice mutation" >> isEqualTo "a")
+            assertThat (xs = original) (tag "original unchanged" >> isTrue)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Array module Get/Set (use badGetExn/badSetExn)-----------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.get on value types" <| fun _ ->
+        test ("Array.get on value types", fun _ ->
             let xs = [| 10; 20; 30 |]
-            Expect.equal (Array.get 0 xs) 10 "module get int[0]"
-            Expect.equal (Array.get 2 xs) 30 "module get int[2]"
+            assertThat (Array.get 0 xs) (tag "module get int[0]" >> isEqualTo 10)
+            assertThat (Array.get 2 xs) (tag "module get int[2]" >> isEqualTo 30)
+        )
 
-        testCase "Array.get on reference types" <| fun _ ->
+        test ("Array.get on reference types", fun _ ->
             let xs = [| "hello"; "world" |]
-            Expect.equal (Array.get 0 xs) "hello" "module get string[0]"
+            assertThat (Array.get 0 xs) (tag "module get string[0]" >> isEqualTo "hello")
+        )
 
-        testCase "Array.get on empty array" <| fun _ ->
+        test ("Array.get on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.get 0 xs |> ignore)
+        )
 
-        testCase "Array.get on null array" <| fun _ ->
+        test ("Array.get on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.get 0 xs |> ignore)
             let ys : string[] = null
             throwsNull (fun () -> Array.get 0 ys |> ignore)
+        )
 
-        testCase "Array.set on value types" <| fun _ ->
+        test ("Array.set on value types", fun _ ->
             let xs = [| 10; 20; 30 |]
             Array.set 1 99 xs
-            Expect.equal xs.[1] 99 "module set int"
+            assertThat xs.[1] (tag "module set int" >> isEqualTo 99)
+        )
 
-        testCase "Array.set on reference types" <| fun _ ->
+        test ("Array.set on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             Array.set 1 "z" xs
-            Expect.equal xs.[1] "z" "module set string"
+            assertThat xs.[1] (tag "module set string" >> isEqualTo "z")
+        )
 
-        testCase "Array.set null on reference types" <| fun _ ->
+        test ("Array.set null on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             Array.set 1 null xs
-            Expect.isTrue (isNull xs.[1]) "module set null"
+            assertThat xs.[1] (tag "module set null" >> isNull)
+        )
 
-        testCase "Array.set on empty array" <| fun _ ->
+        test ("Array.set on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.set 0 99 xs)
+        )
 
-        testCase "Array.set on null array" <| fun _ ->
+        test ("Array.set on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.set 0 99 xs)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Array.getNeg/setNeg (module level)------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.getNeg on value types" <| fun _ ->
+        test ("Array.getNeg on value types", fun _ ->
             let xs = [| 10; 20; 30 |]
-            Expect.equal (Array.getNeg -1 xs) 30 "getNeg -1"
-            Expect.equal (Array.getNeg -3 xs) 10 "getNeg -3"
-            Expect.equal (Array.getNeg 0 xs) 10 "getNeg 0"
-            Expect.equal (Array.getNeg 2 xs) 30 "getNeg 2"
+            assertThat (Array.getNeg -1 xs) (tag "getNeg -1" >> isEqualTo 30)
+            assertThat (Array.getNeg -3 xs) (tag "getNeg -3" >> isEqualTo 10)
+            assertThat (Array.getNeg 0 xs) (tag "getNeg 0" >> isEqualTo 10)
+            assertThat (Array.getNeg 2 xs) (tag "getNeg 2" >> isEqualTo 30)
+        )
 
-        testCase "Array.getNeg on reference types" <| fun _ ->
+        test ("Array.getNeg on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
-            Expect.equal (Array.getNeg -1 xs) "c" "getNeg -1 ref"
-            Expect.equal (Array.getNeg 0 xs) "a" "getNeg 0 ref"
+            assertThat (Array.getNeg -1 xs) (tag "getNeg -1 ref" >> isEqualTo "c")
+            assertThat (Array.getNeg 0 xs) (tag "getNeg 0 ref" >> isEqualTo "a")
+        )
 
-        testCase "Array.getNeg throws on empty" <| fun _ ->
+        test ("Array.getNeg throws on empty", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.getNeg 0 xs |> ignore)
+        )
 
-        testCase "Array.getNeg throws on null" <| fun _ ->
+        test ("Array.getNeg throws on null", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.getNeg 0 xs |> ignore)
+        )
 
-        testCase "Array.getNeg throws out of range" <| fun _ ->
+        test ("Array.getNeg throws out of range", fun _ ->
             let xs = [| 1; 2; 3 |]
             throwsRange (fun () -> Array.getNeg -4 xs |> ignore)
             throwsRange (fun () -> Array.getNeg 3 xs |> ignore)
+        )
 
-        testCase "Array.setNeg on value types" <| fun _ ->
+        test ("Array.setNeg on value types", fun _ ->
             let xs = [| 10; 20; 30 |]
             Array.setNeg -1 99 xs
-            Expect.equal xs.[2] 99 "setNeg -1"
+            assertThat xs.[2] (tag "setNeg -1" >> isEqualTo 99)
+        )
 
-        testCase "Array.setNeg on reference types" <| fun _ ->
+        test ("Array.setNeg on reference types", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             Array.setNeg -1 "z" xs
-            Expect.equal xs.[2] "z" "setNeg -1 ref"
+            assertThat xs.[2] (tag "setNeg -1 ref" >> isEqualTo "z")
+        )
 
-        testCase "Array.setNeg throws on empty" <| fun _ ->
+        test ("Array.setNeg throws on empty", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.setNeg 0 99 xs)
+        )
 
-        testCase "Array.setNeg throws on null" <| fun _ ->
+        test ("Array.setNeg throws on null", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.setNeg 0 99 xs)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Duplicate/Copy (should produce independent copies)-------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Duplicate on reference type array creates independent copy" <| fun _ ->
+        test ("Duplicate on reference type array creates independent copy", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let dup = xs.Duplicate()
             dup.[0] <- "z"
-            Expect.equal xs.[0] "a" "original not modified"
-            Expect.equal dup.[0] "z" "dup modified"
+            assertThat xs.[0] (tag "original not modified" >> isEqualTo "a")
+            assertThat dup.[0] (tag "dup modified" >> isEqualTo "z")
+        )
 
-        testCase "Duplicate on value type array creates independent copy" <| fun _ ->
+        test ("Duplicate on value type array creates independent copy", fun _ ->
             let xs = [| 1; 2; 3 |]
             let dup = xs.Duplicate()
             dup.[0] <- 99
-            Expect.equal xs.[0] 1 "original not modified"
+            assertThat xs.[0] (tag "original not modified" >> isEqualTo 1)
+        )
 
-        testCase "Duplicate on empty array" <| fun _ ->
+        test ("Duplicate on empty array", fun _ ->
             let xs : int[] = [||]
             let dup = xs.Duplicate()
-            Expect.equal dup.Length 0 "dup empty"
+            assertThat dup.Length (tag "dup empty" >> isEqualTo 0)
+        )
 
-        testCase "Copy on reference type array creates independent copy" <| fun _ ->
+        test ("Copy on reference type array creates independent copy", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let cp = xs.Copy()
             cp.[0] <- "z"
-            Expect.equal xs.[0] "a" "original not modified"
+            assertThat xs.[0] (tag "original not modified" >> isEqualTo "a")
+        )
 
-        testCase "Duplicate preserves null elements" <| fun _ ->
+        test ("Duplicate preserves null elements", fun _ ->
             let xs = [| "a"; null; "c" |]
             let dup = xs.Duplicate()
-            Expect.isTrue (isNull dup.[1]) "null preserved in dup"
+            assertThat dup.[1] (tag "null preserved in dup" >> isNull)
+        )
 
-        testCase "Duplicate with duplicates" <| fun _ ->
+        test ("Duplicate with duplicates", fun _ ->
             let xs = [| 5; 5; 5 |]
             let dup = xs.Duplicate()
-            Expect.isTrue (dup = xs) "dup equals original"
+            assertThat (dup = xs) (tag "dup equals original" >> isTrue)
             dup.[0] <- 99
-            Expect.equal xs.[0] 5 "original not modified"
+            assertThat xs.[0] (tag "original not modified" >> isEqualTo 5)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------FailIfEmpty/FailIfLessThan with types--------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "FailIfEmpty on reference type array" <| fun _ ->
+        test ("FailIfEmpty on reference type array", fun _ ->
             let xs = [| "a"; "b" |]
             let result = xs.FailIfEmpty("ok")
-            Expect.isTrue (Object.ReferenceEquals(xs, result)) "returns same ref"
+            assertThat (Object.ReferenceEquals(xs, result)) (tag "returns same ref" >> isTrue)
+        )
 
-        testCase "FailIfEmpty on empty reference type array" <| fun _ ->
+        test ("FailIfEmpty on empty reference type array", fun _ ->
             let xs : string[] = [||]
-            Expect.throws (fun () -> xs.FailIfEmpty("empty") |> ignore) "throws on empty ref"
+            assertThat (fun () -> xs.FailIfEmpty("empty") |> ignore) (tag "throws on empty ref" >> throws)
+        )
 
-        testCase "FailIfEmpty on empty value type array" <| fun _ ->
+        test ("FailIfEmpty on empty value type array", fun _ ->
             let xs : float[] = [||]
-            Expect.throws (fun () -> xs.FailIfEmpty("empty") |> ignore) "throws on empty float"
+            assertThat (fun () -> xs.FailIfEmpty("empty") |> ignore) (tag "throws on empty float" >> throws)
+        )
 
-        testCase "FailIfLessThan on reference type array" <| fun _ ->
+        test ("FailIfLessThan on reference type array", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let result = xs.FailIfLessThan(2, "ok")
-            Expect.isTrue (Object.ReferenceEquals(xs, result)) "returns same ref"
+            assertThat (Object.ReferenceEquals(xs, result)) (tag "returns same ref" >> isTrue)
+        )
 
-        testCase "FailIfLessThan on insufficient reference type array" <| fun _ ->
+        test ("FailIfLessThan on insufficient reference type array", fun _ ->
             let xs = [| "a" |]
-            Expect.throws (fun () -> xs.FailIfLessThan(3, "too few") |> ignore) "throws on too few ref"
+            assertThat (fun () -> xs.FailIfLessThan(3, "too few") |> ignore) (tag "throws on too few ref" >> throws)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------AsString / ToString (different names in Fable)-----------------------------
@@ -803,186 +934,215 @@ module FableParity =
         // Both should produce similar output format
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "AsString/asString on int array" <| fun _ ->
+        test ("AsString/asString on int array", fun _ ->
             let xs = [| 1; 2; 3 |]
             #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
             #else
             let s = xs.asString
             #endif
-            Expect.isTrue (s.Contains("3")) "should contain count"
+            assertThat (s.Contains("3")) (tag "should contain count" >> isTrue)
+        )
 
-        testCase "AsString/asString on empty int array" <| fun _ ->
+        test ("AsString/asString on empty int array", fun _ ->
             let xs : int[] = [||]
             #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
             #else
             let s = xs.asString
             #endif
-            Expect.isTrue (s.Contains("empty")) "should contain empty"
+            assertThat (s.Contains("empty")) (tag "should contain empty" >> isTrue)
+        )
 
-        testCase "AsString/asString on string array" <| fun _ ->
+        test ("AsString/asString on string array", fun _ ->
             let xs = [| "hello"; "world" |]
             #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
             #else
             let s = xs.asString
             #endif
-            Expect.isTrue (s.Contains("2")) "should contain count"
+            assertThat (s.Contains("2")) (tag "should contain count" >> isTrue)
+        )
 
-        testCase "AsString/asString on single element" <| fun _ ->
+        test ("AsString/asString on single element", fun _ ->
             let xs = [| 42 |]
             #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
             let s = xs.AsString
             #else
             let s = xs.asString
             #endif
-            Expect.isTrue (s.Contains("1")) "should contain count 1"
+            assertThat (s.Contains("1")) (tag "should contain count 1" >> isTrue)
+        )
 
-        testCase "ToString(n) on int array" <| fun _ ->
+        test ("ToString(n) on int array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5; 6; 7; 8; 9; 10 |]
             let s = xs.ToString(3).Replace("\r\n", "\n").Trim()
-            Expect.isTrue (s.Contains("10 items")) "should mention 10 items"
-            Expect.isTrue (s.Contains("0: 1")) "should contain first entry"
-            Expect.isTrue (s.Contains("...")) "should contain ellipsis for truncated"
+            assertThat (s.Contains("10 items")) (tag "should mention 10 items" >> isTrue)
+            assertThat (s.Contains("0: 1")) (tag "should contain first entry" >> isTrue)
+            assertThat (s.Contains("...")) (tag "should contain ellipsis for truncated" >> isTrue)
+        )
 
-        testCase "ToString(n) on empty array" <| fun _ ->
+        test ("ToString(n) on empty array", fun _ ->
             let xs : int[] = [||]
             let s = xs.ToString(5)
-            Expect.isTrue (s.Contains("empty")) "should contain empty"
+            assertThat (s.Contains("empty")) (tag "should contain empty" >> isTrue)
+        )
 
-        testCase "ToString(n) on string array" <| fun _ ->
+        test ("ToString(n) on string array", fun _ ->
             let xs = [| "alpha"; "beta"; "gamma" |]
             let s = xs.ToString(10).Replace("\r\n", "\n").Trim()
-            Expect.isTrue (s.Contains("3 items")) "should mention 3 items"
-            Expect.isTrue (s.Contains("alpha")) "should contain first"
-            Expect.isTrue (s.Contains("gamma")) "should contain last"
+            assertThat (s.Contains("3 items")) (tag "should mention 3 items" >> isTrue)
+            assertThat (s.Contains("alpha")) (tag "should contain first" >> isTrue)
+            assertThat (s.Contains("gamma")) (tag "should contain last" >> isTrue)
+        )
 
-        testCase "ToString(0) shows no entries" <| fun _ ->
+        test ("ToString(0) shows no entries", fun _ ->
             let xs = [| 1; 2; 3 |]
             let s = xs.ToString(0)
-            Expect.isFalse (s.Contains("0:")) "should not show entries"
-            Expect.isTrue (s.Contains("3 items")) "should mention count"
+            assertThat (s.Contains("0:")) (tag "should not show entries" >> isFalse)
+            assertThat (s.Contains("3 items")) (tag "should mention count" >> isTrue)
+        )
 
-        testCase "ToString(n) on single element" <| fun _ ->
+        test ("ToString(n) on single element", fun _ ->
             let xs = [| 42 |]
             let s = xs.ToString(5).Replace("\r\n", "\n").Trim()
-            Expect.isTrue (s.Contains("1 item")) "should mention 1 item"
-            Expect.isTrue (s.Contains("42")) "should contain the value"
+            assertThat (s.Contains("1 item")) (tag "should mention 1 item" >> isTrue)
+            assertThat (s.Contains("42")) (tag "should contain the value" >> isTrue)
+        )
 
-        testCase "ToString(n) with null elements" <| fun _ ->
+        test ("ToString(n) with null elements", fun _ ->
             let xs = [| "a"; null; "c" |]
             let s = xs.ToString(5).Replace("\r\n", "\n")
-            Expect.isTrue (s.Contains("3 items")) "should mention count"
+            assertThat (s.Contains("3 items")) (tag "should mention count" >> isTrue)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------IsEmpty/IsNotEmpty/HasItems/IsSingleton with types-------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "IsEmpty on reference type empty array" <| fun _ ->
+        test ("IsEmpty on reference type empty array", fun _ ->
             let xs : string[] = [||]
-            Expect.isTrue xs.IsEmpty "IsEmpty ref"
+            assertThat xs.IsEmpty (tag "IsEmpty ref" >> isTrue)
+        )
 
-        testCase "IsEmpty on reference type non-empty array" <| fun _ ->
+        test ("IsEmpty on reference type non-empty array", fun _ ->
             let xs = [| "a" |]
-            Expect.isFalse xs.IsEmpty "not IsEmpty ref"
+            assertThat xs.IsEmpty (tag "not IsEmpty ref" >> isFalse)
+        )
 
-        testCase "IsNotEmpty on reference type" <| fun _ ->
-            Expect.isTrue [| "a" |].IsNotEmpty "IsNotEmpty ref"
+        test ("IsNotEmpty on reference type", fun _ ->
+            assertThat [| "a" |].IsNotEmpty (tag "IsNotEmpty ref" >> isTrue)
             let xs : string[] = [||]
-            Expect.isFalse xs.IsNotEmpty "not IsNotEmpty ref"
+            assertThat xs.IsNotEmpty (tag "not IsNotEmpty ref" >> isFalse)
+        )
 
-        testCase "HasItems on reference type" <| fun _ ->
-            Expect.isTrue [| "a" |].HasItems "HasItems ref"
+        test ("HasItems on reference type", fun _ ->
+            assertThat [| "a" |].HasItems (tag "HasItems ref" >> isTrue)
             let xs : string[] = [||]
-            Expect.isFalse xs.HasItems "not HasItems ref"
+            assertThat xs.HasItems (tag "not HasItems ref" >> isFalse)
+        )
 
-        testCase "IsSingleton on reference type" <| fun _ ->
-            Expect.isTrue [| "a" |].IsSingleton "IsSingleton ref"
+        test ("IsSingleton on reference type", fun _ ->
+            assertThat [| "a" |].IsSingleton (tag "IsSingleton ref" >> isTrue)
             let xs : string[] = [||]
-            Expect.isFalse xs.IsSingleton "not IsSingleton empty ref"
-            Expect.isFalse [| "a"; "b" |].IsSingleton "not IsSingleton multi ref"
+            assertThat xs.IsSingleton (tag "not IsSingleton empty ref" >> isFalse)
+            assertThat [| "a"; "b" |].IsSingleton (tag "not IsSingleton multi ref" >> isFalse)
+        )
 
-        testCase "IsEmpty on float array" <| fun _ ->
+        test ("IsEmpty on float array", fun _ ->
             let xs : float[] = [||]
-            Expect.isTrue xs.IsEmpty "IsEmpty float"
+            assertThat xs.IsEmpty (tag "IsEmpty float" >> isTrue)
+        )
 
-        testCase "IsSingleton on float array" <| fun _ ->
-            Expect.isTrue [| 1.0 |].IsSingleton "IsSingleton float"
+        test ("IsSingleton on float array", fun _ ->
+            assertThat [| 1.0 |].IsSingleton (tag "IsSingleton float" >> isTrue)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------LastIndex with various types-----------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "LastIndex on reference type array" <| fun _ ->
+        test ("LastIndex on reference type array", fun _ ->
             let xs = [| "a"; "b"; "c" |]
-            Expect.equal xs.LastIndex 2 "LastIndex ref"
+            assertThat xs.LastIndex (tag "LastIndex ref" >> isEqualTo 2)
+        )
 
-        testCase "LastIndex on empty reference type array" <| fun _ ->
+        test ("LastIndex on empty reference type array", fun _ ->
             let xs : string[] = [||]
-            Expect.equal xs.LastIndex -1 "LastIndex empty ref"
+            assertThat xs.LastIndex (tag "LastIndex empty ref" >> isEqualTo -1)
+        )
 
-        testCase "LastIndex on float array" <| fun _ ->
+        test ("LastIndex on float array", fun _ ->
             let xs = [| 1.0; 2.0 |]
-            Expect.equal xs.LastIndex 1 "LastIndex float"
+            assertThat xs.LastIndex (tag "LastIndex float" >> isEqualTo 1)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Arrays with duplicate elements---------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Get with duplicate elements returns correct one" <| fun _ ->
+        test ("Get with duplicate elements returns correct one", fun _ ->
             let xs = [| 5; 5; 5 |]
-            Expect.equal (xs.Get 0) 5 "dup get[0]"
-            Expect.equal (xs.Get 1) 5 "dup get[1]"
-            Expect.equal (xs.Get 2) 5 "dup get[2]"
+            assertThat (xs.Get 0) (tag "dup get[0]" >> isEqualTo 5)
+            assertThat (xs.Get 1) (tag "dup get[1]" >> isEqualTo 5)
+            assertThat (xs.Get 2) (tag "dup get[2]" >> isEqualTo 5)
+        )
 
-        testCase "Set with duplicate elements sets correct one" <| fun _ ->
+        test ("Set with duplicate elements sets correct one", fun _ ->
             let xs = [| 5; 5; 5 |]
             xs.Set 1 99
-            Expect.equal xs.[0] 5 "dup set unchanged[0]"
-            Expect.equal xs.[1] 99 "dup set changed[1]"
-            Expect.equal xs.[2] 5 "dup set unchanged[2]"
+            assertThat xs.[0] (tag "dup set unchanged[0]" >> isEqualTo 5)
+            assertThat xs.[1] (tag "dup set changed[1]" >> isEqualTo 99)
+            assertThat xs.[2] (tag "dup set unchanged[2]" >> isEqualTo 5)
+        )
 
-        testCase "GetNeg with duplicate reference elements" <| fun _ ->
+        test ("GetNeg with duplicate reference elements", fun _ ->
             let xs = [| "x"; "x"; "x" |]
-            Expect.equal (xs.GetNeg -1) "x" "dup GetNeg -1"
-            Expect.equal (xs.GetNeg -3) "x" "dup GetNeg -3"
+            assertThat (xs.GetNeg -1) (tag "dup GetNeg -1" >> isEqualTo "x")
+            assertThat (xs.GetNeg -3) (tag "dup GetNeg -3" >> isEqualTo "x")
+        )
 
-        testCase "Slice with all-same elements" <| fun _ ->
+        test ("Slice with all-same elements", fun _ ->
             let xs = [| 7; 7; 7; 7; 7 |]
             let result = xs.Slice(1, 3)
-            Expect.isTrue (result = [| 7; 7; 7 |]) "Slice all same"
+            assertThat (result = [| 7; 7; 7 |]) (tag "Slice all same" >> isTrue)
+        )
 
-        testCase "Last/First/Second/Third with duplicates" <| fun _ ->
+        test ("Last/First/Second/Third with duplicates", fun _ ->
             let xs = [| 5; 5; 5; 5 |]
-            Expect.equal xs.First 5 "First dup"
-            Expect.equal xs.Second 5 "Second dup"
-            Expect.equal xs.Third 5 "Third dup"
-            Expect.equal xs.Last 5 "Last dup"
+            assertThat xs.First (tag "First dup" >> isEqualTo 5)
+            assertThat xs.Second (tag "Second dup" >> isEqualTo 5)
+            assertThat xs.Third (tag "Third dup" >> isEqualTo 5)
+            assertThat xs.Last (tag "Last dup" >> isEqualTo 5)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Module-level functions with reference types---------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.getNeg with null elements in reference array" <| fun _ ->
+        test ("Array.getNeg with null elements in reference array", fun _ ->
             let xs = [| null; "b"; null |]
-            Expect.isTrue (isNull (Array.getNeg 0 xs)) "getNeg null[0]"
-            Expect.isTrue (isNull (Array.getNeg -1 xs)) "getNeg null[-1]"
-            Expect.equal (Array.getNeg 1 xs) "b" "getNeg non-null"
+            assertThat (Array.getNeg 0 xs) (tag "getNeg null[0]" >> isNull)
+            assertThat (Array.getNeg -1 xs) (tag "getNeg null[-1]" >> isNull)
+            assertThat (Array.getNeg 1 xs) (tag "getNeg non-null" >> isEqualTo "b")
+        )
 
-        testCase "Array.setNeg null on reference array" <| fun _ ->
+        test ("Array.setNeg null on reference array", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             Array.setNeg -1 null xs
-            Expect.isTrue (isNull xs.[2]) "setNeg null ref"
+            assertThat xs.[2] (tag "setNeg null ref" >> isNull)
+        )
 
-        testCase "Array.get with null elements" <| fun _ ->
+        test ("Array.get with null elements", fun _ ->
             let xs = [| null; "b"; null |]
-            Expect.isTrue (isNull (Array.get 0 xs)) "get null[0]"
-            Expect.equal (Array.get 1 xs) "b" "get non-null[1]"
+            assertThat (Array.get 0 xs) (tag "get null[0]" >> isNull)
+            assertThat (Array.get 1 xs) (tag "get non-null[1]" >> isEqualTo "b")
+        )
 
-        testCase "Array.set null element" <| fun _ ->
+        test ("Array.set null element", fun _ ->
             let xs = [| "a"; "b" |]
             Array.set 0 null xs
-            Expect.isTrue (isNull xs.[0]) "set null via module"
+            assertThat xs.[0] (tag "set null via module" >> isNull)
+        )
 
-    ]
+    ])

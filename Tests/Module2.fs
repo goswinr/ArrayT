@@ -2,11 +2,8 @@ namespace Tests
 
 open ArrayT
 
-#if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-open Fable.Mocha
-#else
-open Expecto
-#endif
+open Scriptorium.Nib.Assertion
+open type Scriptorium.Quill.Test
 
 open System
 open System.Collections.Generic
@@ -16,1103 +13,1319 @@ module Module2 =
  open Exceptions
 
  let tests =
-    testList "Module Tests" [
+    testList ("Module Tests", [
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Basic Get/Set functions---------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.get returns item at index" <| fun _ ->
+        test ("Array.get returns item at index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.get 2 xs) 3 "get at index 2"
-            Expect.equal (Array.get 0 xs) 1 "get at index 0"
-            Expect.equal (Array.get 4 xs) 5 "get at index 4"
+            assertThat (Array.get 2 xs) (tag "get at index 2" >> isEqualTo 3)
+            assertThat (Array.get 0 xs) (tag "get at index 0" >> isEqualTo 1)
+            assertThat (Array.get 4 xs) (tag "get at index 4" >> isEqualTo 5)
+        )
 
-        testCase "Array.get throws on negative index" <| fun _ ->
+        test ("Array.get throws on negative index", fun _ ->
             let xs = [|1; 2; 3|]
             throwsRange (fun () -> Array.get -1 xs |> ignore)
+        )
 
-        testCase "Array.get throws on index out of range" <| fun _ ->
+        test ("Array.get throws on index out of range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsRange (fun () -> Array.get 3 xs |> ignore)
+        )
 
-        testCase "Array.get throws on null array" <| fun _ ->
+        test ("Array.get throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.get 0 xs |> ignore)
+        )
 
-        testCase "Array.get does not modify input array" <| fun _ ->
+        test ("Array.get does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.get 1 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.set sets item at index" <| fun _ ->
+        test ("Array.set sets item at index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             Array.set 2 99 xs
-            Expect.equal xs.[2] 99 "value should be set"
+            assertThat xs.[2] (tag "value should be set" >> isEqualTo 99)
+        )
 
-        testCase "Array.set throws on negative index" <| fun _ ->
+        test ("Array.set throws on negative index", fun _ ->
             let xs = [|1; 2; 3|]
             throwsRange (fun () -> Array.set -1 99 xs)
+        )
 
-        testCase "Array.set throws on index out of range" <| fun _ ->
+        test ("Array.set throws on index out of range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsRange (fun () -> Array.set 3 99 xs)
+        )
 
-        testCase "Array.set throws on null array" <| fun _ ->
+        test ("Array.set throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.set 0 99 xs)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Negative indexing---------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.getNeg returns item at negative index" <| fun _ ->
+        test ("Array.getNeg returns item at negative index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.getNeg -1 xs) 5 "getNeg -1"
-            Expect.equal (Array.getNeg -2 xs) 4 "getNeg -2"
-            Expect.equal (Array.getNeg -5 xs) 1 "getNeg -5"
+            assertThat (Array.getNeg -1 xs) (tag "getNeg -1" >> isEqualTo 5)
+            assertThat (Array.getNeg -2 xs) (tag "getNeg -2" >> isEqualTo 4)
+            assertThat (Array.getNeg -5 xs) (tag "getNeg -5" >> isEqualTo 1)
+        )
 
-        testCase "Array.getNeg works with positive index" <| fun _ ->
+        test ("Array.getNeg works with positive index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.getNeg 0 xs) 1 "getNeg 0"
-            Expect.equal (Array.getNeg 2 xs) 3 "getNeg 2"
+            assertThat (Array.getNeg 0 xs) (tag "getNeg 0" >> isEqualTo 1)
+            assertThat (Array.getNeg 2 xs) (tag "getNeg 2" >> isEqualTo 3)
+        )
 
-        testCase "Array.getNeg throws on index out of range" <| fun _ ->
+        test ("Array.getNeg throws on index out of range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsRange (fun () -> Array.getNeg -4 xs |> ignore)
             throwsRange (fun () -> Array.getNeg 3 xs |> ignore)
+        )
 
-        testCase "Array.getNeg throws on null array" <| fun _ ->
+        test ("Array.getNeg throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.getNeg -1 xs |> ignore)
+        )
 
-        testCase "Array.getNeg does not modify input array" <| fun _ ->
+        test ("Array.getNeg does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.getNeg -1 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.setNeg sets item at negative index" <| fun _ ->
+        test ("Array.setNeg sets item at negative index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             Array.setNeg -1 99 xs
-            Expect.equal xs.[4] 99 "setNeg -1 should set last item"
+            assertThat xs.[4] (tag "setNeg -1 should set last item" >> isEqualTo 99)
+        )
 
-        testCase "Array.setNeg works with positive index" <| fun _ ->
+        test ("Array.setNeg works with positive index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             Array.setNeg 0 99 xs
-            Expect.equal xs.[0] 99 "setNeg 0 should set first item"
+            assertThat xs.[0] (tag "setNeg 0 should set first item" >> isEqualTo 99)
+        )
 
-        testCase "Array.setNeg throws on index out of range" <| fun _ ->
+        test ("Array.setNeg throws on index out of range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsRange (fun () -> Array.setNeg -4 99 xs)
             throwsRange (fun () -> Array.setNeg 3 99 xs)
+        )
 
-        testCase "Array.setNeg throws on null array" <| fun _ ->
+        test ("Array.setNeg throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.setNeg -1 99 xs)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Looped indexing-----------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.getLooped returns item with looped positive index" <| fun _ ->
+        test ("Array.getLooped returns item with looped positive index", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.equal (Array.getLooped 0 xs) 1 "getLooped 0"
-            Expect.equal (Array.getLooped 3 xs) 1 "getLooped 3"
-            Expect.equal (Array.getLooped 4 xs) 2 "getLooped 4"
-            Expect.equal (Array.getLooped 6 xs) 1 "getLooped 6"
+            assertThat (Array.getLooped 0 xs) (tag "getLooped 0" >> isEqualTo 1)
+            assertThat (Array.getLooped 3 xs) (tag "getLooped 3" >> isEqualTo 1)
+            assertThat (Array.getLooped 4 xs) (tag "getLooped 4" >> isEqualTo 2)
+            assertThat (Array.getLooped 6 xs) (tag "getLooped 6" >> isEqualTo 1)
+        )
 
-        testCase "Array.getLooped returns item with looped negative index" <| fun _ ->
+        test ("Array.getLooped returns item with looped negative index", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.equal (Array.getLooped -1 xs) 3 "getLooped -1"
-            Expect.equal (Array.getLooped -2 xs) 2 "getLooped -2"
-            Expect.equal (Array.getLooped -3 xs) 1 "getLooped -3"
-            Expect.equal (Array.getLooped -4 xs) 3 "getLooped -4"
+            assertThat (Array.getLooped -1 xs) (tag "getLooped -1" >> isEqualTo 3)
+            assertThat (Array.getLooped -2 xs) (tag "getLooped -2" >> isEqualTo 2)
+            assertThat (Array.getLooped -3 xs) (tag "getLooped -3" >> isEqualTo 1)
+            assertThat (Array.getLooped -4 xs) (tag "getLooped -4" >> isEqualTo 3)
+        )
 
-        testCase "Array.getLooped throws on empty array" <| fun _ ->
+        test ("Array.getLooped throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.getLooped 0 xs |> ignore)
+        )
 
-        testCase "Array.getLooped throws on null array" <| fun _ ->
+        test ("Array.getLooped throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.getLooped 0 xs |> ignore)
+        )
 
-        testCase "Array.getLooped does not modify input array" <| fun _ ->
+        test ("Array.getLooped does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.getLooped 5 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.setLooped sets item with looped index" <| fun _ ->
+        test ("Array.setLooped sets item with looped index", fun _ ->
             let xs = [|1; 2; 3|]
             Array.setLooped 3 99 xs
-            Expect.equal xs.[0] 99 "setLooped 3 should set first item"
+            assertThat xs.[0] (tag "setLooped 3 should set first item" >> isEqualTo 99)
+        )
 
-        testCase "Array.setLooped sets item with negative looped index" <| fun _ ->
+        test ("Array.setLooped sets item with negative looped index", fun _ ->
             let xs = [|1; 2; 3|]
             Array.setLooped -1 99 xs
-            Expect.equal xs.[2] 99 "setLooped -1 should set last item"
+            assertThat xs.[2] (tag "setLooped -1 should set last item" >> isEqualTo 99)
+        )
 
-        testCase "Array.setLooped throws on empty array" <| fun _ ->
+        test ("Array.setLooped throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.setLooped 0 99 xs)
+        )
 
-        testCase "Array.setLooped throws on null array" <| fun _ ->
+        test ("Array.setLooped throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.setLooped 0 99 xs)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Positional access---------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.first returns first item" <| fun _ ->
+        test ("Array.first returns first item", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.first xs) 1 "first"
+            assertThat (Array.first xs) (tag "first" >> isEqualTo 1)
+        )
 
-        testCase "Array.first throws on empty array" <| fun _ ->
+        test ("Array.first throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.first xs |> ignore)
+        )
 
-        testCase "Array.first throws on null array" <| fun _ ->
+        test ("Array.first throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.first xs |> ignore)
+        )
 
-        testCase "Array.first does not modify input array" <| fun _ ->
+        test ("Array.first does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.first xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.second returns second item" <| fun _ ->
+        test ("Array.second returns second item", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.second xs) 2 "second"
+            assertThat (Array.second xs) (tag "second" >> isEqualTo 2)
+        )
 
-        testCase "Array.second throws on array with less than 2 items" <| fun _ ->
+        test ("Array.second throws on array with less than 2 items", fun _ ->
             let xs = [|1|]
             throwsRange (fun () -> Array.second xs |> ignore)
+        )
 
-        testCase "Array.second throws on null array" <| fun _ ->
+        test ("Array.second throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.second xs |> ignore)
+        )
 
-        testCase "Array.third returns third item" <| fun _ ->
+        test ("Array.third returns third item", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.third xs) 3 "third"
+            assertThat (Array.third xs) (tag "third" >> isEqualTo 3)
+        )
 
-        testCase "Array.third throws on array with less than 3 items" <| fun _ ->
+        test ("Array.third throws on array with less than 3 items", fun _ ->
             let xs = [|1; 2|]
             throwsRange (fun () -> Array.third xs |> ignore)
+        )
 
-        testCase "Array.third throws on null array" <| fun _ ->
+        test ("Array.third throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.third xs |> ignore)
+        )
 
-        testCase "Array.secondLast returns second last item" <| fun _ ->
+        test ("Array.secondLast returns second last item", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.secondLast xs) 4 "secondLast"
+            assertThat (Array.secondLast xs) (tag "secondLast" >> isEqualTo 4)
+        )
 
-        testCase "Array.secondLast throws on array with less than 2 items" <| fun _ ->
+        test ("Array.secondLast throws on array with less than 2 items", fun _ ->
             let xs = [|1|]
             throwsRange (fun () -> Array.secondLast xs |> ignore)
+        )
 
-        testCase "Array.secondLast throws on null array" <| fun _ ->
+        test ("Array.secondLast throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.secondLast xs |> ignore)
+        )
 
-        testCase "Array.thirdLast returns third last item" <| fun _ ->
+        test ("Array.thirdLast returns third last item", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.thirdLast xs) 3 "thirdLast"
+            assertThat (Array.thirdLast xs) (tag "thirdLast" >> isEqualTo 3)
+        )
 
-        testCase "Array.thirdLast throws on array with less than 3 items" <| fun _ ->
+        test ("Array.thirdLast throws on array with less than 3 items", fun _ ->
             let xs = [|1; 2|]
             throwsRange (fun () -> Array.thirdLast xs |> ignore)
+        )
 
-        testCase "Array.thirdLast throws on null array" <| fun _ ->
+        test ("Array.thirdLast throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.thirdLast xs |> ignore)
+        )
 
-        testCase "Array.firstAndOnly returns only item" <| fun _ ->
+        test ("Array.firstAndOnly returns only item", fun _ ->
             let xs = [|42|]
-            Expect.equal (Array.firstAndOnly xs) 42 "firstAndOnly"
+            assertThat (Array.firstAndOnly xs) (tag "firstAndOnly" >> isEqualTo 42)
+        )
 
-        testCase "Array.firstAndOnly throws on empty array" <| fun _ ->
+        test ("Array.firstAndOnly throws on empty array", fun _ ->
             let xs : int[] = [||]
             throwsRange (fun () -> Array.firstAndOnly xs |> ignore)
+        )
 
-        testCase "Array.firstAndOnly throws on array with more than one item" <| fun _ ->
+        test ("Array.firstAndOnly throws on array with more than one item", fun _ ->
             let xs = [|1; 2|]
             throwsRange (fun () -> Array.firstAndOnly xs |> ignore)
+        )
 
-        testCase "Array.firstAndOnly throws on null array" <| fun _ ->
+        test ("Array.firstAndOnly throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.firstAndOnly xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Slicing and trimming------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.slice returns slice with positive indices" <| fun _ ->
+        test ("Array.slice returns slice with positive indices", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.isTrue (Array.slice 1 3 xs = [|2; 3; 4|]) "slice 1 3"
+            assertThat (Array.slice 1 3 xs = [|2; 3; 4|]) (tag "slice 1 3" >> isTrue)
+        )
 
-        testCase "Array.slice returns slice with negative indices" <| fun _ ->
+        test ("Array.slice returns slice with negative indices", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.isTrue (Array.slice -2 -1 xs = [|4; 5|]) "slice -2 -1"
-            Expect.isTrue (Array.slice 1 -2 xs = [|2; 3; 4|]) "slice 1 -2"
+            assertThat (Array.slice -2 -1 xs = [|4; 5|]) (tag "slice -2 -1" >> isTrue)
+            assertThat (Array.slice 1 -2 xs = [|2; 3; 4|]) (tag "slice 1 -2" >> isTrue)
+        )
 
-        testCase "Array.slice returns single item" <| fun _ ->
+        test ("Array.slice returns single item", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.isTrue (Array.slice 2 2 xs = [|3|]) "slice 2 2"
+            assertThat (Array.slice 2 2 xs = [|3|]) (tag "slice 2 2" >> isTrue)
+        )
 
-        testCase "Array.slice throws on invalid range" <| fun _ ->
+        test ("Array.slice throws on invalid range", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             throwsRange (fun () -> Array.slice 3 1 xs |> ignore)
+        )
 
-        testCase "Array.slice throws on null array" <| fun _ ->
+        test ("Array.slice throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.slice 0 1 xs |> ignore)
+        )
 
-        testCase "Array.slice does not modify input array" <| fun _ ->
+        test ("Array.slice does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             let original = xs.Duplicate()
             let _ = Array.slice 1 3 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.trim trims from start and end" <| fun _ ->
+        test ("Array.trim trims from start and end", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.isTrue (Array.trim 1 1 xs = [|2; 3; 4|]) "trim 1 1"
+            assertThat (Array.trim 1 1 xs = [|2; 3; 4|]) (tag "trim 1 1" >> isTrue)
+        )
 
-        testCase "Array.trim returns empty array when trimming more than length" <| fun _ ->
+        test ("Array.trim returns empty array when trimming more than length", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isTrue (Array.trim 2 2 xs = [||]) "trim 2 2"
+            assertThat (Array.trim 2 2 xs = [||]) (tag "trim 2 2" >> isTrue)
+        )
 
-        testCase "Array.trim returns same elements when trimming 0" <| fun _ ->
+        test ("Array.trim returns same elements when trimming 0", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isTrue (Array.trim 0 0 xs = [|1; 2; 3|]) "trim 0 0"
+            assertThat (Array.trim 0 0 xs = [|1; 2; 3|]) (tag "trim 0 0" >> isTrue)
+        )
 
-        testCase "Array.trim throws on negative trim values" <| fun _ ->
+        test ("Array.trim throws on negative trim values", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.trim -1 0 xs |> ignore)
             throwsArg (fun () -> Array.trim 0 -1 xs |> ignore)
+        )
 
-        testCase "Array.trim throws on null array" <| fun _ ->
+        test ("Array.trim throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.trim 1 1 xs |> ignore)
+        )
 
-        testCase "Array.trim does not modify input array" <| fun _ ->
+        test ("Array.trim does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             let original = xs.Duplicate()
             let _ = Array.trim 1 1 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Windowing functions (non-looped)------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.windowed2 returns pairs" <| fun _ ->
+        test ("Array.windowed2 returns pairs", fun _ ->
             let xs = [|1; 2; 3; 4|]
             let result = Array.windowed2 xs |> Seq.toArray
-            Expect.isTrue (result = [|(1,2); (2,3); (3,4)|]) "windowed2"
+            assertThat (result = [|(1,2); (2,3); (3,4)|]) (tag "windowed2" >> isTrue)
+        )
 
-        testCase "Array.windowed2 throws on array with less than 2 items" <| fun _ ->
+        test ("Array.windowed2 throws on array with less than 2 items", fun _ ->
             let xs = [|1|]
             throwsArg (fun () -> Array.windowed2 xs |> ignore)
+        )
 
-        testCase "Array.windowed2 throws on null array" <| fun _ ->
+        test ("Array.windowed2 throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.windowed2 xs |> ignore)
+        )
 
-        testCase "Array.windowed2 does not modify input array" <| fun _ ->
+        test ("Array.windowed2 does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.windowed2 xs |> Seq.toArray
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.windowed3 returns triplets" <| fun _ ->
+        test ("Array.windowed3 returns triplets", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             let result = Array.windowed3 xs |> Seq.toArray
-            Expect.isTrue (result = [|(1,2,3); (2,3,4); (3,4,5)|]) "windowed3"
+            assertThat (result = [|(1,2,3); (2,3,4); (3,4,5)|]) (tag "windowed3" >> isTrue)
+        )
 
-        testCase "Array.windowed3 throws on array with less than 3 items" <| fun _ ->
+        test ("Array.windowed3 throws on array with less than 3 items", fun _ ->
             let xs = [|1; 2|]
             throwsArg (fun () -> Array.windowed3 xs |> ignore)
+        )
 
-        testCase "Array.windowed3 throws on null array" <| fun _ ->
+        test ("Array.windowed3 throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.windowed3 xs |> ignore)
+        )
 
-        testCase "Array.windowed2i returns pairs with index" <| fun _ ->
+        test ("Array.windowed2i returns pairs with index", fun _ ->
             let xs = [|'a'; 'b'; 'c'; 'd'|]
             let result = Array.windowed2i xs |> Seq.toArray
-            Expect.isTrue (result = [|(0,'a','b'); (1,'b','c'); (2,'c','d')|]) "windowed2i"
+            assertThat (result = [|(0,'a','b'); (1,'b','c'); (2,'c','d')|]) (tag "windowed2i" >> isTrue)
+        )
 
-        testCase "Array.windowed2i throws on array with less than 2 items" <| fun _ ->
+        test ("Array.windowed2i throws on array with less than 2 items", fun _ ->
             let xs = [|'a'|]
             throwsArg (fun () -> Array.windowed2i xs |> ignore)
+        )
 
-        testCase "Array.windowed2i throws on null array" <| fun _ ->
+        test ("Array.windowed2i throws on null array", fun _ ->
             let xs : char[] = null
             throwsNull (fun () -> Array.windowed2i xs |> ignore)
+        )
 
-        testCase "Array.windowed3i returns triplets with index" <| fun _ ->
+        test ("Array.windowed3i returns triplets with index", fun _ ->
             let xs = [|'a'; 'b'; 'c'; 'd'; 'e'|]
             let result = Array.windowed3i xs |> Seq.toArray
-            Expect.isTrue (result = [|(1,'a','b','c'); (2,'b','c','d'); (3,'c','d','e')|]) "windowed3i"
+            assertThat (result = [|(1,'a','b','c'); (2,'b','c','d'); (3,'c','d','e')|]) (tag "windowed3i" >> isTrue)
+        )
 
-        testCase "Array.windowed3i throws on array with less than 3 items" <| fun _ ->
+        test ("Array.windowed3i throws on array with less than 3 items", fun _ ->
             let xs = [|'a'; 'b'|]
             throwsArg (fun () -> Array.windowed3i xs |> ignore)
+        )
 
-        testCase "Array.windowed3i throws on null array" <| fun _ ->
+        test ("Array.windowed3i throws on null array", fun _ ->
             let xs : char[] = null
             throwsNull (fun () -> Array.windowed3i xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Windowing functions (looped)----------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.thisNext returns looped pairs" <| fun _ ->
+        test ("Array.thisNext returns looped pairs", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.thisNext xs |> Seq.toArray
-            Expect.isTrue (result = [|(1,2); (2,3); (3,1)|]) "thisNext"
+            assertThat (result = [|(1,2); (2,3); (3,1)|]) (tag "thisNext" >> isTrue)
+        )
 
-        testCase "Array.thisNext throws on array with less than 2 items" <| fun _ ->
+        test ("Array.thisNext throws on array with less than 2 items", fun _ ->
             let xs = [|1|]
             throwsArg (fun () -> Array.thisNext xs |> ignore)
+        )
 
-        testCase "Array.thisNext throws on null array" <| fun _ ->
+        test ("Array.thisNext throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.thisNext xs |> ignore)
+        )
 
-        testCase "Array.prevThis returns looped pairs starting with last-first" <| fun _ ->
+        test ("Array.prevThis returns looped pairs starting with last-first", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.prevThis xs |> Seq.toArray
-            Expect.isTrue (result = [|(3,1); (1,2); (2,3)|]) "prevThis"
+            assertThat (result = [|(3,1); (1,2); (2,3)|]) (tag "prevThis" >> isTrue)
+        )
 
-        testCase "Array.prevThis throws on array with less than 2 items" <| fun _ ->
+        test ("Array.prevThis throws on array with less than 2 items", fun _ ->
             let xs = [|1|]
             throwsArg (fun () -> Array.prevThis xs |> ignore)
+        )
 
-        testCase "Array.prevThis throws on null array" <| fun _ ->
+        test ("Array.prevThis throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.prevThis xs |> ignore)
+        )
 
-        testCase "Array.prevThisNext returns looped triplets" <| fun _ ->
+        test ("Array.prevThisNext returns looped triplets", fun _ ->
             let xs = [|1; 2; 3; 4|]
             let result = Array.prevThisNext xs |> Seq.toArray
-            Expect.isTrue (result = [|(4,1,2); (1,2,3); (2,3,4); (3,4,1)|]) "prevThisNext"
+            assertThat (result = [|(4,1,2); (1,2,3); (2,3,4); (3,4,1)|]) (tag "prevThisNext" >> isTrue)
+        )
 
-        testCase "Array.prevThisNext throws on array with less than 3 items" <| fun _ ->
+        test ("Array.prevThisNext throws on array with less than 3 items", fun _ ->
             let xs = [|1; 2|]
             throwsArg (fun () -> Array.prevThisNext xs |> ignore)
+        )
 
-        testCase "Array.prevThisNext throws on null array" <| fun _ ->
+        test ("Array.prevThisNext throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.prevThisNext xs |> ignore)
+        )
 
-        testCase "Array.iThisNext returns looped pairs with index" <| fun _ ->
+        test ("Array.iThisNext returns looped pairs with index", fun _ ->
             let xs = [|'a'; 'b'; 'c'|]
             let result = Array.iThisNext xs |> Seq.toArray
-            Expect.isTrue (result = [|(0,'a','b'); (1,'b','c'); (2,'c','a')|]) "iThisNext"
+            assertThat (result = [|(0,'a','b'); (1,'b','c'); (2,'c','a')|]) (tag "iThisNext" >> isTrue)
+        )
 
-        testCase "Array.iThisNext throws on array with less than 2 items" <| fun _ ->
+        test ("Array.iThisNext throws on array with less than 2 items", fun _ ->
             let xs = [|'a'|]
             throwsArg (fun () -> Array.iThisNext xs |> ignore)
+        )
 
-        testCase "Array.iThisNext throws on null array" <| fun _ ->
+        test ("Array.iThisNext throws on null array", fun _ ->
             let xs : char[] = null
             throwsNull (fun () -> Array.iThisNext xs |> ignore)
+        )
 
-        testCase "Array.iPrevThisNext returns looped triplets with index" <| fun _ ->
+        test ("Array.iPrevThisNext returns looped triplets with index", fun _ ->
             let xs = [|'a'; 'b'; 'c'; 'd'|]
             let result = Array.iPrevThisNext xs |> Seq.toArray
-            Expect.isTrue (result = [|(0,'d','a','b'); (1,'a','b','c'); (2,'b','c','d'); (3,'c','d','a')|]) "iPrevThisNext"
+            assertThat (result = [|(0,'d','a','b'); (1,'a','b','c'); (2,'b','c','d'); (3,'c','d','a')|]) (tag "iPrevThisNext" >> isTrue)
+        )
 
-        testCase "Array.iPrevThisNext throws on array with less than 3 items" <| fun _ ->
+        test ("Array.iPrevThisNext throws on array with less than 3 items", fun _ ->
             let xs = [|'a'; 'b'|]
             throwsArg (fun () -> Array.iPrevThisNext xs |> ignore)
+        )
 
-        testCase "Array.iPrevThisNext throws on null array" <| fun _ ->
+        test ("Array.iPrevThisNext throws on null array", fun _ ->
             let xs : char[] = null
             throwsNull (fun () -> Array.iPrevThisNext xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Singleton creation--------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.singleton creates single item array" <| fun _ ->
+        test ("Array.singleton creates single item array", fun _ ->
             let result = Array.singleton 42
-            Expect.isTrue (result = [|42|]) "singleton"
+            assertThat (result = [|42|]) (tag "singleton" >> isTrue)
+        )
 
-        testCase "Array.singleton allows null values" <| fun _ ->
+        test ("Array.singleton allows null values", fun _ ->
             let result = Array.singleton (null: string)
-            Expect.equal result.Length 1 "singleton null"
+            assertThat result.Length (tag "singleton null" >> isEqualTo 1)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Rotation tests------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.rotate" <| fun _ ->
+        test ("Array.rotate", fun _ ->
             let xs = [|0; 1; 2; 3; 4; 5|]
-            Expect.isTrue (xs |> Array.rotate  2 = [|4; 5; 0; 1; 2; 3 |]) "rotate 2"
-            Expect.isTrue (xs |> Array.rotate  1 = [|5; 0; 1; 2; 3; 4 |]) "rotate 1"
-            Expect.isTrue (xs |> Array.rotate -2 = [|2; 3; 4; 5; 0; 1|]) "rotate -2"
-            Expect.isTrue (xs |> Array.rotate -1 = [|1; 2; 3; 4; 5; 0|]) "rotate -1"
-            Expect.isTrue (xs |> Array.rotate -6 = xs) "rotate -6"
-            Expect.isTrue (xs |> Array.rotate  12 = xs) "rotate 12"
-            Expect.isTrue (xs |> Array.rotate -12 = xs) "rotate -12"
-            Expect.isTrue (xs |> Array.rotate -13 = (xs|> Array.rotate -1)) "rotate -13"
-            Expect.isTrue (xs |> Array.rotate  13 = (xs|> Array.rotate  1)) "rotate 13"
+            assertThat (xs |> Array.rotate  2 = [|4; 5; 0; 1; 2; 3 |]) (tag "rotate 2" >> isTrue)
+            assertThat (xs |> Array.rotate  1 = [|5; 0; 1; 2; 3; 4 |]) (tag "rotate 1" >> isTrue)
+            assertThat (xs |> Array.rotate -2 = [|2; 3; 4; 5; 0; 1|]) (tag "rotate -2" >> isTrue)
+            assertThat (xs |> Array.rotate -1 = [|1; 2; 3; 4; 5; 0|]) (tag "rotate -1" >> isTrue)
+            assertThat (xs |> Array.rotate -6 = xs) (tag "rotate -6" >> isTrue)
+            assertThat (xs |> Array.rotate  12 = xs) (tag "rotate 12" >> isTrue)
+            assertThat (xs |> Array.rotate -12 = xs) (tag "rotate -12" >> isTrue)
+            assertThat (xs |> Array.rotate -13 = (xs|> Array.rotate -1)) (tag "rotate -13" >> isTrue)
+            assertThat (xs |> Array.rotate  13 = (xs|> Array.rotate  1)) (tag "rotate 13" >> isTrue)
+        )
 
-        testCase "Array.rotate throws on null array" <| fun _ ->
+        test ("Array.rotate throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.rotate 1 xs |> ignore)
+        )
 
-        testCase "Array.rotate does not modify input array" <| fun _ ->
+        test ("Array.rotate does not modify input array", fun _ ->
             let xs = [|0; 1; 2; 3; 4; 5|]
             let original = xs.Duplicate()
             let _ = Array.rotate 2 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.rotateDownTill" <| fun _ ->
+        test ("Array.rotateDownTill", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            Expect.isTrue (xs |> Array.rotateDownTill(fun i -> i = 7) = [|7; 2; 3; 7; 5; 0 |]) "rotateDownTill"
+            assertThat (xs |> Array.rotateDownTill(fun i -> i = 7) = [|7; 2; 3; 7; 5; 0 |]) (tag "rotateDownTill" >> isTrue)
             throwsArg (fun () -> xs |> Array.rotateDownTill (fun i -> i = 99) |> ignore)
+        )
 
-        testCase "Array.rotateDownTill does not modify input array" <| fun _ ->
+        test ("Array.rotateDownTill does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             let original = xs.Duplicate()
             let _ = Array.rotateDownTill (fun i -> i = 7) xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.rotateDownTillLast" <| fun _ ->
+        test ("Array.rotateDownTillLast", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            Expect.isTrue (xs |> Array.rotateDownTillLast(fun i -> i = 7) = [|2; 3; 7; 5; 0; 7 |]) "rotateDownTillLast"
+            assertThat (xs |> Array.rotateDownTillLast(fun i -> i = 7) = [|2; 3; 7; 5; 0; 7 |]) (tag "rotateDownTillLast" >> isTrue)
             throwsArg (fun () -> xs |> Array.rotateDownTillLast (fun i -> i = 99) |> ignore)
+        )
 
-        testCase "Array.rotateDownTillLast does not modify input array" <| fun _ ->
+        test ("Array.rotateDownTillLast does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             let original = xs.Duplicate()
             let _ = Array.rotateDownTillLast (fun i -> i = 7) xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.rotateUpTill" <| fun _ ->
+        test ("Array.rotateUpTill", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            Expect.isTrue (xs |> Array.rotateUpTill(fun i -> i = 7) = [|7; 5; 0; 7; 2; 3 |]) "rotateUpTill"
+            assertThat (xs |> Array.rotateUpTill(fun i -> i = 7) = [|7; 5; 0; 7; 2; 3 |]) (tag "rotateUpTill" >> isTrue)
             throwsArg (fun () -> xs |> Array.rotateUpTill (fun i -> i = 99) |> ignore)
+        )
 
-        testCase "Array.rotateUpTill does not modify input array" <| fun _ ->
+        test ("Array.rotateUpTill does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             let original = xs.Duplicate()
             let _ = Array.rotateUpTill (fun i -> i = 7) xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.rotateUpTillLast" <| fun _ ->
+        test ("Array.rotateUpTillLast", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            Expect.isTrue (xs |> Array.rotateUpTillLast(fun i -> i = 7) = [|5; 0; 7; 2; 3; 7 |]) "rotateUpTillLast"
+            assertThat (xs |> Array.rotateUpTillLast(fun i -> i = 7) = [|5; 0; 7; 2; 3; 7 |]) (tag "rotateUpTillLast" >> isTrue)
             throwsArg (fun () -> xs |> Array.rotateUpTillLast (fun i -> i = 99) |> ignore)
+        )
 
-        testCase "Array.rotateUpTillLast does not modify input array" <| fun _ ->
+        test ("Array.rotateUpTillLast does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             let original = xs.Duplicate()
             let _ = Array.rotateUpTillLast (fun i -> i = 7) xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Status check functions----------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.isSingleton returns true for single item array" <| fun _ ->
+        test ("Array.isSingleton returns true for single item array", fun _ ->
             let xs = [|42|]
-            Expect.isTrue (Array.isSingleton xs) "isSingleton"
+            assertThat (Array.isSingleton xs) (tag "isSingleton" >> isTrue)
+        )
 
-        testCase "Array.isSingleton returns false for empty array" <| fun _ ->
+        test ("Array.isSingleton returns false for empty array", fun _ ->
             let xs : int[] = [||]
-            Expect.isFalse (Array.isSingleton xs) "isSingleton empty"
+            assertThat (Array.isSingleton xs) (tag "isSingleton empty" >> isFalse)
+        )
 
-        testCase "Array.isSingleton returns false for array with multiple items" <| fun _ ->
+        test ("Array.isSingleton returns false for array with multiple items", fun _ ->
             let xs = [|1; 2|]
-            Expect.isFalse (Array.isSingleton xs) "isSingleton multiple"
+            assertThat (Array.isSingleton xs) (tag "isSingleton multiple" >> isFalse)
+        )
 
-        testCase "Array.isSingleton throws on null array" <| fun _ ->
+        test ("Array.isSingleton throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.isSingleton xs |> ignore)
+        )
 
-        testCase "Array.hasOne returns true for single item array" <| fun _ ->
+        test ("Array.hasOne returns true for single item array", fun _ ->
             let xs = [|42|]
-            Expect.isTrue (Array.hasOne xs) "hasOne"
+            assertThat (Array.hasOne xs) (tag "hasOne" >> isTrue)
+        )
 
-        testCase "Array.hasOne returns false for empty array" <| fun _ ->
+        test ("Array.hasOne returns false for empty array", fun _ ->
             let xs : int[] = [||]
-            Expect.isFalse (Array.hasOne xs) "hasOne empty"
+            assertThat (Array.hasOne xs) (tag "hasOne empty" >> isFalse)
+        )
 
-        testCase "Array.hasOne throws on null array" <| fun _ ->
+        test ("Array.hasOne throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.hasOne xs |> ignore)
+        )
 
-        testCase "Array.isNotEmpty returns true for non-empty array" <| fun _ ->
+        test ("Array.isNotEmpty returns true for non-empty array", fun _ ->
             let xs = [|1|]
-            Expect.isTrue (Array.isNotEmpty xs) "isNotEmpty"
+            assertThat (Array.isNotEmpty xs) (tag "isNotEmpty" >> isTrue)
+        )
 
-        testCase "Array.isNotEmpty returns false for empty array" <| fun _ ->
+        test ("Array.isNotEmpty returns false for empty array", fun _ ->
             let xs : int[] = [||]
-            Expect.isFalse (Array.isNotEmpty xs) "isNotEmpty empty"
+            assertThat (Array.isNotEmpty xs) (tag "isNotEmpty empty" >> isFalse)
+        )
 
-        testCase "Array.isNotEmpty throws on null array" <| fun _ ->
+        test ("Array.isNotEmpty throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.isNotEmpty xs |> ignore)
+        )
 
-        testCase "Array.hasItems returns true when count matches" <| fun _ ->
+        test ("Array.hasItems returns true when count matches", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isTrue (Array.hasItems 3 xs) "hasItems 3"
+            assertThat (Array.hasItems 3 xs) (tag "hasItems 3" >> isTrue)
+        )
 
-        testCase "Array.hasItems returns false when count does not match" <| fun _ ->
+        test ("Array.hasItems returns false when count does not match", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isFalse (Array.hasItems 2 xs) "hasItems 2"
+            assertThat (Array.hasItems 2 xs) (tag "hasItems 2" >> isFalse)
+        )
 
-        testCase "Array.hasItems throws on null array" <| fun _ ->
+        test ("Array.hasItems throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.hasItems 1 xs |> ignore)
+        )
 
-        testCase "Array.hasMinimumItems returns true when count is sufficient" <| fun _ ->
+        test ("Array.hasMinimumItems returns true when count is sufficient", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isTrue (Array.hasMinimumItems 2 xs) "hasMinimumItems 2"
-            Expect.isTrue (Array.hasMinimumItems 3 xs) "hasMinimumItems 3"
+            assertThat (Array.hasMinimumItems 2 xs) (tag "hasMinimumItems 2" >> isTrue)
+            assertThat (Array.hasMinimumItems 3 xs) (tag "hasMinimumItems 3" >> isTrue)
+        )
 
-        testCase "Array.hasMinimumItems returns false when count is insufficient" <| fun _ ->
+        test ("Array.hasMinimumItems returns false when count is insufficient", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isFalse (Array.hasMinimumItems 4 xs) "hasMinimumItems 4"
+            assertThat (Array.hasMinimumItems 4 xs) (tag "hasMinimumItems 4" >> isFalse)
+        )
 
-        testCase "Array.hasMinimumItems throws on null array" <| fun _ ->
+        test ("Array.hasMinimumItems throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.hasMinimumItems 1 xs |> ignore)
+        )
 
-        testCase "Array.hasMaximumItems returns true when count is not exceeded" <| fun _ ->
+        test ("Array.hasMaximumItems returns true when count is not exceeded", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isTrue (Array.hasMaximumItems 3 xs) "hasMaximumItems 3"
-            Expect.isTrue (Array.hasMaximumItems 4 xs) "hasMaximumItems 4"
+            assertThat (Array.hasMaximumItems 3 xs) (tag "hasMaximumItems 3" >> isTrue)
+            assertThat (Array.hasMaximumItems 4 xs) (tag "hasMaximumItems 4" >> isTrue)
+        )
 
-        testCase "Array.hasMaximumItems returns false when count is exceeded" <| fun _ ->
+        test ("Array.hasMaximumItems returns false when count is exceeded", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isFalse (Array.hasMaximumItems 2 xs) "hasMaximumItems 2"
+            assertThat (Array.hasMaximumItems 2 xs) (tag "hasMaximumItems 2" >> isFalse)
+        )
 
-        testCase "Array.hasMaximumItems throws on null array" <| fun _ ->
+        test ("Array.hasMaximumItems throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.hasMaximumItems 1 xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Min/Max functions---------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.min2 returns two smallest elements" <| fun _ ->
+        test ("Array.min2 returns two smallest elements", fun _ ->
             let xs = [|5; 1; 4; 2; 3|]
             let a, b = Array.min2 xs
-            Expect.equal a 1 "min2 first"
-            Expect.equal b 2 "min2 second"
+            assertThat a (tag "min2 first" >> isEqualTo 1)
+            assertThat b (tag "min2 second" >> isEqualTo 2)
+        )
 
-        testCase "Array.min2 keeps order for equal elements" <| fun _ ->
+        test ("Array.min2 keeps order for equal elements", fun _ ->
             let xs = [|3; 1; 1; 2|]
             let a, b = Array.min2 xs
-            Expect.equal a 1 "min2 first equal"
-            Expect.equal b 1 "min2 second equal"
+            assertThat a (tag "min2 first equal" >> isEqualTo 1)
+            assertThat b (tag "min2 second equal" >> isEqualTo 1)
+        )
 
-        testCase "Array.min2 throws on array with less than 2 items" <| fun _ ->
+        test ("Array.min2 throws on array with less than 2 items", fun _ ->
             let xs = [|1|]
             throwsArg (fun () -> Array.min2 xs |> ignore)
+        )
 
-        testCase "Array.min2 throws on null array" <| fun _ ->
+        test ("Array.min2 throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.min2 xs |> ignore)
+        )
 
-        testCase "Array.min2 does not modify input array" <| fun _ ->
+        test ("Array.min2 does not modify input array", fun _ ->
             let xs = [|5; 1; 4; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.min2 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.max2 returns two largest elements" <| fun _ ->
+        test ("Array.max2 returns two largest elements", fun _ ->
             let xs = [|1; 5; 2; 4; 3|]
             let a, b = Array.max2 xs
-            Expect.equal a 5 "max2 first"
-            Expect.equal b 4 "max2 second"
+            assertThat a (tag "max2 first" >> isEqualTo 5)
+            assertThat b (tag "max2 second" >> isEqualTo 4)
+        )
 
-        testCase "Array.max2 keeps order for equal elements" <| fun _ ->
+        test ("Array.max2 keeps order for equal elements", fun _ ->
             let xs = [|3; 5; 5; 2|]
             let a, b = Array.max2 xs
-            Expect.equal a 5 "max2 first equal"
-            Expect.equal b 5 "max2 second equal"
+            assertThat a (tag "max2 first equal" >> isEqualTo 5)
+            assertThat b (tag "max2 second equal" >> isEqualTo 5)
+        )
 
-        testCase "Array.max2 throws on array with less than 2 items" <| fun _ ->
+        test ("Array.max2 throws on array with less than 2 items", fun _ ->
             let xs = [|1|]
             throwsArg (fun () -> Array.max2 xs |> ignore)
+        )
 
-        testCase "Array.max2 throws on null array" <| fun _ ->
+        test ("Array.max2 throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.max2 xs |> ignore)
+        )
 
-        testCase "Array.min2By returns two smallest by projection" <| fun _ ->
+        test ("Array.min2By returns two smallest by projection", fun _ ->
             let xs = [|"apple"; "be"; "cat"; "do"|]
             let a, b = Array.min2By String.length xs
-            Expect.equal a "be" "min2By first"
-            Expect.equal b "do" "min2By second"
+            assertThat a (tag "min2By first" >> isEqualTo "be")
+            assertThat b (tag "min2By second" >> isEqualTo "do")
+        )
 
-        testCase "Array.min2By throws on null array" <| fun _ ->
+        test ("Array.min2By throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.min2By String.length xs |> ignore)
+        )
 
-        testCase "Array.max2By returns two largest by projection" <| fun _ ->
+        test ("Array.max2By returns two largest by projection", fun _ ->
             let xs = [|"a"; "apple"; "be"; "elephant"|]
             let a, b = Array.max2By String.length xs
-            Expect.equal a "elephant" "max2By first"
-            Expect.equal b "apple" "max2By second"
+            assertThat a (tag "max2By first" >> isEqualTo "elephant")
+            assertThat b (tag "max2By second" >> isEqualTo "apple")
+        )
 
-        testCase "Array.max2By throws on null array" <| fun _ ->
+        test ("Array.max2By throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.max2By String.length xs |> ignore)
+        )
 
-        testCase "Array.min2IndicesBy returns indices of two smallest" <| fun _ ->
+        test ("Array.min2IndicesBy returns indices of two smallest", fun _ ->
             let xs = [|"apple"; "be"; "cat"; "do"|]
             let i1, i2 = Array.min2IndicesBy String.length xs
-            Expect.equal i1 1 "min2IndicesBy first"
-            Expect.equal i2 3 "min2IndicesBy second"
+            assertThat i1 (tag "min2IndicesBy first" >> isEqualTo 1)
+            assertThat i2 (tag "min2IndicesBy second" >> isEqualTo 3)
+        )
 
-        testCase "Array.min2IndicesBy throws on null array" <| fun _ ->
+        test ("Array.min2IndicesBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.min2IndicesBy String.length xs |> ignore)
+        )
 
-        testCase "Array.max2IndicesBy returns indices of two largest" <| fun _ ->
+        test ("Array.max2IndicesBy returns indices of two largest", fun _ ->
             let xs = [|"a"; "apple"; "be"; "elephant"|]
             let i1, i2 = Array.max2IndicesBy String.length xs
-            Expect.equal i1 3 "max2IndicesBy first"
-            Expect.equal i2 1 "max2IndicesBy second"
+            assertThat i1 (tag "max2IndicesBy first" >> isEqualTo 3)
+            assertThat i2 (tag "max2IndicesBy second" >> isEqualTo 1)
+        )
 
-        testCase "Array.max2IndicesBy throws on null array" <| fun _ ->
+        test ("Array.max2IndicesBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.max2IndicesBy String.length xs |> ignore)
+        )
 
-        testCase "Array.min3 returns three smallest elements" <| fun _ ->
+        test ("Array.min3 returns three smallest elements", fun _ ->
             let xs = [|5; 1; 4; 2; 3|]
             let a, b, c = Array.min3 xs
-            Expect.equal a 1 "min3 first"
-            Expect.equal b 2 "min3 second"
-            Expect.equal c 3 "min3 third"
+            assertThat a (tag "min3 first" >> isEqualTo 1)
+            assertThat b (tag "min3 second" >> isEqualTo 2)
+            assertThat c (tag "min3 third" >> isEqualTo 3)
+        )
 
-        testCase "Array.min3 throws on array with less than 3 items" <| fun _ ->
+        test ("Array.min3 throws on array with less than 3 items", fun _ ->
             let xs = [|1; 2|]
             throwsArg (fun () -> Array.min3 xs |> ignore)
+        )
 
-        testCase "Array.min3 throws on null array" <| fun _ ->
+        test ("Array.min3 throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.min3 xs |> ignore)
+        )
 
-        testCase "Array.max3 returns three largest elements" <| fun _ ->
+        test ("Array.max3 returns three largest elements", fun _ ->
             let xs = [|1; 5; 2; 4; 3|]
             let a, b, c = Array.max3 xs
-            Expect.equal a 5 "max3 first"
-            Expect.equal b 4 "max3 second"
-            Expect.equal c 3 "max3 third"
+            assertThat a (tag "max3 first" >> isEqualTo 5)
+            assertThat b (tag "max3 second" >> isEqualTo 4)
+            assertThat c (tag "max3 third" >> isEqualTo 3)
+        )
 
-        testCase "Array.max3 throws on array with less than 3 items" <| fun _ ->
+        test ("Array.max3 throws on array with less than 3 items", fun _ ->
             let xs = [|1; 2|]
             throwsArg (fun () -> Array.max3 xs |> ignore)
+        )
 
-        testCase "Array.max3 throws on null array" <| fun _ ->
+        test ("Array.max3 throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.max3 xs |> ignore)
+        )
 
-        testCase "Array.min3By returns three smallest by projection" <| fun _ ->
+        test ("Array.min3By returns three smallest by projection", fun _ ->
             let xs = [|"apple"; "be"; "cat"; "do"; "elephant"|]
             let a, b, c = Array.min3By String.length xs
-            Expect.equal a "be" "min3By first"
-            Expect.equal b "do" "min3By second"
-            Expect.equal c "cat" "min3By third"
+            assertThat a (tag "min3By first" >> isEqualTo "be")
+            assertThat b (tag "min3By second" >> isEqualTo "do")
+            assertThat c (tag "min3By third" >> isEqualTo "cat")
+        )
 
-        testCase "Array.min3By throws on null array" <| fun _ ->
+        test ("Array.min3By throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.min3By String.length xs |> ignore)
+        )
 
-        testCase "Array.max3By returns three largest by projection" <| fun _ ->
+        test ("Array.max3By returns three largest by projection", fun _ ->
             let xs = [|"a"; "apple"; "be"; "elephant"; "cat"|]
             let a, b, c = Array.max3By String.length xs
-            Expect.equal a "elephant" "max3By first"
-            Expect.equal b "apple" "max3By second"
-            Expect.equal c "cat" "max3By third"
+            assertThat a (tag "max3By first" >> isEqualTo "elephant")
+            assertThat b (tag "max3By second" >> isEqualTo "apple")
+            assertThat c (tag "max3By third" >> isEqualTo "cat")
+        )
 
-        testCase "Array.max3By throws on null array" <| fun _ ->
+        test ("Array.max3By throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.max3By String.length xs |> ignore)
+        )
 
-        testCase "Array.min3IndicesBy returns indices of three smallest" <| fun _ ->
+        test ("Array.min3IndicesBy returns indices of three smallest", fun _ ->
             let xs = [|"apple"; "be"; "cat"; "do"; "e"|]
             let i1, i2, i3 = Array.min3IndicesBy String.length xs
-            Expect.equal i1 4 "min3IndicesBy first"
-            Expect.equal i2 1 "min3IndicesBy second"
-            Expect.equal i3 3 "min3IndicesBy third"
+            assertThat i1 (tag "min3IndicesBy first" >> isEqualTo 4)
+            assertThat i2 (tag "min3IndicesBy second" >> isEqualTo 1)
+            assertThat i3 (tag "min3IndicesBy third" >> isEqualTo 3)
+        )
 
-        testCase "Array.min3IndicesBy throws on null array" <| fun _ ->
+        test ("Array.min3IndicesBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.min3IndicesBy String.length xs |> ignore)
+        )
 
-        testCase "Array.max3IndicesBy returns indices of three largest" <| fun _ ->
+        test ("Array.max3IndicesBy returns indices of three largest", fun _ ->
             let xs = [|"a"; "apple"; "be"; "elephant"; "cat"|]
             let i1, i2, i3 = Array.max3IndicesBy String.length xs
-            Expect.equal i1 3 "max3IndicesBy first"
-            Expect.equal i2 1 "max3IndicesBy second"
-            Expect.equal i3 4 "max3IndicesBy third"
+            assertThat i1 (tag "max3IndicesBy first" >> isEqualTo 3)
+            assertThat i2 (tag "max3IndicesBy second" >> isEqualTo 1)
+            assertThat i3 (tag "max3IndicesBy third" >> isEqualTo 4)
+        )
 
-        testCase "Array.max3IndicesBy throws on null array" <| fun _ ->
+        test ("Array.max3IndicesBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.max3IndicesBy String.length xs |> ignore)
+        )
 
-        testCase "Array.minIndexBy returns index of smallest by projection" <| fun _ ->
+        test ("Array.minIndexBy returns index of smallest by projection", fun _ ->
             let xs = [|"apple"; "be"; "cat"|]
             let i = Array.minIndexBy String.length xs
-            Expect.equal i 1 "minIndexBy"
+            assertThat i (tag "minIndexBy" >> isEqualTo 1)
+        )
 
-        testCase "Array.minIndexBy throws on empty array" <| fun _ ->
+        test ("Array.minIndexBy throws on empty array", fun _ ->
             let xs : string[] = [||]
             throwsArg (fun () -> Array.minIndexBy String.length xs |> ignore)
+        )
 
-        testCase "Array.minIndexBy throws on null array" <| fun _ ->
+        test ("Array.minIndexBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.minIndexBy String.length xs |> ignore)
+        )
 
-        testCase "Array.maxIndexBy returns index of largest by projection" <| fun _ ->
+        test ("Array.maxIndexBy returns index of largest by projection", fun _ ->
             let xs = [|"apple"; "be"; "elephant"|]
             let i = Array.maxIndexBy String.length xs
-            Expect.equal i 2 "maxIndexBy"
+            assertThat i (tag "maxIndexBy" >> isEqualTo 2)
+        )
 
-        testCase "Array.maxIndexBy throws on empty array" <| fun _ ->
+        test ("Array.maxIndexBy throws on empty array", fun _ ->
             let xs : string[] = [||]
             throwsArg (fun () -> Array.maxIndexBy String.length xs |> ignore)
+        )
 
-        testCase "Array.maxIndexBy throws on null array" <| fun _ ->
+        test ("Array.maxIndexBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.maxIndexBy String.length xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Swap function-------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.swap swaps two elements" <| fun _ ->
+        test ("Array.swap swaps two elements", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             Array.swap 1 3 xs
-            Expect.isTrue (xs = [|1; 4; 3; 2; 5|]) "swap 1 3"
+            assertThat (xs = [|1; 4; 3; 2; 5|]) (tag "swap 1 3" >> isTrue)
+        )
 
-        testCase "Array.swap with same index does nothing" <| fun _ ->
+        test ("Array.swap with same index does nothing", fun _ ->
             let xs = [|1; 2; 3|]
             Array.swap 1 1 xs
-            Expect.isTrue (xs = [|1; 2; 3|]) "swap same index"
+            assertThat (xs = [|1; 2; 3|]) (tag "swap same index" >> isTrue)
+        )
 
-        testCase "Array.swap throws on negative index" <| fun _ ->
+        test ("Array.swap throws on negative index", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.swap -1 1 xs)
             throwsArg (fun () -> Array.swap 1 -1 xs)
+        )
 
-        testCase "Array.swap throws on index out of range" <| fun _ ->
+        test ("Array.swap throws on index out of range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.swap 0 3 xs)
             throwsArg (fun () -> Array.swap 3 0 xs)
+        )
 
-        testCase "Array.swap throws on null array" <| fun _ ->
+        test ("Array.swap throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.swap 0 1 xs)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Count functions-----------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.count returns length" <| fun _ ->
+        test ("Array.count returns length", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.count xs) 5 "count"
+            assertThat (Array.count xs) (tag "count" >> isEqualTo 5)
+        )
 
-        testCase "Array.count returns 0 for empty array" <| fun _ ->
+        test ("Array.count returns 0 for empty array", fun _ ->
             let xs : int[] = [||]
-            Expect.equal (Array.count xs) 0 "count empty"
+            assertThat (Array.count xs) (tag "count empty" >> isEqualTo 0)
+        )
 
-        testCase "Array.count throws on null array" <| fun _ ->
+        test ("Array.count throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.count xs |> ignore)
+        )
 
-        testCase "Array.countIf counts matching items" <| fun _ ->
+        test ("Array.countIf counts matching items", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             let count = Array.countIf (fun x -> x > 2) xs
-            Expect.equal count 3 "countIf"
+            assertThat count (tag "countIf" >> isEqualTo 3)
+        )
 
-        testCase "Array.countIf returns 0 when no items match" <| fun _ ->
+        test ("Array.countIf returns 0 when no items match", fun _ ->
             let xs = [|1; 2; 3|]
             let count = Array.countIf (fun x -> x > 10) xs
-            Expect.equal count 0 "countIf none match"
+            assertThat count (tag "countIf none match" >> isEqualTo 0)
+        )
 
-        testCase "Array.countIf returns 0 for empty array" <| fun _ ->
+        test ("Array.countIf returns 0 for empty array", fun _ ->
             let xs : int[] = [||]
             let count = Array.countIf (fun _ -> true) xs
-            Expect.equal count 0 "countIf empty"
+            assertThat count (tag "countIf empty" >> isEqualTo 0)
+        )
 
-        testCase "Array.countIf throws on null array" <| fun _ ->
+        test ("Array.countIf throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.countIf (fun _ -> true) xs |> ignore)
+        )
 
-        testCase "Array.countIf does not modify input array" <| fun _ ->
+        test ("Array.countIf does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.countIf (fun x -> x > 1) xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Filter by index-----------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.filteri " <| fun _ ->
+        test ("Array.filteri ", fun _ ->
             let arr = [|'a';'b';'c'|]
             let result = arr|> Array.filteri (fun i -> i % 2 = 0)
-            Expect.isTrue (result = [|'a';'c'|]) "filteri"
-            Expect.isFalse (Object.ReferenceEquals(arr, result)) "filteri should return new array"
+            assertThat (result = [|'a';'c'|]) (tag "filteri" >> isTrue)
+            assertThat (Object.ReferenceEquals(arr, result)) (tag "filteri should return new array" >> isFalse)
+        )
 
-        testCase "Array.filteri returns empty for all false predicate" <| fun _ ->
+        test ("Array.filteri returns empty for all false predicate", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.filteri (fun _ -> false) xs
-            Expect.isTrue (result = [||]) "filteri all false"
+            assertThat (result = [||]) (tag "filteri all false" >> isTrue)
+        )
 
-        testCase "Array.filteri returns all for all true predicate" <| fun _ ->
+        test ("Array.filteri returns all for all true predicate", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.filteri (fun _ -> true) xs
-            Expect.isTrue (result = [|1; 2; 3|]) "filteri all true"
+            assertThat (result = [|1; 2; 3|]) (tag "filteri all true" >> isTrue)
+        )
 
-        testCase "Array.filteri throws on null array" <| fun _ ->
+        test ("Array.filteri throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.filteri (fun _ -> true) xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Collection conversion-----------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.ofResizeArray creates array from ResizeArray" <| fun _ ->
+        test ("Array.ofResizeArray creates array from ResizeArray", fun _ ->
             let ra = ResizeArray<int>([1; 2; 3])
             let result = Array.ofResizeArray ra
-            Expect.isTrue (result = [|1; 2; 3|]) "ofResizeArray"
+            assertThat (result = [|1; 2; 3|]) (tag "ofResizeArray" >> isTrue)
+        )
 
-        testCase "Array.ofResizeArray throws on null" <| fun _ ->
+        test ("Array.ofResizeArray throws on null", fun _ ->
             let ra : ResizeArray<int> = null
             throwsNull (fun () -> Array.ofResizeArray ra |> ignore)
+        )
 
-        testCase "Array.toResizeArray creates ResizeArray from array" <| fun _ ->
+        test ("Array.toResizeArray creates ResizeArray from array", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.toResizeArray xs
-            Expect.equal result.Count 3 "toResizeArray count"
-            Expect.equal result.[0] 1 "toResizeArray [0]"
-            Expect.equal result.[1] 2 "toResizeArray [1]"
-            Expect.equal result.[2] 3 "toResizeArray [2]"
+            assertThat result.Count (tag "toResizeArray count" >> isEqualTo 3)
+            assertThat result.[0] (tag "toResizeArray [0]" >> isEqualTo 1)
+            assertThat result.[1] (tag "toResizeArray [1]" >> isEqualTo 2)
+            assertThat result.[2] (tag "toResizeArray [2]" >> isEqualTo 3)
+        )
 
-        testCase "Array.toResizeArray throws on null" <| fun _ ->
+        test ("Array.toResizeArray throws on null", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.toResizeArray xs |> ignore)
+        )
 
-        testCase "Array.toResizeArray does not modify input array" <| fun _ ->
+        test ("Array.toResizeArray does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
             let original = xs.Duplicate()
             let _ = Array.toResizeArray xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.asResizeArray creates ResizeArray from array" <| fun _ ->
+        test ("Array.asResizeArray creates ResizeArray from array", fun _ ->
             let xs = [|"a"; "b"; "c"|]
             let result = Array.asResizeArray xs
-            Expect.equal result.Count 3 "asResizeArray count"
+            assertThat result.Count (tag "asResizeArray count" >> isEqualTo 3)
+        )
 
-        testCase "Array.asResizeArray throws on null" <| fun _ ->
+        test ("Array.asResizeArray throws on null", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.asResizeArray xs |> ignore)
+        )
 
-        testCase "Array.ofIList creates array from IList" <| fun _ ->
+        test ("Array.ofIList creates array from IList", fun _ ->
             let list : IList<int> = ResizeArray<int>([1; 2; 3])
             let result = Array.ofIList list
-            Expect.isTrue (result = [|1; 2; 3|]) "ofIList"
+            assertThat (result = [|1; 2; 3|]) (tag "ofIList" >> isTrue)
+        )
 
-        testCase "Array.ofIList throws on null" <| fun _ ->
+        test ("Array.ofIList throws on null", fun _ ->
             let list : IList<int> = null
             throwsNull (fun () -> Array.ofIList list |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Conditional transformation------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.mapIfResult applies transform when result meets predicate" <| fun _ ->
+        test ("Array.mapIfResult applies transform when result meets predicate", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.mapIfResult (fun r -> r.Length > 0) (Array.map ((+) 1)) xs
-            Expect.isTrue (result = [|2; 3; 4|]) "mapIfResult applied"
+            assertThat (result = [|2; 3; 4|]) (tag "mapIfResult applied" >> isTrue)
+        )
 
-        testCase "Array.mapIfResult returns original when result does not meet predicate" <| fun _ ->
+        test ("Array.mapIfResult returns original when result does not meet predicate", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.mapIfResult (fun r -> r.Length > 10) (Array.map ((+) 1)) xs
-            Expect.isTrue (Object.ReferenceEquals(xs, result)) "mapIfResult not applied"
+            assertThat (Object.ReferenceEquals(xs, result)) (tag "mapIfResult not applied" >> isTrue)
+        )
 
-        testCase "Array.mapIfResult throws on null array" <| fun _ ->
+        test ("Array.mapIfResult throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.mapIfResult (fun _ -> true) id xs |> ignore)
+        )
 
-        testCase "Array.mapIfInputAndResult applies transform when both predicates pass" <| fun _ ->
+        test ("Array.mapIfInputAndResult applies transform when both predicates pass", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.mapIfInputAndResult (fun a -> a.Length > 0) (fun r -> r.Length > 0) (Array.map ((+) 1)) xs
-            Expect.isTrue (result = [|2; 3; 4|]) "mapIfInputAndResult applied"
+            assertThat (result = [|2; 3; 4|]) (tag "mapIfInputAndResult applied" >> isTrue)
+        )
 
-        testCase "Array.mapIfInputAndResult returns original when input predicate fails" <| fun _ ->
+        test ("Array.mapIfInputAndResult returns original when input predicate fails", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.mapIfInputAndResult (fun a -> a.Length > 10) (fun _ -> true) (Array.map ((+) 1)) xs
-            Expect.isTrue (Object.ReferenceEquals(xs, result)) "mapIfInputAndResult input failed"
+            assertThat (Object.ReferenceEquals(xs, result)) (tag "mapIfInputAndResult input failed" >> isTrue)
+        )
 
-        testCase "Array.mapIfInputAndResult returns original when result predicate fails" <| fun _ ->
+        test ("Array.mapIfInputAndResult returns original when result predicate fails", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.mapIfInputAndResult (fun _ -> true) (fun r -> r.Length > 10) (Array.map ((+) 1)) xs
-            Expect.isTrue (Object.ReferenceEquals(xs, result)) "mapIfInputAndResult result failed"
+            assertThat (Object.ReferenceEquals(xs, result)) (tag "mapIfInputAndResult result failed" >> isTrue)
+        )
 
-        testCase "Array.mapIfInputAndResult throws on null array" <| fun _ ->
+        test ("Array.mapIfInputAndResult throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.mapIfInputAndResult (fun _ -> true) (fun _ -> true) id xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Duplicates functions------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.duplicates returns duplicate elements" <| fun _ ->
+        test ("Array.duplicates returns duplicate elements", fun _ ->
             let xs = [|1; 2; 3; 2; 4; 3; 2|]
             let result = Array.duplicates xs
-            Expect.isTrue (result = [|2; 3|]) "duplicates"
+            assertThat (result = [|2; 3|]) (tag "duplicates" >> isTrue)
+        )
 
-        testCase "Array.duplicates returns empty when no duplicates" <| fun _ ->
+        test ("Array.duplicates returns empty when no duplicates", fun _ ->
             let xs = [|1; 2; 3; 4|]
             let result = Array.duplicates xs
-            Expect.isTrue (result = [||]) "duplicates none"
+            assertThat (result = [||]) (tag "duplicates none" >> isTrue)
+        )
 
-        testCase "Array.duplicates returns empty for empty array" <| fun _ ->
+        test ("Array.duplicates returns empty for empty array", fun _ ->
             let xs : int[] = [||]
             let result = Array.duplicates xs
-            Expect.isTrue (result = [||]) "duplicates empty"
+            assertThat (result = [||]) (tag "duplicates empty" >> isTrue)
+        )
 
-        testCase "Array.duplicates throws on null array" <| fun _ ->
+        test ("Array.duplicates throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.duplicates xs |> ignore)
+        )
 
-        testCase "Array.duplicates does not modify input array" <| fun _ ->
+        test ("Array.duplicates does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 2; 4|]
             let original = xs.Duplicate()
             let _ = Array.duplicates xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.duplicatesBy returns duplicates by projection" <| fun _ ->
+        test ("Array.duplicatesBy returns duplicates by projection", fun _ ->
             let xs = [|"apple"; "be"; "Art"; "big"|]
             let result = Array.duplicatesBy (fun (s:string) -> Char.ToLower(s.[0])) xs
-            Expect.isTrue (result = [|"Art"; "big"|]) "duplicatesBy"
+            assertThat (result = [|"Art"; "big"|]) (tag "duplicatesBy" >> isTrue)
+        )
 
-        testCase "Array.duplicatesBy returns empty when no duplicates" <| fun _ ->
+        test ("Array.duplicatesBy returns empty when no duplicates", fun _ ->
             let xs = [|"apple"; "be"; "cat"|]
             let result = Array.duplicatesBy (fun (s:string) -> s.[0]) xs
-            Expect.isTrue (result = [||]) "duplicatesBy none"
+            assertThat (result = [||]) (tag "duplicatesBy none" >> isTrue)
+        )
 
-        testCase "Array.duplicatesBy throws on null array" <| fun _ ->
+        test ("Array.duplicatesBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.duplicatesBy String.length xs |> ignore)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Error handling functions--------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.failIfEmpty returns array when not empty" <| fun _ ->
+        test ("Array.failIfEmpty returns array when not empty", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.failIfEmpty "should not throw" xs
-            Expect.isTrue (Object.ReferenceEquals(xs, result)) "failIfEmpty returns same array"
+            assertThat (Object.ReferenceEquals(xs, result)) (tag "failIfEmpty returns same array" >> isTrue)
+        )
 
-        testCase "Array.failIfEmpty throws on empty array" <| fun _ ->
+        test ("Array.failIfEmpty throws on empty array", fun _ ->
             let xs : int[] = [||]
-            Expect.throws (fun () -> Array.failIfEmpty "is empty" xs |> ignore) "should throw on empty"
+            assertThat (fun () -> Array.failIfEmpty "is empty" xs |> ignore) (tag "should throw on empty" >> throws)
+        )
 
-        testCase "Array.failIfLessThan returns array when count is sufficient" <| fun _ ->
+        test ("Array.failIfLessThan returns array when count is sufficient", fun _ ->
             let xs = [|1; 2; 3|]
             let result = Array.failIfLessThan 3 "should not throw" xs
-            Expect.isTrue (Object.ReferenceEquals(xs, result)) "failIfLessThan returns same array"
+            assertThat (Object.ReferenceEquals(xs, result)) (tag "failIfLessThan returns same array" >> isTrue)
+        )
 
-        testCase "Array.failIfLessThan throws when count is insufficient" <| fun _ ->
+        test ("Array.failIfLessThan throws when count is insufficient", fun _ ->
             let xs = [|1; 2|]
-            Expect.throws (fun () -> Array.failIfLessThan 3 "too few" xs |> ignore) "should throw when too few"
+            assertThat (fun () -> Array.failIfLessThan 3 "too few" xs |> ignore) (tag "should throw when too few" >> throws)
+        )
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Search/Match functions----------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        testCase "Array.matches returns true when array matches at index" <| fun _ ->
+        test ("Array.matches returns true when array matches at index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.isTrue (Array.matches [|2; 3|] 1 xs) "matches at index 1"
+            assertThat (Array.matches [|2; 3|] 1 xs) (tag "matches at index 1" >> isTrue)
+        )
 
-        testCase "Array.matches returns false when array does not match" <| fun _ ->
+        test ("Array.matches returns false when array does not match", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.isFalse (Array.matches [|2; 4|] 1 xs) "does not match"
+            assertThat (Array.matches [|2; 4|] 1 xs) (tag "does not match" >> isFalse)
+        )
 
-        testCase "Array.matches returns false when not enough items remain" <| fun _ ->
+        test ("Array.matches returns false when not enough items remain", fun _ ->
             let xs = [|1; 2; 3|]
-            Expect.isFalse (Array.matches [|3; 4|] 2 xs) "not enough items"
+            assertThat (Array.matches [|3; 4|] 2 xs) (tag "not enough items" >> isFalse)
+        )
 
-        testCase "Array.matches throws on invalid index" <| fun _ ->
+        test ("Array.matches throws on invalid index", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.matches [|1|] -1 xs |> ignore)
             throwsArg (fun () -> Array.matches [|1|] 3 xs |> ignore)
+        )
 
-        testCase "Array.matches throws on null searchFor" <| fun _ ->
+        test ("Array.matches throws on null searchFor", fun _ ->
             let xs = [|1; 2; 3|]
             throwsNull (fun () -> Array.matches null 0 xs |> ignore)
+        )
 
-        testCase "Array.matches does not modify input array" <| fun _ ->
+        test ("Array.matches does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             let original = xs.Duplicate()
             let _ = Array.matches [|2; 3|] 1 xs
-            Expect.isTrue (xs = original) "input array should not be modified"
+            assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
+        )
 
-        testCase "Array.findValue finds value in range" <| fun _ ->
+        test ("Array.findValue finds value in range", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.findValue 3 0 4 xs) 2 "findValue"
+            assertThat (Array.findValue 3 0 4 xs) (tag "findValue" >> isEqualTo 2)
+        )
 
-        testCase "Array.findValue returns -1 when not found" <| fun _ ->
+        test ("Array.findValue returns -1 when not found", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.findValue 6 0 4 xs) -1 "findValue not found"
+            assertThat (Array.findValue 6 0 4 xs) (tag "findValue not found" >> isEqualTo -1)
+        )
 
-        testCase "Array.findValue respects range bounds" <| fun _ ->
+        test ("Array.findValue respects range bounds", fun _ ->
             let xs = [|1; 2; 3; 2; 5|]
-            Expect.equal (Array.findValue 2 2 2 xs) -1 "findValue not in range"
-            Expect.equal (Array.findValue 2 2 4 xs) 3 "findValue in range"
+            assertThat (Array.findValue 2 2 2 xs) (tag "findValue not in range" >> isEqualTo -1)
+            assertThat (Array.findValue 2 2 4 xs) (tag "findValue in range" >> isEqualTo 3)
+        )
 
-        testCase "Array.findValue throws on invalid range" <| fun _ ->
+        test ("Array.findValue throws on invalid range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.findValue 1 -1 2 xs |> ignore)
             throwsArg (fun () -> Array.findValue 1 0 3 xs |> ignore)
             throwsArg (fun () -> Array.findValue 1 2 1 xs |> ignore)
+        )
 
-        testCase "Array.findValue throws on null array" <| fun _ ->
+        test ("Array.findValue throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.findValue 1 0 0 xs |> ignore)
+        )
 
-        testCase "Array.findLastValue finds last value in range" <| fun _ ->
+        test ("Array.findLastValue finds last value in range", fun _ ->
             let xs = [|1; 2; 3; 2; 5|]
-            Expect.equal (Array.findLastValue 2 0 4 xs) 3 "findLastValue"
+            assertThat (Array.findLastValue 2 0 4 xs) (tag "findLastValue" >> isEqualTo 3)
+        )
 
-        testCase "Array.findLastValue returns -1 when not found" <| fun _ ->
+        test ("Array.findLastValue returns -1 when not found", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            Expect.equal (Array.findLastValue 6 0 4 xs) -1 "findLastValue not found"
+            assertThat (Array.findLastValue 6 0 4 xs) (tag "findLastValue not found" >> isEqualTo -1)
+        )
 
-        testCase "Array.findLastValue throws on invalid range" <| fun _ ->
+        test ("Array.findLastValue throws on invalid range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.findLastValue 1 -1 2 xs |> ignore)
             throwsArg (fun () -> Array.findLastValue 1 0 3 xs |> ignore)
+        )
 
-        testCase "Array.findLastValue throws on null array" <| fun _ ->
+        test ("Array.findLastValue throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.findLastValue 1 0 0 xs |> ignore)
+        )
 
-        testCase "findlast" <| fun _ ->
+        test ("findlast", fun _ ->
             let i =  "abcde".ToCharArray()
             let l =  i.LastIndex
             let ab =  "ab".ToCharArray()
             let de =  "de".ToCharArray()
 
-            Expect.isTrue (
+            assertThat (
                 ( 0 = Array.findArray ab 0 l i)
                 && (-1 = Array.findArray ab 1 l i)
                 && ( 0 = Array.findLastArray ab 0 l i)
@@ -1121,26 +1334,31 @@ module Module2 =
                 && ( 3 = Array.findArray de 0 l   i)
                 && (-1 = Array.findLastArray de 0 (l-1)  i)
                 && ( 3 = Array.findLastArray de 0 l   i)
-            ) "findArray and findLastArray"
+            ) (tag "findArray and findLastArray" >> isTrue)
+        )
 
-        testCase "Array.findArray throws on invalid range" <| fun _ ->
+        test ("Array.findArray throws on invalid range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.findArray [|1|] -1 2 xs |> ignore)
             throwsArg (fun () -> Array.findArray [|1|] 0 3 xs |> ignore)
             throwsArg (fun () -> Array.findArray [|1|] 2 1 xs |> ignore)
+        )
 
-        testCase "Array.findArray throws on null array" <| fun _ ->
+        test ("Array.findArray throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.findArray [|1|] 0 0 xs |> ignore)
+        )
 
-        testCase "Array.findLastArray throws on invalid range" <| fun _ ->
+        test ("Array.findLastArray throws on invalid range", fun _ ->
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.findLastArray [|1|] -1 2 xs |> ignore)
             throwsArg (fun () -> Array.findLastArray [|1|] 0 3 xs |> ignore)
             throwsArg (fun () -> Array.findLastArray [|1|] 2 1 xs |> ignore)
+        )
 
-        testCase "Array.findLastArray throws on null array" <| fun _ ->
+        test ("Array.findLastArray throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.findLastArray [|1|] 0 0 xs |> ignore)
+        )
 
-    ]
+    ])

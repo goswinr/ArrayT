@@ -21,18 +21,26 @@ dotnet tool restore
 
 ## Testing
 
-Tests run on both .NET (Expecto) and JavaScript (Fable.Mocha with Mocha).
+Tests use [Scriptorium](https://fable-hub.github.io/Scriptorium/) (`Scriptorium.Quill` for the test DSL and runner, `Scriptorium.Nib` for assertions).
+The same test suite runs unchanged on .NET and on JavaScript via Fable.
 
 ```bash
 # Run .NET tests
 cd Tests
 dotnet run
 
-# Run JavaScript tests (includes Fable compilation and TypeScript verification)
+# Run JavaScript tests (Fable compiles Tests.fsproj to _js and runs it with node, then verifies TypeScript compilation of Src)
 cd Tests
 npm ci      # first time only
 npm test
 ```
+
+Test style:
+
+- Tests are written as `test ("name", fun _ -> ...)` inside `testList ("name", [ ... ])` (`open type Scriptorium.Quill.Test`).
+- Assertions use `assertThat actual (tag "message" >> isEqualTo expected)`, `isTrue`, `isFalse`, `isNull` and `throws` (`open Scriptorium.Nib.Assertion`).
+- All test lists are run by a single `runTests [ ... ]` call in `Tests/Main.fs`; on JS the process exits once the run completes.
+- Test names must be unique within a list, Scriptorium rejects duplicate test paths.
 
 ## Project Structure
 

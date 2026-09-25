@@ -2,9 +2,7 @@ namespace Tests
 open ArrayT
 
 #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-open Fable.Mocha
-#else
-open Expecto
+open Scriptorium.Nib.Assertion // used by the JS branches of CheckThrowsExn below
 #endif
 
 open System
@@ -65,7 +63,7 @@ module Exceptions =
     /// calls Assert.Fail()
     let CheckThrowsExn<'a when 'a :> exn> (f : unit -> unit) : unit =
         #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-            Expect.throws f "CheckThrowsExn"
+            assertThat f (tag "CheckThrowsExn" >> throws)
         #else
             try
                 let _ = f ()
@@ -78,7 +76,7 @@ module Exceptions =
     let private CheckThrowsExn2<'a when 'a :> exn> _s (f : unit -> unit) : unit =
 
         #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-            Expect.throws f "CheckThrowsExn2"
+            assertThat f (tag "CheckThrowsExn2" >> throws)
         #else
 
             let funcThrowsAsExpected =

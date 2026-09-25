@@ -5,460 +5,536 @@ module Extensions =
     open ArrayT
 
 
-    #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-    open Fable.Mocha
-    #else
-    open Expecto
-    #endif
+    open Scriptorium.Nib.Assertion
+    open type Scriptorium.Quill.Test
 
     let tests =
-      testList "extensions Tests" [
+      testList ("extensions Tests", [
 
-        test "Intro: 9=9" {Expect.equal 9 9 "Intro"}
+        test ("Intro: 9=9", fun _ -> assertThat 9 (tag "Intro" >> isEqualTo 9))
 
-        test "DebugIndexer" {
+        test ("DebugIndexer", fun _ ->
             let aa = [|for i in 0 .. 9 ->  float i |]
-            Expect.equal (aa.DebugIdx.[2]) 2.0 "DebugIndexer 2"
-            Expect.throws (fun () -> aa.DebugIdx.[10] |> ignore ) "DebugIndexer 10"
+            assertThat (aa.DebugIdx.[2]) (tag "DebugIndexer 2" >> isEqualTo 2.0)
+            assertThat (fun () -> aa.DebugIdx.[10] |> ignore ) (tag "DebugIndexer 10" >> throws)
             aa.DebugIdx.[2] <- 3.0
-            Expect.equal (aa.[2]) 3.0 "DebugIndexer 2 Item"
-        }
+            assertThat (aa.[2]) (tag "DebugIndexer 2 Item" >> isEqualTo 3.0)
+        )
 
         let a = [|for i in 0 .. 9 ->  float i |]
         //let b = Array.init 10 (fun i -> float i)
 
-        test "Get" {
-            Expect.equal (a.Get 2) 2.0 "Get 2"
-            Expect.equal (a.Get 2) a[2] "Get 2 Item"
-            Expect.throws (fun () -> a.Get 10 |> ignore ) "Get 10"
-            Expect.throws (fun () -> a.Get -1 |> ignore ) "Get -1"
+        test ("Get", fun _ ->
+            assertThat (a.Get 2) (tag "Get 2" >> isEqualTo 2.0)
+            assertThat (a.Get 2) (tag "Get 2 Item" >> isEqualTo (a[2]))
+            assertThat (fun () -> a.Get 10 |> ignore ) (tag "Get 10" >> throws)
+            assertThat (fun () -> a.Get -1 |> ignore ) (tag "Get -1" >> throws)
 
-        }
-        test "Set" {
+        )
+        test ("Set", fun _ ->
             let a = a.Duplicate()
             a.Set 2 3.0
-            Expect.equal (a.Get 2) 3.0 "Set 2"
+            assertThat (a.Get 2) (tag "Set 2" >> isEqualTo 3.0)
             a[2] <- 4.0
-            Expect.equal (a.Get 2) 4.0 "Set 2 Item"
-            Expect.throws (fun () -> a.Set 10 0.0 |> ignore ) "Set 10"
-            Expect.throws (fun () -> a.Set -1 0.0 |> ignore ) "Set -1"
-        }
+            assertThat (a.Get 2) (tag "Set 2 Item" >> isEqualTo 4.0)
+            assertThat (fun () -> a.Set 10 0.0 |> ignore ) (tag "Set 10" >> throws)
+            assertThat (fun () -> a.Set -1 0.0 |> ignore ) (tag "Set -1" >> throws)
+        )
 
         // -- xs.LastIndex --
-        testCase "LastIndex doesn't raises exception on empty Array" <| fun _ ->
+        test ("LastIndex doesn't raises exception on empty Array", fun _ ->
             let xs = [||]
             let r =  xs.LastIndex
-            Expect.equal -1 r "Expected -1"
+            assertThat -1 (tag "Expected -1" >> isEqualTo r)
+        )
 
-        testCase "LastIndex returns Count - 1 on non-empty Array" <| fun _ ->
+        test ("LastIndex returns Count - 1 on non-empty Array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let lastIndex = xs.LastIndex
-            Expect.equal lastIndex (xs.Length - 1) "Expected LastIndex to be equal to Count - 1"
+            assertThat lastIndex (tag "Expected LastIndex to be equal to Count - 1" >> isEqualTo (xs.Length - 1))
+        )
 
         //---- xs.Last ----
-        testCase "Last getter raises exception on empty Array" <| fun _ ->
+        test ("Last getter raises exception on empty Array", fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.Last |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Last setter raises exception on empty Array" <| fun _ ->
+        test ("Last setter raises exception on empty Array", fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.Last <- 1
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Last getter returns last item on non-empty Array" <| fun _ ->
+        test ("Last getter returns last item on non-empty Array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let lastItem = xs.Last
-            Expect.equal lastItem 5 "Expected Last to be equal to the last item in the Array"
+            assertThat lastItem (tag "Expected Last to be equal to the last item in the Array" >> isEqualTo 5)
+        )
 
-        testCase "Last setter changes last item on non-empty Array" <| fun _ ->
+        test ("Last setter changes last item on non-empty Array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             xs.Last <- 6
-            Expect.equal xs.Last 6 "Expected Last to be changed to the new value"
+            assertThat xs.Last (tag "Expected Last to be changed to the new value" >> isEqualTo 6)
+        )
 
         //---- xs.SecondLast ----
-        testCase "SecondLast getter raises exception on Array with less than 2 items" <| fun _ ->
+        test ("SecondLast getter raises exception on Array with less than 2 items", fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.SecondLast |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "SecondLast setter raises exception on Array with less than 2 items" <| fun _ ->
+        test ("SecondLast setter raises exception on Array with less than 2 items", fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.SecondLast <- 1
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "SecondLast getter returns second last item on Array with 2 or more items" <| fun _ ->
+        test ("SecondLast getter returns second last item on Array with 2 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let secondLastItem = xs.SecondLast
-            Expect.equal secondLastItem 4 "Expected SecondLast to be equal to the second last item in the Array"
+            assertThat secondLastItem (tag "Expected SecondLast to be equal to the second last item in the Array" >> isEqualTo 4)
+        )
 
-        testCase "SecondLast setter changes second last item on Array with 2 or more items" <| fun _ ->
+        test ("SecondLast setter changes second last item on Array with 2 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             xs.SecondLast <- 6
-            Expect.equal xs.SecondLast 6 "Expected SecondLast to be changed to the new value"
+            assertThat xs.SecondLast (tag "Expected SecondLast to be changed to the new value" >> isEqualTo 6)
+        )
 
         //---- xs.ThirdLast ----
-        testCase "ThirdLast getter raises exception on Array with less than 3 items" <| fun _ ->
+        test ("ThirdLast getter raises exception on Array with less than 3 items", fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.ThirdLast |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "ThirdLast setter raises exception on Array with less than 3 items" <| fun _ ->
+        test ("ThirdLast setter raises exception on Array with less than 3 items", fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.ThirdLast <- 1
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "ThirdLast getter returns third last item on Array with 3 or more items" <| fun _ ->
+        test ("ThirdLast getter returns third last item on Array with 3 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let thirdLastItem = xs.ThirdLast
-            Expect.equal thirdLastItem 3 "Expected ThirdLast to be equal to the third last item in the Array"
+            assertThat thirdLastItem (tag "Expected ThirdLast to be equal to the third last item in the Array" >> isEqualTo 3)
+        )
 
-        testCase "ThirdLast setter changes third last item on Array with 3 or more items" <| fun _ ->
+        test ("ThirdLast setter changes third last item on Array with 3 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             xs.ThirdLast <- 6
-            Expect.equal xs.ThirdLast 6 "Expected ThirdLast to be changed to the new value"
+            assertThat xs.ThirdLast (tag "Expected ThirdLast to be changed to the new value" >> isEqualTo 6)
+        )
 
         //---- xs.First ----
-        testCase "First getter raises exception on empty Array" <| fun _ ->
+        test ("First getter raises exception on empty Array", fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.First |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "First setter raises exception on empty Array" <| fun _ ->
+        test ("First setter raises exception on empty Array", fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.First <- 1
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "First getter returns first item on non-empty Array" <| fun _ ->
+        test ("First getter returns first item on non-empty Array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let firstItem = xs.First
-            Expect.equal firstItem 1 "Expected First to be equal to the first item in the Array"
+            assertThat firstItem (tag "Expected First to be equal to the first item in the Array" >> isEqualTo 1)
+        )
 
-        testCase "First setter changes first item on non-empty Array" <| fun _ ->
+        test ("First setter changes first item on non-empty Array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             xs.First <- 6
-            Expect.equal xs.First 6 "Expected First to be changed to the new value"
+            assertThat xs.First (tag "Expected First to be changed to the new value" >> isEqualTo 6)
+        )
 
         //---- xs.FirstAndOnly ----
-        testCase "FirstAndOnly getter raises exception on empty Array" <| fun _ ->
+        test ("FirstAndOnly getter raises exception on empty Array", fun _ ->
             let xs = [||]
             let testCode = fun () -> xs.FirstAndOnly |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "FirstAndOnly getter raises exception on Array with more than one item" <| fun _ ->
+        test ("FirstAndOnly getter raises exception on Array with more than one item", fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.FirstAndOnly |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "FirstAndOnly getter returns the item on Array with exactly one item" <| fun _ ->
+        test ("FirstAndOnly getter returns the item on Array with exactly one item", fun _ ->
             let xs = [| 1|]
             let firstAndOnlyItem = xs.FirstAndOnly
-            Expect.equal firstAndOnlyItem 1 "Expected FirstAndOnly to be equal to the only item in the Array"
+            assertThat firstAndOnlyItem (tag "Expected FirstAndOnly to be equal to the only item in the Array" >> isEqualTo 1)
+        )
 
         //---- xs.Second ----
-        testCase "Second getter raises exception on Array with less than 2 items" <| fun _ ->
+        test ("Second getter raises exception on Array with less than 2 items", fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.Second |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Second setter raises exception on Array with less than 2 items" <| fun _ ->
+        test ("Second setter raises exception on Array with less than 2 items", fun _ ->
             let xs = [| 1|]
             let testCode = fun () -> xs.Second <- 1
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Second getter returns second item on Array with 2 or more items" <| fun _ ->
+        test ("Second getter returns second item on Array with 2 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let secondItem = xs.Second
-            Expect.equal secondItem 2 "Expected Second to be equal to the second item in the Array"
+            assertThat secondItem (tag "Expected Second to be equal to the second item in the Array" >> isEqualTo 2)
+        )
 
-        testCase "Second setter changes second item on Array with 2 or more items" <| fun _ ->
+        test ("Second setter changes second item on Array with 2 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             xs.Second <- 6
-            Expect.equal xs.Second 6 "Expected Second to be changed to the new value"
+            assertThat xs.Second (tag "Expected Second to be changed to the new value" >> isEqualTo 6)
+        )
 
         //---- xs.Third ----
-        testCase "Third getter raises exception on Array with less than 3 items" <| fun _ ->
+        test ("Third getter raises exception on Array with less than 3 items", fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.Third |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Third setter raises exception on Array with less than 3 items" <| fun _ ->
+        test ("Third setter raises exception on Array with less than 3 items", fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.Third <- 1
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Third getter returns third item on Array with 3 or more items" <| fun _ ->
+        test ("Third getter returns third item on Array with 3 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let thirdItem = xs.Third
-            Expect.equal thirdItem 3 "Expected Third to be equal to the third item in the Array"
+            assertThat thirdItem (tag "Expected Third to be equal to the third item in the Array" >> isEqualTo 3)
+        )
 
-        testCase "Third setter changes third item on Array with 3 or more items" <| fun _ ->
+        test ("Third setter changes third item on Array with 3 or more items", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             xs.Third <- 6
-            Expect.equal xs.Third 6 "Expected Third to be changed to the new value"
+            assertThat xs.Third (tag "Expected Third to be changed to the new value" >> isEqualTo 6)
+        )
 
-        testCase "Third getter on empty Array raises exception" <| fun _ ->
+        test ("Third getter on empty Array raises exception", fun _ ->
             let xs : int[] = [||]
             let testCode = fun () -> xs.Third |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
         //---- xs.IsEmpty ----
-        testCase "IsEmpty returns true for empty Array" <| fun _ ->
+        test ("IsEmpty returns true for empty Array", fun _ ->
             let xs = [||]
-            Expect.isTrue xs.IsEmpty "Expected IsEmpty to be true for an empty Array"
+            assertThat xs.IsEmpty (tag "Expected IsEmpty to be true for an empty Array" >> isTrue)
+        )
 
-        testCase "IsEmpty returns false for non-empty Array" <| fun _ ->
+        test ("IsEmpty returns false for non-empty Array", fun _ ->
             let xs = [| 1|]
-            Expect.isFalse xs.IsEmpty "Expected IsEmpty to be false for a non-empty Array"
+            assertThat xs.IsEmpty (tag "Expected IsEmpty to be false for a non-empty Array" >> isFalse)
+        )
 
         //---- xs.IsSingleton ----
-        testCase "IsSingleton returns true for Array with one item" <| fun _ ->
+        test ("IsSingleton returns true for Array with one item", fun _ ->
             let xs = [| 1|]
-            Expect.isTrue xs.IsSingleton "Expected IsSingleton to be true for a Array with one item"
+            assertThat xs.IsSingleton (tag "Expected IsSingleton to be true for a Array with one item" >> isTrue)
+        )
 
-        testCase "IsSingleton returns false for Array with zero or more than one items" <| fun _ ->
+        test ("IsSingleton returns false for Array with zero or more than one items", fun _ ->
             let xs = [| 1; 2|]
-            Expect.isFalse xs.IsSingleton "Expected IsSingleton to be false for a Array with zero or more than one items"
+            assertThat xs.IsSingleton (tag "Expected IsSingleton to be false for a Array with zero or more than one items" >> isFalse)
+        )
 
         //---- xs.IsNotEmpty ----
-        testCase "IsNotEmpty returns false for empty Array" <| fun _ ->
+        test ("IsNotEmpty returns false for empty Array", fun _ ->
             let xs = [||]
-            Expect.isFalse xs.IsNotEmpty "Expected IsNotEmpty to be false for an empty Array"
+            assertThat xs.IsNotEmpty (tag "Expected IsNotEmpty to be false for an empty Array" >> isFalse)
+        )
 
-        testCase "IsNotEmpty returns true for non-empty Array" <| fun _ ->
+        test ("IsNotEmpty returns true for non-empty Array", fun _ ->
             let xs = [| 1|]
-            Expect.isTrue xs.IsNotEmpty "Expected IsNotEmpty to be true for a non-empty Array"
+            assertThat xs.IsNotEmpty (tag "Expected IsNotEmpty to be true for a non-empty Array" >> isTrue)
+        )
 
 
         //---- xs.GetNeg ----
-        testCase "GetNeg gets an item in the Array by index, allowing for negative index" <| fun _ ->
+        test ("GetNeg gets an item in the Array by index, allowing for negative index", fun _ ->
             let xs = [| 1; 2; 3|]
             let item = xs.GetNeg -1
-            Expect.equal item 3 "Expected GetNeg to get the last item in the Array when index is -1"
+            assertThat item (tag "Expected GetNeg to get the last item in the Array when index is -1" >> isEqualTo 3)
+        )
 
         //---- xs.SetNeg ----
-        testCase "SetNeg sets an item in the Array by index, allowing for negative index" <| fun _ ->
+        test ("SetNeg sets an item in the Array by index, allowing for negative index", fun _ ->
             let xs = [| 1; 2; 3|]
             xs.SetNeg -1 4
-            Expect.equal xs.Last 4 "Expected SetNeg to set the last item in the Array when index is -1"
+            assertThat xs.Last (tag "Expected SetNeg to set the last item in the Array when index is -1" >> isEqualTo 4)
+        )
 
         //---- xs.GetLooped ----
-        testCase "GetLooped gets an item in the Array by index, treating the Array as an endless loop" <| fun _ ->
+        test ("GetLooped gets an item in the Array by index, treating the Array as an endless loop", fun _ ->
             let xs = [| 1; 2; 3|]
             let item = xs.GetLooped 3
-            Expect.equal item 1 "Expected GetLooped to get the first item in the Array when index is equal to the count of the Array"
+            assertThat item (tag "Expected GetLooped to get the first item in the Array when index is equal to the count of the Array" >> isEqualTo 1)
+        )
 
         //---- xs.SetLooped ----
-        testCase "SetLooped sets an item in the Array by index, treating the Array as an endless loop" <| fun _ ->
+        test ("SetLooped sets an item in the Array by index, treating the Array as an endless loop", fun _ ->
             let xs = [| 1; 2; 3|]
             xs.SetLooped 3 4
-            Expect.equal xs.First 4 "Expected SetLooped to set the first item in the Array when index is equal to the count of the Array"
+            assertThat xs.First (tag "Expected SetLooped to set the first item in the Array when index is equal to the count of the Array" >> isEqualTo 4)
+        )
 
 
 
         //---- xs.Duplicate ----
-        testCase "Duplicate creates a shallow copy of the Array" <| fun _ ->
+        test ("Duplicate creates a shallow copy of the Array", fun _ ->
             let xs = [| 1; 2; 3|]
             let ys = xs.Duplicate()
-            Expect.isTrue (ys = xs) "Expected Clone to create a shallow copy of the Array"
+            assertThat (ys = xs) (tag "Expected Clone to create a shallow copy of the Array" >> isTrue)
+        )
 
 
         //---- xs.GetSlice ----
-        testCase "GetSlice gets a slice from the Array" <| fun _ ->
+        test ("GetSlice gets a slice from the Array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let slice = xs[1..3]
-            Expect.isTrue (slice = [| 2; 3; 4|]) "Expected GetSlice to get a slice from the Array"
+            assertThat (slice = [| 2; 3; 4|]) (tag "Expected GetSlice to get a slice from the Array" >> isTrue)
+        )
 
         //---- xs.SetSlice ----
-        testCase "SetSlice sets a slice in the Array" <| fun _ ->
+        test ("SetSlice sets a slice in the Array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let newValues = [| 6; 7; 8|]
             xs[1..3] <-  newValues
-            Expect.isTrue (xs = [| 1; 6; 7; 8; 5|]) "Expected SetSlice to set a slice in the Array"
+            assertThat (xs = [| 1; 6; 7; 8; 5|]) (tag "Expected SetSlice to set a slice in the Array" >> isTrue)
+        )
 
 
-        testCase "GetSlice raises exception when start index is out of range" <| fun _ ->
+        test ("GetSlice raises exception when start index is out of range", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let testCode = fun () -> xs.Slice(5,8) |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "toString entries" <| fun _ ->
+        test ("toString entries", fun _ ->
             let a = [|1;2;3;4;5;6|]
             let s = a.ToString(3).Replace("\r\n", "\n").Trim()
             let expected = "array<Int32> with 6 items:\n  0: 1\n  1: 2\n  2: 3\n  ...\n  5: 6"
-            Expect.equal s expected "toString entries"
+            assertThat s (tag "toString entries" >> isEqualTo expected)
+        )
 
         //---- xs.FailIfEmpty ----
-        testCase "FailIfEmpty returns array when not empty" <| fun _ ->
+        test ("FailIfEmpty returns array when not empty", fun _ ->
             let xs = [| 1; 2; 3|]
             let result = xs.FailIfEmpty("should not throw")
-            Expect.equal xs result "Expected same array to be returned"
+            assertThat xs (tag "Expected same array to be returned" >> isEqualTo result)
+        )
 
-        testCase "FailIfEmpty throws on empty Array" <| fun _ ->
+        test ("FailIfEmpty throws on empty Array", fun _ ->
             let xs : int[] = [||]
             let testCode = fun () -> xs.FailIfEmpty("is empty") |> ignore
-            Expect.throws testCode "Expected an Exception on empty array"
+            assertThat testCode (tag "Expected an Exception on empty array" >> throws)
+        )
 
         //---- xs.FailIfLessThan ----
-        testCase "FailIfLessThan returns array when count is sufficient" <| fun _ ->
+        test ("FailIfLessThan returns array when count is sufficient", fun _ ->
             let xs = [| 1; 2; 3|]
             let result = xs.FailIfLessThan(3, "should not throw")
-            Expect.equal xs result "Expected same array to be returned"
+            assertThat xs (tag "Expected same array to be returned" >> isEqualTo result)
+        )
 
-        testCase "FailIfLessThan throws when count is insufficient" <| fun _ ->
+        test ("FailIfLessThan throws when count is insufficient", fun _ ->
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.FailIfLessThan(3, "too few") |> ignore
-            Expect.throws testCode "Expected an Exception when array has too few items"
+            assertThat testCode (tag "Expected an Exception when array has too few items" >> throws)
+        )
 
-        testCase "FailIfLessThan returns array when count exceeds minimum" <| fun _ ->
+        test ("FailIfLessThan returns array when count exceeds minimum", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let result = xs.FailIfLessThan(3, "should not throw")
-            Expect.equal xs result "Expected same array to be returned"
+            assertThat xs (tag "Expected same array to be returned" >> isEqualTo result)
+        )
 
         //---- xs.HasItems ----
-        testCase "HasItems returns true for non-empty Array" <| fun _ ->
+        test ("HasItems returns true for non-empty Array", fun _ ->
             let xs = [| 1; 2; 3|]
-            Expect.isTrue xs.HasItems "Expected HasItems to be true for a non-empty Array"
+            assertThat xs.HasItems (tag "Expected HasItems to be true for a non-empty Array" >> isTrue)
+        )
 
-        testCase "HasItems returns false for empty Array" <| fun _ ->
+        test ("HasItems returns false for empty Array", fun _ ->
             let xs : int[] = [||]
-            Expect.isFalse xs.HasItems "Expected HasItems to be false for an empty Array"
+            assertThat xs.HasItems (tag "Expected HasItems to be false for an empty Array" >> isFalse)
+        )
 
         //---- Immutability tests for extension members ----
-        testCase "Get does not modify input array" <| fun _ ->
+        test ("Get does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
             let original = xs.Duplicate()
             let _ = xs.Get 1
-            Expect.isTrue (xs = original) "Get should not modify input array"
+            assertThat (xs = original) (tag "Get should not modify input array" >> isTrue)
+        )
 
-        testCase "GetNeg does not modify input array" <| fun _ ->
+        test ("GetNeg does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
             let original = xs.Duplicate()
             let _ = xs.GetNeg -1
-            Expect.isTrue (xs = original) "GetNeg should not modify input array"
+            assertThat (xs = original) (tag "GetNeg should not modify input array" >> isTrue)
+        )
 
-        testCase "GetLooped does not modify input array" <| fun _ ->
+        test ("GetLooped does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
             let original = xs.Duplicate()
             let _ = xs.GetLooped 5
-            Expect.isTrue (xs = original) "GetLooped should not modify input array"
+            assertThat (xs = original) (tag "GetLooped should not modify input array" >> isTrue)
+        )
 
-        testCase "Duplicate creates independent copy" <| fun _ ->
+        test ("Duplicate creates independent copy", fun _ ->
             let xs = [| 1; 2; 3|]
             let dup = xs.Duplicate()
             dup.[0] <- 99
-            Expect.equal xs.[0] 1 "Original array should not be modified when duplicate is changed"
+            assertThat xs.[0] (tag "Original array should not be modified when duplicate is changed" >> isEqualTo 1)
+        )
 
-        testCase "Slice does not modify input array" <| fun _ ->
+        test ("Slice does not modify input array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let original = xs.Duplicate()
             let _ = xs.Slice(1, 3)
-            Expect.isTrue (xs = original) "Slice should not modify input array"
+            assertThat (xs = original) (tag "Slice should not modify input array" >> isTrue)
+        )
 
-        testCase "First getter does not modify input array" <| fun _ ->
+        test ("First getter does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
             let original = xs.Duplicate()
             let _ = xs.First
-            Expect.isTrue (xs = original) "First getter should not modify input array"
+            assertThat (xs = original) (tag "First getter should not modify input array" >> isTrue)
+        )
 
-        testCase "Last getter does not modify input array" <| fun _ ->
+        test ("Last getter does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
             let original = xs.Duplicate()
             let _ = xs.Last
-            Expect.isTrue (xs = original) "Last getter should not modify input array"
+            assertThat (xs = original) (tag "Last getter should not modify input array" >> isTrue)
+        )
 
         //---- Additional edge cases ----
-        testCase "DebugIndexer throws on negative index" <| fun _ ->
+        test ("DebugIndexer throws on negative index", fun _ ->
             let xs = [| 1; 2; 3|]
             let testCode = fun () -> xs.DebugIdx.[-1] |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Idx gets item at index" <| fun _ ->
+        test ("Idx gets item at index", fun _ ->
             let xs = [| 1; 2; 3|]
-            Expect.equal (xs.Idx 1) 2 "Idx should return the item at index"
+            assertThat (xs.Idx 1) (tag "Idx should return the item at index" >> isEqualTo 2)
+        )
 
-        testCase "Idx throws on invalid index" <| fun _ ->
+        test ("Idx throws on invalid index", fun _ ->
             let xs = [| 1; 2; 3|]
             let testCode = fun () -> xs.Idx 3 |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "GetNeg with boundary negative index" <| fun _ ->
+        test ("GetNeg with boundary negative index", fun _ ->
             let xs = [| 1; 2; 3|]
-            Expect.equal (xs.GetNeg -3) 1 "GetNeg -3 should return first item"
+            assertThat (xs.GetNeg -3) (tag "GetNeg -3 should return first item" >> isEqualTo 1)
+        )
 
-        testCase "GetNeg throws when negative index is too large" <| fun _ ->
+        test ("GetNeg throws when negative index is too large", fun _ ->
             let xs = [| 1; 2; 3|]
             let testCode = fun () -> xs.GetNeg -4 |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "SetNeg with boundary negative index" <| fun _ ->
+        test ("SetNeg with boundary negative index", fun _ ->
             let xs = [| 1; 2; 3|]
             xs.SetNeg -3 99
-            Expect.equal xs.[0] 99 "SetNeg -3 should set first item"
+            assertThat xs.[0] (tag "SetNeg -3 should set first item" >> isEqualTo 99)
+        )
 
-        testCase "SetNeg throws when negative index is too large" <| fun _ ->
+        test ("SetNeg throws when negative index is too large", fun _ ->
             let xs = [| 1; 2; 3|]
             let testCode = fun () -> xs.SetNeg -4 99
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "GetLooped with large positive index" <| fun _ ->
+        test ("GetLooped with large positive index", fun _ ->
             let xs = [| 1; 2; 3|]
-            Expect.equal (xs.GetLooped 100) (xs.[100 % 3]) "GetLooped should wrap large positive index"
+            assertThat (xs.GetLooped 100) (tag "GetLooped should wrap large positive index" >> isEqualTo (xs.[100 % 3]))
+        )
 
-        testCase "GetLooped with large negative index" <| fun _ ->
+        test ("GetLooped with large negative index", fun _ ->
             let xs = [| 1; 2; 3|]
             let expected = xs.[((-100 % 3) + 3) % 3]
-            Expect.equal (xs.GetLooped -100) expected "GetLooped should wrap large negative index"
+            assertThat (xs.GetLooped -100) (tag "GetLooped should wrap large negative index" >> isEqualTo expected)
+        )
 
-        testCase "SetLooped with large positive index" <| fun _ ->
+        test ("SetLooped with large positive index", fun _ ->
             let xs = [| 1; 2; 3|]
             xs.SetLooped 100 99
-            Expect.equal xs.[100 % 3] 99 "SetLooped should wrap large positive index"
+            assertThat xs.[100 % 3] (tag "SetLooped should wrap large positive index" >> isEqualTo 99)
+        )
 
-        testCase "Slice with negative start and positive end" <| fun _ ->
+        test ("Slice with negative start and positive end", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let result = xs.Slice(-3, 4)
-            Expect.isTrue (result = [|3; 4; 5|]) "Slice should work with mixed indices"
+            assertThat (result = [|3; 4; 5|]) (tag "Slice should work with mixed indices" >> isTrue)
+        )
 
-        testCase "Slice throws when start is after end" <| fun _ ->
+        test ("Slice throws when start is after end", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let testCode = fun () -> xs.Slice(3, 1) |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "Slice throws when indices are out of bounds" <| fun _ ->
+        test ("Slice throws when indices are out of bounds", fun _ ->
             let xs = [| 1; 2; 3|]
             let testCode1 = fun () -> xs.Slice(5, 6) |> ignore
             let testCode2 = fun () -> xs.Slice(0, 5) |> ignore
-            Expect.throws testCode1 "Expected an IndexOutOfRangeException for start out of bounds"
-            Expect.throws testCode2 "Expected an IndexOutOfRangeException for end out of bounds"
+            assertThat testCode1 (tag "Expected an IndexOutOfRangeException for start out of bounds" >> throws)
+            assertThat testCode2 (tag "Expected an IndexOutOfRangeException for end out of bounds" >> throws)
+        )
 
-        testCase "IsSingleton returns false for empty Array" <| fun _ ->
+        test ("IsSingleton returns false for empty Array", fun _ ->
             let xs : int[] = [||]
-            Expect.isFalse xs.IsSingleton "Expected IsSingleton to be false for an empty Array"
+            assertThat xs.IsSingleton (tag "Expected IsSingleton to be false for an empty Array" >> isFalse)
+        )
 
-        testCase "LastIndex returns correct value for various arrays" <| fun _ ->
-            Expect.equal [|1|].LastIndex 0 "Single item array should have LastIndex 0"
-            Expect.equal [|1;2;3|].LastIndex 2 "Three item array should have LastIndex 2"
+        test ("LastIndex returns correct value for various arrays", fun _ ->
+            assertThat [|1|].LastIndex (tag "Single item array should have LastIndex 0" >> isEqualTo 0)
+            assertThat [|1;2;3|].LastIndex (tag "Three item array should have LastIndex 2" >> isEqualTo 2)
+        )
 
-        testCase "FirstAndOnly fails on empty Array" <| fun _ ->
+        test ("FirstAndOnly fails on empty Array", fun _ ->
             let xs : int[] = [||]
             let testCode = fun () -> xs.FirstAndOnly |> ignore
-            Expect.throws testCode "Expected an IndexOutOfRangeException"
+            assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
+        )
 
-        testCase "SecondLast on two item Array" <| fun _ ->
+        test ("SecondLast on two item Array", fun _ ->
             let xs = [| 1; 2|]
-            Expect.equal xs.SecondLast 1 "SecondLast on two item array should return first item"
+            assertThat xs.SecondLast (tag "SecondLast on two item array should return first item" >> isEqualTo 1)
+        )
 
-        testCase "ThirdLast on three item Array" <| fun _ ->
+        test ("ThirdLast on three item Array", fun _ ->
             let xs = [| 1; 2; 3|]
-            Expect.equal xs.ThirdLast 1 "ThirdLast on three item array should return first item"
+            assertThat xs.ThirdLast (tag "ThirdLast on three item array should return first item" >> isEqualTo 1)
+        )
 
-        testCase "Second on two item Array" <| fun _ ->
+        test ("Second on two item Array", fun _ ->
             let xs = [| 1; 2|]
-            Expect.equal xs.Second 2 "Second on two item array should return second item"
+            assertThat xs.Second (tag "Second on two item array should return second item" >> isEqualTo 2)
+        )
 
-        testCase "Third on three item Array" <| fun _ ->
+        test ("Third on three item Array", fun _ ->
             let xs = [| 1; 2; 3|]
-            Expect.equal xs.Third 3 "Third on three item array should return third item"
+            assertThat xs.Third (tag "Third on three item array should return third item" >> isEqualTo 3)
+        )
 
-    ]
+    ])

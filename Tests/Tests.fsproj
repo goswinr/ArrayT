@@ -8,9 +8,9 @@
 
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.Mocha" Version="2.17.0" />
-    <PackageReference Include="Expecto" Version="11.1.0" />
-    <PackageReference Include="FSharp.Core" Version="10.0.100" /><!-- `Include` syntax for dependabot -->
+    <PackageReference Include="Scriptorium.Quill" Version="0.7.1" /> <!-- test DSL and runner, for .NET and Fable JS/TS -->
+    <PackageReference Include="Scriptorium.Nib" Version="0.4.1" />   <!-- assertions -->
+    <PackageReference Include="FSharp.Core" Version="10.0.101" /><!-- `Include` syntax for dependabot. Scriptorium needs at least 10.0.101 -->
 
     <ProjectReference Include="../Src/ArrayT.fsproj" />
     <Compile Include="Module.fs" />

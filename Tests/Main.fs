@@ -1,26 +1,16 @@
 namespace Tests
 
 open ArrayT
+open type Scriptorium.Quill.Runner
 
 module Main =
 
-    #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-
-    open Fable.Mocha
-    Mocha.runTests Tests.Extensions.tests |> ignore
-    Mocha.runTests Tests.Module2.tests |> ignore
-    Mocha.runTests Tests.FableParity.tests |> ignore
-
-    #else
-
-    open Expecto
+    // Scriptorium runs the same test suite on .NET and on JS/TS via Fable.
+    // It must be a single runTests call: on JS the process exits when the run completes.
     [<EntryPoint>]
-    let main argv : int =
-        runTestsWithCLIArgs [] [||] Tests.Extensions.tests
-        |||
-        runTestsWithCLIArgs [] [||] Tests.Module2.tests
-        |||
-        runTestsWithCLIArgs [] [||] Tests.FableParity.tests
-
-
-    #endif
+    let main _argv : int =
+        runTests [
+            Tests.Extensions.tests
+            Tests.Module2.tests
+            Tests.FableParity.tests
+        ]

@@ -24,11 +24,13 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      # tests use Scriptorium, the same test suite runs on .NET and on JS via Fable
+
       - name: Run tests .NET
         run: dotnet run
         working-directory: ./Tests
 
-      # run JS tests:
+      # run JS tests (Fable compiles the tests to JS and runs them with node, then verifies TS compilation):
 
       - name: Restore .NET tools (Fable)
         run: dotnet tool restore
