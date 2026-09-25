@@ -967,6 +967,15 @@ module Module2 =
             throwsArg (fun () -> Array.minIndexBy String.length xs |> ignore)
         )
 
+        test ("Min and max error messages name the public function", fun _ ->
+            let empty : string[] = [||]
+            throwsWith ["Array.minIndexBy: Count must be at least one"] (fun () -> Array.minIndexBy String.length empty |> ignore)
+            throwsWith ["Array.max2: Count must be at least two"] (fun () -> Array.max2 [| 1 |] |> ignore)
+            throwsWith ["Array.min2IndicesBy: Count must be at least two"] (fun () -> Array.min2IndicesBy id [| 1 |] |> ignore)
+            throwsWith ["Array.min3: Count must be at least three"] (fun () -> Array.min3 [| 1; 2 |] |> ignore)
+            throwsWith ["Array.max3By: Count must be at least three"] (fun () -> Array.max3By id [| 1; 2 |] |> ignore)
+        )
+
         test ("Array.minIndexBy throws on null array", fun _ ->
             let xs : string[] = null
             throwsNull (fun () -> Array.minIndexBy String.length xs |> ignore)

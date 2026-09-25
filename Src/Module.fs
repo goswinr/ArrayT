@@ -594,8 +594,9 @@ module Array =
             m
         *)
 
-        let inline simple2 cmpF (arr: 'T[]) : 'T * 'T =
-            if arr.Length < 2 then fail arr "MinMax.simple2: Count must be at least two"
+        // funcName is the name of the public function, for the error message
+        let inline simple2 (funcName: string) cmpF (arr: 'T[]) : 'T * 'T =
+            if arr.Length < 2 then fail arr $"{funcName}: Count must be at least two"
             let mutable m1 = arr.[0]
             let mutable m2 = arr.[1]
             for i = 1 to arr.Length - 1 do
@@ -638,8 +639,8 @@ module Array =
             else
                 2, 1, 0
 
-        let inline simple3 cmpF (arr: 'T[]) : 'T * 'T * 'T =
-            if arr.Length < 3 then fail arr "MinMax.simple3: Count must be at least three"
+        let inline simple3 (funcName: string) cmpF (arr: 'T[]) : 'T * 'T * 'T =
+            if arr.Length < 3 then fail arr $"{funcName}: Count must be at least three"
             let e1 = arr.[0]
             let e2 = arr.[1]
             let e3 = arr.[2]
@@ -658,8 +659,8 @@ module Array =
                     m3 <- this
             m1, m2, m3
 
-        let inline indexByFun cmpF func (arr: 'T[]) : int =
-            if arr.Length < 1 then fail arr "MinMax.indexByFun: Count must be at least one"
+        let inline indexByFun (funcName: string) cmpF func (arr: 'T[]) : int =
+            if arr.Length < 1 then fail arr $"{funcName}: Count must be at least one"
             let mutable f = func arr.[0]
             let mutable mf = f
             let mutable ii = 0
@@ -670,8 +671,8 @@ module Array =
                     mf <- f
             ii
 
-        let inline index2ByFun cmpF func (arr: 'T[]) : int * int =
-            if arr.Length < 2 then fail arr "MinMax.index2ByFun: Count must be at least two"
+        let inline index2ByFun (funcName: string) cmpF func (arr: 'T[]) : int * int =
+            if arr.Length < 2 then fail arr $"{funcName}: Count must be at least two"
             let mutable i1 = 0
             let mutable i2 = 1
             let mutable mf1 = func arr.[i1]
@@ -689,8 +690,8 @@ module Array =
                     mf2 <- f
             i1, i2
 
-        let inline index3ByFun (cmpOp: 'U -> 'U -> bool) (byFun: 'T -> 'U) (arr: 'T[]) : int * int * int =
-            if arr.Length < 3 then fail arr "MinMax.index3ByFun: Count must be at least three"
+        let inline index3ByFun (funcName: string) (cmpOp: 'U -> 'U -> bool) (byFun: 'T -> 'U) (arr: 'T[]) : int * int * int =
+            if arr.Length < 3 then fail arr $"{funcName}: Count must be at least three"
             // sort first 3
             let mutable i1, i2, i3 = indexOfSort3By byFun cmpOp arr.[0] arr.[1] arr.[2] // otherwise would fail on sorting first 3, test on Array([5;6;3;1;2;0])|> Array.max3
             let mutable e1 = byFun arr.[i1]
@@ -724,23 +725,25 @@ module Array =
         *)
 
 
-    /// <summary>Returns the index of the smallest of all elements of the Array, compared via Operators.max on the function result.</summary>
+    /// <summary>Returns the index of the smallest of all elements of the Array, compared via Operators.min on the function result.
+    /// If several elements are equally small, the index of the first one is returned.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The index of the smallest element.</returns>
     let inline minIndexBy (projection: 'T -> 'Key) (arr: 'T[]) : int =
         if isNull arr then nullExn "minIndexBy"
-        arr |> MinMax.indexByFun (<) projection
+        arr |> MinMax.indexByFun "minIndexBy" (<) projection
 
-    /// <summary>Returns the index of the greatest of all elements of the Array, compared via Operators.max on the function result.</summary>
+    /// <summary>Returns the index of the greatest of all elements of the Array, compared via Operators.max on the function result.
+    /// If several elements are equally great, the index of the first one is returned.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The index of the maximum element.</returns>
     let inline maxIndexBy (projection: 'T -> 'Key) (arr: 'T[]) : int =
         if isNull arr then nullExn "maxIndexBy"
-        arr |> MinMax.indexByFun (>) projection
+        arr |> MinMax.indexByFun "maxIndexBy" (>) projection
 
 
     /// <summary>Returns the smallest and the second smallest element of the Array.
@@ -749,7 +752,7 @@ module Array =
     /// <returns>A tuple of the smallest and second smallest elements.</returns>
     let inline min2 (arr: 'T[]) : 'T * 'T =
         if isNull arr then nullExn "min2"
-        arr |> MinMax.simple2 (<)
+        arr |> MinMax.simple2 "min2" (<)
 
     /// <summary>Returns the biggest and the second biggest element of the Array.
     /// If they are equal then the  order is kept</summary>
@@ -757,7 +760,7 @@ module Array =
     /// <returns>A tuple of the biggest and second biggest elements.</returns>
     let inline max2 (arr: 'T[]) : 'T * 'T =
         if isNull arr then nullExn "max2"
-        arr |> MinMax.simple2 (>)
+        arr |> MinMax.simple2 "max2" (>)
 
 
 
@@ -769,7 +772,7 @@ module Array =
     /// <returns>A tuple of the smallest and second smallest elements.</returns>
     let inline min2By (f: 'T -> 'Key) (arr: 'T[]) : 'T * 'T =
         if isNull arr then nullExn "min2By"
-        let i, ii = arr |> MinMax.index2ByFun (<) f
+        let i, ii = arr |> MinMax.index2ByFun "min2By" (<) f
         arr.[i], arr.[ii]
 
     /// <summary>Returns the biggest and the second biggest element of the Array.
@@ -780,7 +783,7 @@ module Array =
     /// <returns>A tuple of the biggest and second biggest elements.</returns>
     let inline max2By (f: 'T -> 'Key) (arr: 'T[]) : 'T * 'T =
         if isNull arr then nullExn "max2By"
-        let i, ii = arr |> MinMax.index2ByFun (>) f
+        let i, ii = arr |> MinMax.index2ByFun "max2By" (>) f
         arr.[i], arr.[ii]
 
     /// <summary>Returns the indices of the smallest and the second smallest element of the Array.
@@ -791,7 +794,7 @@ module Array =
     /// <returns>A tuple of the indices of the smallest and second smallest elements.</returns>
     let inline min2IndicesBy (f: 'T -> 'Key) (arr: 'T[]) : int * int =
         if isNull arr then nullExn "min2IndicesBy"
-        arr |> MinMax.index2ByFun (<) f
+        arr |> MinMax.index2ByFun "min2IndicesBy" (<) f
 
     /// <summary>Returns the indices of the biggest and the second biggest element of the Array.
     /// Elements are compared by applying the predicate function first.
@@ -801,7 +804,7 @@ module Array =
     /// <returns>A tuple of the indices of the biggest and second biggest elements.</returns>
     let inline max2IndicesBy (f: 'T -> 'Key) (arr: 'T[]) : int * int =
         if isNull arr then nullExn "max2IndicesBy"
-        arr |> MinMax.index2ByFun (>) f
+        arr |> MinMax.index2ByFun "max2IndicesBy" (>) f
 
 
     /// <summary>Returns the smallest three elements of the Array.
@@ -811,7 +814,7 @@ module Array =
     /// <returns>A tuple of the three smallest elements.</returns>
     let inline min3 (arr: 'T[]) : 'T * 'T * 'T =
         if isNull arr then nullExn "min3"
-        arr |> MinMax.simple3 (<)
+        arr |> MinMax.simple3 "min3" (<)
 
     /// <summary>Returns the biggest three elements of the Array.
     /// The first element is the biggest, the second is the second biggest and the third is the third biggest.
@@ -820,7 +823,7 @@ module Array =
     /// <returns>A tuple of the three biggest elements.</returns>
     let inline max3 (arr: 'T[]) : 'T * 'T * 'T =
         if isNull arr then nullExn "max3"
-        arr |> MinMax.simple3 (>)
+        arr |> MinMax.simple3 "max3" (>)
 
     /// <summary>Returns the smallest three elements of the Array.
     /// The first element is the smallest, the second is the second smallest and the third is the third smallest.
@@ -831,7 +834,7 @@ module Array =
     /// <returns>A tuple of the three smallest elements.</returns>
     let inline min3By (f: 'T -> 'Key) (arr: 'T[]) : 'T * 'T * 'T =
         if isNull arr then nullExn "min3By"
-        let i, ii, iii = arr |> MinMax.index3ByFun (<) f
+        let i, ii, iii = arr |> MinMax.index3ByFun "min3By" (<) f
         arr.[i], arr.[ii], arr.[iii]
 
     /// <summary>Returns the biggest three elements of the Array.
@@ -843,7 +846,7 @@ module Array =
     /// <returns>A tuple of the three biggest elements.</returns>
     let inline max3By (f: 'T -> 'Key) (arr: 'T[]) : 'T * 'T * 'T =
         if isNull arr then nullExn "max3By"
-        let i, ii, iii = arr |> MinMax.index3ByFun (>) f
+        let i, ii, iii = arr |> MinMax.index3ByFun "max3By" (>) f
         arr.[i], arr.[ii], arr.[iii]
 
     /// <summary>Returns the indices of the three smallest elements of the Array.
@@ -855,7 +858,7 @@ module Array =
     /// <returns>A tuple of the indices of the three smallest elements.</returns>
     let inline min3IndicesBy (f: 'T -> 'Key) (arr: 'T[]) : int * int * int =
         if isNull arr then nullExn "min3IndicesBy"
-        arr |> MinMax.index3ByFun (<) f
+        arr |> MinMax.index3ByFun "min3IndicesBy" (<) f
 
     /// <summary>Returns the indices of the three biggest elements of the Array.
     /// The first element is the index of the biggest, the second is the index of the second biggest and the third is the index of the third biggest.
@@ -866,7 +869,7 @@ module Array =
     /// <returns>A tuple of the indices of the three biggest elements.</returns>
     let inline max3IndicesBy (f: 'T -> 'Key) (arr: 'T[]) : int * int * int =
         if isNull arr then nullExn "max3IndicesBy"
-        arr |> MinMax.index3ByFun (>) f
+        arr |> MinMax.index3ByFun "max3IndicesBy" (>) f
 
 
     /// <summary>Return the length or count of the collection.
