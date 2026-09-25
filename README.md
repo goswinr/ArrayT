@@ -358,6 +358,17 @@ arr.ToString(3)   // show only first 3 entries (and the last one)
 //   6: 7"
 ```
 
+### Skipping index checks in Fable
+
+When compiling with Fable you can define the `UNCHECKED` symbol, e.g. `dotnet fable --define UNCHECKED`.
+Then `xs.Get`, `xs.Set`, `xs.Idx`, `Array.get` and `Array.set` skip their index checks (and `Array.get` and `Array.set` their null checks too)
+and compile to plain JavaScript `arr[i]` access.
+`Array.zeroCreateUndef` then emits `new Array(len)` without filling the items with default values.
+It is only available for reference types.
+
+This works because Fable compiles ArrayT from source.
+On .NET the precompiled `ArrayT.dll` from NuGet is used, so `UNCHECKED` has no effect there.
+
 ## Use of AI and LLMs
 All core functions are written by hand to ensure performance and correctness.<br>
 However, AI tools have been used for code review, typo and grammar checking in documentation<br>

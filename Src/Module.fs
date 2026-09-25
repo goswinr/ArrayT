@@ -39,10 +39,13 @@ module Array =
             arr.Set index value
         #endif
 
-    /// Just Array.zeroCreate<'T> in .NET, but when used in Fable and `UNCHECKED` is defined it emits `new Array(len)`
-    /// without filling the array with items of their default value.
-    /// Values are `undefined` in JavaScript
-    /// Not safe on numbers, Fable emits TypedArrays for numeric arrays. And those do not get filled in Fable anyway.
+    /// <summary>Just Array.zeroCreate in .NET.
+    /// In Fable, when the `UNCHECKED` symbol is defined, it emits `new Array(len)`
+    /// without filling the array with the default value of the items.
+    /// So the items are `undefined` in JavaScript until they are set.
+    /// Only for reference types, Fable emits TypedArrays for numeric arrays.</summary>
+    /// <param name="len">The length of the array to create.</param>
+    /// <returns>The new array.</returns>
     let inline zeroCreateUndef<'T when 'T : not struct> (len:int) : 'T [] =
         #if UNCHECKED && (FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT)
             Fable.Core.JsInterop.emitJsExpr (len) "new Array($0)"
