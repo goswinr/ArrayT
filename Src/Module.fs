@@ -83,7 +83,7 @@ module Array =
 
     /// <summary>Gets an item in the Array by index.
     /// Allows for negative index too ( -1 is last item,  like Python)
-    /// (a negative index can also be done with '^' prefix. E.g. ^0 for the last item)</summary>
+    /// (With LangVersion preview, F# also supports indexing from the end with the '^' prefix, e.g. xs.[^0] for the last item.)</summary>
     /// <param name="index">The index to access (can be negative).</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>The value at the specified index.</returns>
@@ -94,7 +94,7 @@ module Array =
 
     /// <summary>Sets an item in the Array by index.
     /// Allows for negative index too ( -1 is last item,  like Python)
-    /// (a negative index can also be done with '^' prefix. E.g. ^0 for the last item)</summary>
+    /// (With LangVersion preview, F# also supports indexing from the end with the '^' prefix, e.g. xs.[^0] for the last item.)</summary>
     /// <param name="index">The index to set (can be negative).</param>
     /// <param name="value">The value to set.</param>
     /// <param name="arr">The input Array.</param>
@@ -175,7 +175,7 @@ module Array =
     /// If the end index is one less than the start index an empty Array is returned.
     /// Raises an IndexOutOfRangeException if indices are out of range.
     /// If you don't want an exception to be raised for index overflow or overlap use Array.trim.
-    /// (A negative index can also be done with '^' prefix. E.g. ^0 for the last item, when F# Language preview features are enabled.)</summary>
+    /// (With LangVersion preview, F# also supports slicing from the end with the '^' prefix, e.g. xs.[1..^1] skips the first and last item.)</summary>
     /// <param name="startIdx">The start index (inclusive, can be negative).</param>
     /// <param name="endIdx">The end index (inclusive, can be negative).</param>
     /// <param name="arr">The input Array.</param>

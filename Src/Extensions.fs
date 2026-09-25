@@ -158,7 +158,7 @@ module AutoOpenArrayTExtensions =
 
         /// <summary>Gets an item in the Array by index.
         /// Allows for negative index too ( -1 is last item,  like Python)
-        /// (From the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)</summary>
+        /// (With LangVersion preview, F# also supports indexing from the end with the '^' prefix, e.g. xs.[^0] for the last item.)</summary>
         /// <param name="index">The index to access (can be negative).</param>
         /// <returns>The value at the specified index.</returns>
         member inline xs.GetNeg index : 'T =
@@ -169,7 +169,7 @@ module AutoOpenArrayTExtensions =
 
         /// <summary>Sets an item in the Array by index.
         /// Allows for negative index too ( -1 is last item,  like Python)
-        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)</summary>
+        /// (With LangVersion preview, F# also supports indexing from the end with the '^' prefix, e.g. xs.[^0] for the last item.)</summary>
         /// <param name="index">The index to set (can be negative).</param>
         /// <param name="value">The value to set.</param>
         member inline xs.SetNeg index value : unit =
@@ -224,7 +224,7 @@ module AutoOpenArrayTExtensions =
         /// The resulting array includes the end index.
         /// If the end index is one less than the start index an empty array is returned.
         /// The built in slicing notation (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
-        /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.</summary>
+        /// Alternative: with LangVersion preview, F# also supports slicing from the end with the '^' prefix, e.g. xs.[1..^1] skips the first and last item.</summary>
         /// <param name="startIdx">The start index (inclusive, can be negative).</param>
         /// <param name="endIdx">The end index (inclusive, can be negative).</param>
         /// <returns>A new array containing the sliced elements.</returns>
