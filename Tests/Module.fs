@@ -1,9 +1,7 @@
 namespace Tests
 open ArrayT
 
-#if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
-open Scriptorium.Nib.Assertion // used by the JS branches of CheckThrowsExn below
-#endif
+open Scriptorium.Nib.Assertion
 
 open System
 open System.Collections.Generic
@@ -97,6 +95,12 @@ module Exceptions =
 
     let throwsNull f : unit = CheckThrowsExn<ArgumentNullException>    f
     let throwsArg f : unit = CheckThrowsExn<ArgumentException>    f
+
+    /// Check that the lambda throws and that the exception message contains all the given parts.
+    /// Works the same on .NET and in Fable.
+    let throwsWith (parts: string list) (f : unit -> unit) : unit =
+        let containsAll (e: exn) = parts |> List.forall (fun (p: string) -> e.Message.Contains p)
+        assertThat f (tag "throwsWith" >> throws >> assertion containsAll (fun e -> $"expected the exception message to contain {parts} but got:\n{e.Message}"))
 
 
 

@@ -350,6 +350,12 @@ module Module2 =
             throwsArg (fun () -> Array.trim 0 -1 xs |> ignore)
         )
 
+        test ("Array.trim error message includes the negative value", fun _ ->
+            let xs = [|1; 2; 3|]
+            throwsWith ["fromStartCount"; "-1"] (fun () -> Array.trim -1 0 xs |> ignore)
+            throwsWith ["fromEndCount"; "-2"] (fun () -> Array.trim 0 -2 xs |> ignore)
+        )
+
         test ("Array.trim throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.trim 1 1 xs |> ignore)
@@ -970,6 +976,11 @@ module Module2 =
             let xs = [|1; 2; 3|]
             throwsArg (fun () -> Array.swap 0 3 xs)
             throwsArg (fun () -> Array.swap 3 0 xs)
+        )
+
+        test ("Array.swap error message includes the indices", fun _ ->
+            let xs = [|1; 2; 3|]
+            throwsWith ["i=0"; "j=7"; "last index 2"] (fun () -> Array.swap 0 7 xs)
         )
 
         test ("Array.swap throws on null array", fun _ ->

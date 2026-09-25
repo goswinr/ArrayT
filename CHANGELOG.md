@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- Error messages of `Array.trim` and `Array.swap` showed a literal `%d` instead of the actual values.
+
 ## [0.26.1] - 2026-09-07
 ### Fixed
 - Packaging: the Fable content glob is no longer recursive, so the package no longer ships generated obj AssemblyInfo files, only the real source files.
@@ -56,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - copy from ResizeArray library 0.19.0
 
+[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.26.1...HEAD
 [0.26.1]: https://github.com/goswinr/ArrayT/compare/0.26.0...0.26.1
 [0.26.0]: https://github.com/goswinr/ArrayT/compare/0.25.0...0.26.0
 <!-- [0.25.0]: https://github.com/goswinr/ArrayT/compare/0.24.2...0.25.0 -->

@@ -225,8 +225,8 @@ module Array =
     /// <returns>A new trimmed array.</returns>
     let trim (fromStartCount:int) (fromEndCount:int) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "trim"
-        if fromStartCount < 0 then fail arr "trim: fromStartCount can't be negative: %d" fromStartCount
-        if fromEndCount < 0 then fail arr "trim: fromEndCount can't be negative: %d" fromEndCount
+        if fromStartCount < 0 then fail arr $"trim: fromStartCount can't be negative: {fromStartCount}"
+        if fromEndCount < 0 then fail arr $"trim: fromEndCount can't be negative: {fromEndCount}"
         let c = arr.Length
         if fromStartCount + fromEndCount >= c then
             [||]
@@ -571,7 +571,7 @@ module Array =
     let inline swap (i:int) (j:int) (arr: 'T[]) : unit =
         if isNull arr then nullExn "swap"
         if i < 0 || j < 0 || i >= arr.Length || j >= arr.Length then
-            fail arr "swap: index i=%d and j=%d can't be less than 0 or bigger than last index %d " i j (arr.Length - 1)
+            fail arr $"swap: index i={i} and j={j} can't be less than 0 or bigger than last index {arr.Length - 1}"
         if i <> j then
             let ti = arr.[i]
             arr.[i] <- arr.[j]
