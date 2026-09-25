@@ -9,6 +9,9 @@ on:
       - main
   workflow_call: # releaseNuget.yml runs this before publishing
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
