@@ -228,6 +228,49 @@ module FableParity =
         )
 
         //--------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------Error message contents-----------------------------------------------------
+        // The descriptive messages are the main feature of this library, so check their content on .NET and in Fable.
+        // (In Fable the type name is shown as 'T, so only the item count is checked.)
+        //--------------------------------------------------------------------------------------------------------------------
+
+        test ("Get and Idx error messages include the bad index, the item count and the content", fun _ ->
+            let xs = [| 0 .. 88 |]
+            throwsWith ["Array.Get: Can't get index 99 from:"; "with 89 items:"; "  0: 0"; "  ..."; "  88: 88"] (fun () -> xs.Get 99 |> ignore)
+            throwsWith ["Array.Idx: Can't get index -1 from:"; "with 89 items:"] (fun () -> xs.Idx -1 |> ignore)
+        )
+
+        test ("Set error message includes the bad index, the value and the item count", fun _ ->
+            let xs = [| 0 .. 88 |]
+            throwsWith ["Array.Set: Can't set index 99 to 7 on:"; "with 89 items:"] (fun () -> xs.Set 99 7)
+        )
+
+        test ("DebugIdx error messages include the bad index and the item count", fun _ ->
+            let xs = [| 1; 2; 3 |]
+            throwsWith ["Array.DebugIdx.[i]: Can't get index 3 from:"; "with 3 items:"] (fun () -> xs.DebugIdx.[3] |> ignore)
+            throwsWith ["Array.DebugIdx.[i]: Can't set index -1 to 9 on:"; "with 3 items:"] (fun () -> xs.DebugIdx.[-1] <- 9)
+        )
+
+        test ("GetNeg, GetLooped, Last and SecondLast error messages include the bad index", fun _ ->
+            let xs = [| 1; 2; 3 |]
+            throwsWith ["Array.GetNeg: Can't get index -4 from:"; "with 3 items:"] (fun () -> xs.GetNeg -4 |> ignore)
+            let empty : int[] = [||]
+            throwsWith ["Array.GetLooped: Can't get index 5 from:"; "empty array"] (fun () -> empty.GetLooped 5 |> ignore)
+            throwsWith ["Array.Last: Can't get index -1 from:"; "empty array"] (fun () -> empty.Last |> ignore)
+            throwsWith ["Array.SecondLast: Can't get index -1 from:"; "with 1 item:"] (fun () -> [| 1 |].SecondLast |> ignore)
+        )
+
+        test ("Array.get and Array.set error messages include the bad index", fun _ ->
+            let xs = [| 1; 2; 3 |]
+            throwsWith ["Array.Get: Can't get index 3 from:"; "with 3 items:"] (fun () -> Array.get 3 xs |> ignore)
+            throwsWith ["Array.Set: Can't set index 3 to 0 on:"; "with 3 items:"] (fun () -> Array.set 3 0 xs)
+        )
+
+        test ("null input error message names the function", fun _ ->
+            let xs : int[] = null
+            throwsWith ["Array.first: input is null!"] (fun () -> Array.first xs |> ignore)
+        )
+
+        //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------badSetExn (tested via Set extension)--------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
