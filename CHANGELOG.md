@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `arr.Slice` and `Array.slice` now report an out-of-range negative end index as such, instead of "start index is bigger than end index".
 - `Array.min3`, `max3`, `min3By`, `max3By`, `min3IndicesBy` and `max3IndicesBy` did not keep the original order for ties among the first three items, as documented.
 - `Array.matches`, `findArray` and `findLastArray` now raise descriptive exceptions for an empty or null search pattern (and `matches` for a null `searchIn`) instead of a bare `IndexOutOfRangeException` or `NullReferenceException`.
+- `arr.ToString(Int32.MaxValue)` printed "..." and the last item twice, and `Array.trim` failed for very large trim counts, both because of an integer overflow.
 
 ## [0.26.1] - 2026-09-07
 ### Fixed

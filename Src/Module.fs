@@ -229,7 +229,7 @@ module Array =
         if fromStartCount < 0 then fail arr $"trim: fromStartCount can't be negative: {fromStartCount}"
         if fromEndCount < 0 then fail arr $"trim: fromEndCount can't be negative: {fromEndCount}"
         let c = arr.Length
-        if fromStartCount + fromEndCount >= c then
+        if fromStartCount >= c || fromEndCount >= c - fromStartCount then // not 'fromStartCount + fromEndCount >= c', that could overflow
             [||]
         else
             let len = c - fromStartCount - fromEndCount

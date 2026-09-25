@@ -354,6 +354,13 @@ module Module2 =
             assertThat (Array.trim 2 2 xs = [||]) (tag "trim 2 2" >> isTrue)
         )
 
+        test ("Array.trim returns empty array for Int32.MaxValue trim counts", fun _ ->
+            let xs = [|1; 2; 3|]
+            assertThat (Array.trim Int32.MaxValue 1 xs = [||]) (tag "trim MaxValue 1" >> isTrue)
+            assertThat (Array.trim 1 Int32.MaxValue xs = [||]) (tag "trim 1 MaxValue" >> isTrue)
+            assertThat (Array.trim Int32.MaxValue Int32.MaxValue xs = [||]) (tag "trim MaxValue MaxValue" >> isTrue)
+        )
+
         test ("Array.trim returns same elements when trimming 0", fun _ ->
             let xs = [|1; 2; 3|]
             assertThat (Array.trim 0 0 xs = [|1; 2; 3|]) (tag "trim 0 0" >> isTrue)

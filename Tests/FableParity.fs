@@ -974,6 +974,12 @@ module FableParity =
             assertThat (s.Contains("...")) (tag "should contain ellipsis for truncated" >> isTrue)
         )
 
+        test ("ToString(Int32.MaxValue) prints all entries once", fun _ ->
+            let xs = [| 1; 2; 3 |]
+            let s = xs.ToString(Int32.MaxValue).Replace("\r\n", "\n").Trim()
+            assertThat s (tag "all entries, no ellipsis" >> isEqualTo "array<Int32> with 3 items:\n  0: 1\n  1: 2\n  2: 3")
+        )
+
         test ("ToString(n) on empty array", fun _ ->
             let xs : int[] = [||]
             let s = xs.ToString(5)
