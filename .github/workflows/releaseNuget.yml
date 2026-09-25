@@ -48,10 +48,6 @@ jobs:
           exit 1
         fi 
 
-    - name: Get repository name
-      id: repo-name
-      run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
-
     - name: Publish NuGet package
       run: |
         $nupkgPath = Get-ChildItem -Path "./Src/bin/Release/" -Filter "*.symbols.nupkg" -Recurse | Select-Object -First 1 -ExpandProperty FullName
