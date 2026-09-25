@@ -1305,6 +1305,17 @@ module Module2 =
             throwsNull (fun () -> Array.matches null 0 xs |> ignore)
         )
 
+        test ("Array.matches throws on null searchIn", fun _ ->
+            let xs : int[] = null
+            throwsNull (fun () -> Array.matches [|1|] 0 xs |> ignore)
+        )
+
+        test ("Array.matches throws a descriptive error on empty searchFor", fun _ ->
+            let xs = [|1; 2; 3|]
+            throwsArg (fun () -> Array.matches [||] 0 xs |> ignore)
+            throwsWith ["matches"; "searchFor array is empty"] (fun () -> Array.matches [||] 0 xs |> ignore)
+        )
+
         test ("Array.matches does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             let original = xs.Duplicate()
@@ -1401,6 +1412,20 @@ module Module2 =
         test ("Array.findLastArray throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.findLastArray [|1|] 0 0 xs |> ignore)
+        )
+
+        test ("Array.findArray and findLastArray throw on null searchFor", fun _ ->
+            let xs = [|1; 2; 3|]
+            throwsNull (fun () -> Array.findArray null 0 2 xs |> ignore)
+            throwsNull (fun () -> Array.findLastArray null 0 2 xs |> ignore)
+        )
+
+        test ("Array.findArray and findLastArray throw a descriptive error on empty searchFor", fun _ ->
+            let xs = [|1; 2; 3|]
+            throwsArg (fun () -> Array.findArray [||] 0 2 xs |> ignore)
+            throwsArg (fun () -> Array.findLastArray [||] 0 2 xs |> ignore)
+            throwsWith ["findArray"; "searchFor array is empty"] (fun () -> Array.findArray [||] 0 2 xs |> ignore)
+            throwsWith ["findLastArray"; "searchFor array is empty"] (fun () -> Array.findLastArray [||] 0 2 xs |> ignore)
         )
 
     ])

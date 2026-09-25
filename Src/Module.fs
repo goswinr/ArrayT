@@ -1010,7 +1010,9 @@ module Array =
     /// <returns>True if the pattern matches at the given index.</returns>
     let matches (searchFor:'T[]) (atIdx:int) (searchIn:'T[]) : bool =
         if isNull searchFor then nullExn "matches"
-        if atIdx < 0                then fail searchIn <| sprintf "matches: atIdx Index is too small: %d for array of %d items" atIdx searchIn.Length
+        if isNull searchIn then nullExn "matches"
+        if searchFor.Length = 0 then fail searchIn "matches: the searchFor array is empty"
+        if atIdx < 0               then fail searchIn <| sprintf "matches: atIdx Index is too small: %d for array of %d items" atIdx searchIn.Length
         if atIdx >= searchIn.Length then fail searchIn <| sprintf "matches: atIdx Index is too big: %d for array of %d items" atIdx searchIn.Length
         let fLast = searchFor.Length - 1
         let iLen = searchIn.Length
@@ -1072,8 +1074,10 @@ module Array =
     /// <param name="searchIn">The array to search in.</param>
     /// <returns>The index of the first occurrence, or -1 if not found.</returns>
     let findArray (searchFor:'T[]) (fromIdx:int) (tillIdx:int) (searchIn:'T[]) : int =
-        if isNull searchIn then nullExn "findArray`"
-        if fromIdx < 0                then fail searchIn <| sprintf "findArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
+        if isNull searchIn then nullExn "findArray"
+        if isNull searchFor then nullExn "findArray"
+        if searchFor.Length = 0 then fail searchIn "findArray: the searchFor array is empty"
+        if fromIdx < 0               then fail searchIn <| sprintf "findArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
         if tillIdx < fromIdx          then fail searchIn <| sprintf "findArray (of %d items): tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" searchFor.Length tillIdx fromIdx searchIn.Length
         let fLast = searchFor.Length - 1
@@ -1097,7 +1101,9 @@ module Array =
     /// <returns>The index of the last occurrence, or -1 if not found.</returns>
     let findLastArray (searchFor:'T[]) (fromIdx:int) (tillIdx:int) (searchIn:'T[]) : int =
         if isNull searchIn then nullExn "findLastArray"
-        if fromIdx < 0                then fail searchIn <| sprintf "findLastArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
+        if isNull searchFor then nullExn "findLastArray"
+        if searchFor.Length = 0 then fail searchIn "findLastArray: the searchFor array is empty"
+        if fromIdx < 0               then fail searchIn <| sprintf "findLastArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then fail searchIn <| sprintf "findLastArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
         if tillIdx < fromIdx          then fail searchIn <| sprintf "findLastArray (of %d items): tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" searchFor.Length tillIdx fromIdx searchIn.Length
         let fLast = searchFor.Length - 1
