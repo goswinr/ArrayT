@@ -267,10 +267,10 @@ Array.max2IndicesBy String.length words   // (1, 2)
 
 ```fsharp
 Array.duplicates [| 1; 2; 3; 2; 4; 3 |]
-// [| 2; 3 |]    (each duplicate reported once, ordered by first occurrence)
+// [| 2; 3 |]    (each duplicate reported once, ordered by where it repeats)
 
 Array.duplicatesBy String.length [| "hi"; "hey"; "go"; "bye" |]
-// [| "hi"; "hey" |]    (length 2 and length 3 both have duplicates)
+// [| "go"; "bye" |]    (the items where length 2 and length 3 repeat)
 ```
 
 ### Searching

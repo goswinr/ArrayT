@@ -981,9 +981,10 @@ module Array =
             arr
 
 
-    /// <summary>Returns all elements that exists more than once in Array.
+    /// <summary>Returns all elements that exist more than once in Array.
     /// Each element that exists more than once is only returned once.
-    /// Returned order is by first occurrence of first duplicate.</summary>
+    /// The returned item is the second occurrence, where the duplicate is first detected.
+    /// Returned order is by position of that second occurrence.</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>An array of duplicate elements.</returns>
     let duplicates (arr: 'T[]) : 'T[] =
@@ -994,9 +995,10 @@ module Array =
         //arr.FindAll(System.Predicate(fun x -> if h.Add x then false else t.Add x))
         arr |> Array.filter (fun x -> if h.Add x then false else t.Add x)
 
-    /// <summary>Returns all elements that exists more than once in Array.
-    /// Each element that exists more than once is only returned once.
-    /// Returned order is by first occurrence of first duplicate.</summary>
+    /// <summary>Returns all elements whose projected value exists more than once in Array.
+    /// Each projected value that exists more than once is only returned once.
+    /// The returned item is the second occurrence, where the duplicate is first detected.
+    /// Returned order is by position of that second occurrence.</summary>
     /// <param name="f">The function to extract comparison value from each element.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>An array of duplicate elements.</returns>

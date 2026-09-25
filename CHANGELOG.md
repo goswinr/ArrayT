@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The docs of `Array.minIndexBy` and `maxIndexBy` named the wrong exception type.
 - Error messages of `Array.rotateUpTillLast` and `rotateDownTillLast` named the wrong function.
 - The docstring of `Array.toResizeArray` said it returns a fixed-length Array.
+- The docs of `Array.duplicates` and `duplicatesBy` now say that the second occurrence of each duplicate is returned; the README example was wrong.
 - Clearer error message from `arr.FirstAndOnly` and `Array.firstAndOnly` when the Array does not have exactly one item.
 
 ## [0.26.1] - 2026-09-07

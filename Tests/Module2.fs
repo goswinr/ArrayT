@@ -1261,6 +1261,12 @@ module Module2 =
             assertThat (result = [|"Art"; "big"|]) (tag "duplicatesBy" >> isTrue)
         )
 
+        test ("Array.duplicates and duplicatesBy return second occurrences in their order", fun _ ->
+            assertThat (Array.duplicates [|3; 2; 2; 3|] = [|2; 3|]) (tag "duplicates order" >> isTrue)
+            let r = Array.duplicatesBy String.length [| "hi"; "hey"; "go"; "bye" |]
+            assertThat (r = [| "go"; "bye" |]) (tag "duplicatesBy returns second occurrences" >> isTrue)
+        )
+
         test ("Array.duplicatesBy returns empty when no duplicates", fun _ ->
             let xs = [|"apple"; "be"; "cat"|]
             let result = Array.duplicatesBy (fun (s:string) -> s.[0]) xs
