@@ -32,8 +32,7 @@
     <PackageTags>fsharp;array;fable;fable-library</PackageTags>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeSymbols>true</IncludeSymbols>
-    <!-- <SymbolPackageFormat>snupkg</SymbolPackageFormat>     -->
+    <!-- no IncludeSymbols: the pdb is embedded in the dll, see DebugType below -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
