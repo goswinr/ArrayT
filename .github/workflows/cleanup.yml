@@ -14,25 +14,26 @@ jobs:
       contents: read
     steps:
 
-      - name: Delete all workflow runs but docs,test and build
-        # those are kept for badges in readme
+      - name: Delete all successful dependabot and cleanup runs
+        # releaseNuget runs are not deleted, they are the record of what was published to nuget.org
         uses: Mattraks/delete-workflow-runs@v2.1.0
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          delete_workflow_pattern: dependabot|cleanup|releaseNuget|outdatedNuget
+          delete_workflow_pattern: dependabot|cleanup
           retain_days: 0
           keep_minimum_runs: 0
           delete_run_by_conclusion_pattern: success
 
 
-      - name: Delete all but last run of all other workflow runs ( docs, test and build)
+      - name: Delete all but the last successful run of build, docs and checkLinks
         uses: Mattraks/delete-workflow-runs@v2.1.0
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
+          delete_workflow_pattern: build|docs|checkLinks
           retain_days: 0
-          # keep only last build, docs, and test run for badge in readme,
+          # keep only the last build, docs and checkLinks run for the badges in the readme,
           # this job runs one per action name.
           # this will also keep runs older than 'retain_days'
           keep_minimum_runs: 1
