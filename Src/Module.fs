@@ -329,7 +329,7 @@ module Array =
     /// <returns>A sequence of indexed consecutive pairs (looped).</returns>
     let iThisNext (arr: 'T[]) : seq<int * 'T * 'T> =
         if isNull arr then nullExn "iThisNext"
-        if arr.Length < 2 then fail arr "iThisNext input has less than two items"
+        if arr.Length < 2 then fail arr "iThisNext: input has less than two items"
         seq {
             for i = 0 to arr.Length - 2 do
                 i, arr.[i], arr.[i + 1]
@@ -434,7 +434,7 @@ module Array =
         else
             let rec findBackIdx i =
                 if i = -1 then
-                    fail arr "rotateUpTill: no item in the array meets the condition"
+                    fail arr "rotateUpTillLast: no item in the array meets the condition"
                 elif condition arr.[i] then
                     i
                 else
@@ -502,7 +502,7 @@ module Array =
             let k = arr.Length
             let rec findIdx i =
                 if i = k then
-                    fail arr "rotateDownTill: no item in the array meets the condition"
+                    fail arr "rotateDownTillLast: no item in the array meets the condition"
                 elif condition arr.[i] then
                     i
                 else

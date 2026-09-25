@@ -631,6 +631,13 @@ module Module2 =
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
 
+        test ("Array.rotate...TillLast and iThisNext error messages name the right function", fun _ ->
+            let xs = [|1; 2; 3|]
+            throwsWith ["Array.rotateUpTillLast:"] (fun () -> Array.rotateUpTillLast (fun i -> i = 99) xs |> ignore)
+            throwsWith ["Array.rotateDownTillLast:"] (fun () -> Array.rotateDownTillLast (fun i -> i = 99) xs |> ignore)
+            throwsWith ["Array.iThisNext: input has less than two items"] (fun () -> Array.iThisNext [| 1 |] |> ignore)
+        )
+
         test ("Array.rotateUpTillLast", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
             assertThat (xs |> Array.rotateUpTillLast(fun i -> i = 7) = [|5; 0; 7; 2; 3; 7 |]) (tag "rotateUpTillLast" >> isTrue)
