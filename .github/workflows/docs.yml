@@ -33,10 +33,9 @@ jobs:
         run: dotnet tool restore
 
       - name: Build code to make xml file
-        run: dotnet build -c Release # see required xml tags: https://fsprojects.github.io/FSharp.Formatting/zero-to-hero.html#Generating-API-documentation
-
-      - name: copy README.md to Docs/index.md
-        run: cp README.md Docs/index.md
+        # see required xml tags: https://fsprojects.github.io/FSharp.Formatting/zero-to-hero.html#Generating-API-documentation
+        # the CopyReadmeToDocs target in ArrayT.fsproj also copies README.md to Docs/index.md
+        run: dotnet build -c Release
 
       - name: Generate the documentation html
         # for this to work in dotnet-tools.json, rollForward must be set to 'false' for fsdocs-tool
