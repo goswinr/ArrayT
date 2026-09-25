@@ -13,7 +13,7 @@
     <PackageReference Include="FSharp.Core" Version="10.0.101" /><!-- `Include` syntax for dependabot. Scriptorium needs at least 10.0.101 -->
 
     <ProjectReference Include="../Src/ArrayT.fsproj" />
-    <Compile Include="Module.fs" />
+    <Compile Include="Helpers.fs" />
     <Compile Include="Module2.fs" />
     <Compile Include="Extensions.fs" />
     <Compile Include="FableParity.fs" />
