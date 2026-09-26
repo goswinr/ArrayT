@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `arr.FailIfEmpty`, `arr.FailIfLessThan`, `Array.failIfEmpty` and `Array.failIfLessThan` raise an `ArgumentException` instead of a plain `Exception`, like ResizeArrayT.
 ### Fixed
 - `Array.rotate` returned a wrong result for amounts close to `Int32.MinValue` because of an integer overflow.
+- `Array.min3`, `max3`, `min3By`, `max3By`, `min3IndicesBy` and `max3IndicesBy` did not keep the original order of tied items among the first three when the type's equality disagrees with its comparison. They now use the stable sorting of ResizeArrayT, which only uses comparison, and no longer need equality on the item or key type.
 
 ## [0.27.0] - 2026-09-26
 ### Changed

@@ -597,35 +597,33 @@ module Array =
             m1, m2
 
 
-        /// If any are equal then the  order is kept by using ( a=b || ) since the compare operate does not include the equal test
+        // A stable sorting network for three values. Since cmp is strict (< or >),
+        // equal values always stay in their original order.
+        // Only cmp is used, not '=', so this also works for types whose equality disagrees with their comparison.
         let inline sort3 cmp a b c : 'T * 'T * 'T =
-            if a = b || cmp a b then
-                if b = c || cmp b c then a, b, c
-                else if a = c || cmp a c then a, c, b
-                else c, a, b
-            else if a = c || cmp a c then
-                b, a, c
-            else if b = c || cmp b c then
-                b, c, a
+            if cmp b a then
+                if cmp c b then c, b, a
+                elif cmp c a then b, c, a
+                else b, a, c
             else
-                c, b, a
+                if cmp c a then c, a, b
+                elif cmp c b then a, c, b
+                else a, b, c
 
-
-        /// If any are equal then the  order is kept by using ( a=b || ) since the compare operate does not include the equal test
+        // The index counterpart of sort3, comparing projected values while keeping
+        // the original index order for equal keys.
         let inline indexOfSort3By f cmp aa bb cc : int * int * int =
             let a = f aa
             let b = f bb
             let c = f cc
-            if a = b || cmp a b then
-                if b = c || cmp b c then 0, 1, 2
-                else if a = c || cmp a c then 0, 2, 1
-                else 2, 0, 1
-            else if a = c || cmp a c then
-                1, 0, 2
-            else if b = c || cmp b c then
-                1, 2, 0
+            if cmp b a then
+                if cmp c b then 2, 1, 0
+                elif cmp c a then 1, 2, 0
+                else 1, 0, 2
             else
-                2, 1, 0
+                if cmp c a then 2, 0, 1
+                elif cmp c b then 0, 2, 1
+                else 0, 1, 2
 
         let inline simple3 (funcName: string) cmpF (arr: 'T[]) : 'T * 'T * 'T =
             if arr.Length < 3 then fail arr $"{funcName}: Count must be at least three"

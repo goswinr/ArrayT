@@ -9,6 +9,20 @@ open System
 open System.Collections.Generic
 
 
+/// Compares by Value only, but Equals also checks the Name.
+/// So items that compare as equal are not equal by '='.
+[<CustomEquality; CustomComparison>]
+type TieItem =
+    { Value: int; Name: string }
+    override this.Equals(o) =
+        match o with
+        | :? TieItem as i -> i.Value = this.Value && i.Name = this.Name
+        | _ -> false
+    override this.GetHashCode() = hash (this.Value, this.Name)
+    interface IComparable with
+        member this.CompareTo(o) = compare this.Value (o :?> TieItem).Value
+
+
 module Module2 =
  open Exceptions
 
@@ -988,6 +1002,32 @@ module Module2 =
             assertThat (Array.min3By fst xs) (tag "min3By" >> isEqualTo ((1, "a"), (2, "b"), (2, "c")))
             let ys = [|(2, "a"); (1, "b"); (2, "c")|]
             assertThat (Array.max3By fst ys) (tag "max3By" >> isEqualTo ((2, "a"), (2, "c"), (1, "b")))
+        )
+
+        test ("Array min3 and max3 functions match a stable sort, also when equality disagrees with comparison", fun _ ->
+            let values = [1; 2; 3]
+            let inputs = [
+                for a in values do
+                    for b in values do
+                        for c in values do
+                            [a; b; c]
+                            for d in values do
+                                [a; b; c; d] ]
+            for vs in inputs do
+                let items = vs |> List.mapi (fun i v -> { Value = v; Name = string i }) |> Array.ofList
+                // List.sortWith is a stable sort
+                let stableIdx cmp = items |> List.ofArray |> List.indexed |> List.sortWith (fun (_, x) (_, y) -> cmp x y) |> List.map fst
+                let asc  = stableIdx (fun (x: TieItem) y -> compare x.Value y.Value)
+                let desc = stableIdx (fun (x: TieItem) y -> compare y.Value x.Value)
+                let first3 (idx: int list) = idx.[0], idx.[1], idx.[2]
+                let names (x: TieItem, y: TieItem, z: TieItem) = [x.Name; y.Name; z.Name]
+                let expectedNames (idx: int list) = [ for i in idx.[0..2] -> string i ]
+                assertThat (Array.min3IndicesBy id items) (tag $"min3IndicesBy {vs}" >> isEqualTo (first3 asc))
+                assertThat (Array.max3IndicesBy id items) (tag $"max3IndicesBy {vs}" >> isEqualTo (first3 desc))
+                assertThat (names (Array.min3 items))     (tag $"min3 {vs}"   >> isEqualTo (expectedNames asc))
+                assertThat (names (Array.max3 items))     (tag $"max3 {vs}"   >> isEqualTo (expectedNames desc))
+                assertThat (names (Array.min3By id items)) (tag $"min3By {vs}" >> isEqualTo (expectedNames asc))
+                assertThat (names (Array.max3By id items)) (tag $"max3By {vs}" >> isEqualTo (expectedNames desc))
         )
 
         test ("Array.max3IndicesBy throws on null array", fun _ ->
