@@ -7,6 +7,7 @@ module Extensions =
 
     open Scriptorium.Nib.Assertion
     open type Scriptorium.Quill.Test
+    open Exceptions
 
     let tests =
       testList ("extensions Tests", [
@@ -341,6 +342,8 @@ module Extensions =
             let xs : int[] = [||]
             let testCode = fun () -> xs.FailIfEmpty("is empty") |> ignore
             assertThat testCode (tag "Expected an Exception on empty array" >> throws)
+            throwsArg testCode
+            throwsWith ["Array.FailIfEmpty: is empty"] testCode
         )
 
         //---- xs.FailIfLessThan ----
@@ -354,6 +357,8 @@ module Extensions =
             let xs = [| 1; 2|]
             let testCode = fun () -> xs.FailIfLessThan(3, "too few") |> ignore
             assertThat testCode (tag "Expected an Exception when array has too few items" >> throws)
+            throwsArg testCode
+            throwsWith ["Array.FailIfLessThan 3: too few"] testCode
         )
 
         test ("FailIfLessThan returns array when count exceeds minimum", fun _ ->

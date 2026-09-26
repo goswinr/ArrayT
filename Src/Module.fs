@@ -60,7 +60,7 @@ module Array =
     // functions added that are not in FSharp.Core Array module)
     //----------------------------------------------------
 
-    /// <summary>Raises an Exception if the Array is empty.
+    /// <summary>Raises an ArgumentException if the Array is empty.
     /// (Useful for chaining)
     /// Returns the input Array</summary>
     /// <param name="errorMessage">The error message to include in the exception.</param>
@@ -68,10 +68,10 @@ module Array =
     /// <returns>The input Array if not empty.</returns>
     let inline failIfEmpty (errorMessage: string) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "failIfEmpty"
-        if arr.Length = 0 then raise <| Exception("Array.FailIfEmpty: " + errorMessage)
+        if arr.Length = 0 then raise <| ArgumentException("Array.FailIfEmpty: " + errorMessage)
         arr
 
-    /// <summary>Raises an Exception if the Array has less then count items.
+    /// <summary>Raises an ArgumentException if the Array has less then count items.
     /// (Useful for chaining)
     /// Returns the input Array</summary>
     /// <param name="count">The minimum count required.</param>
@@ -80,7 +80,7 @@ module Array =
     /// <returns>The input Array if it has enough items.</returns>
     let failIfLessThan (count:int) (errorMessage: string) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "failIfLessThan"
-        if arr.Length < count then raise <| Exception($"Array.FailIfLessThan {count}: {errorMessage}")
+        if arr.Length < count then raise <| ArgumentException($"Array.FailIfLessThan {count}: {errorMessage}")
         arr
 
 

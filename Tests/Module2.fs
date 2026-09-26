@@ -1299,6 +1299,7 @@ module Module2 =
         test ("Array.failIfEmpty throws on empty array", fun _ ->
             let xs : int[] = [||]
             assertThat (fun () -> Array.failIfEmpty "is empty" xs |> ignore) (tag "should throw on empty" >> throws)
+            throwsArg (fun () -> Array.failIfEmpty "is empty" xs |> ignore)
         )
 
         test ("Array.failIfLessThan returns array when count is sufficient", fun _ ->
@@ -1310,6 +1311,7 @@ module Module2 =
         test ("Array.failIfLessThan throws when count is insufficient", fun _ ->
             let xs = [|1; 2|]
             assertThat (fun () -> Array.failIfLessThan 3 "too few" xs |> ignore) (tag "should throw when too few" >> throws)
+            throwsArg (fun () -> Array.failIfLessThan 3 "too few" xs |> ignore)
         )
 
         test ("Array.failIfEmpty and failIfLessThan throw on null array", fun _ ->

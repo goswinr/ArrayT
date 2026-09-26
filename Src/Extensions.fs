@@ -200,23 +200,23 @@ module AutoOpenArrayTExtensions =
             let ii = if t >= 0 then t else t + len
             xs.[ii] <- value
 
-        /// <summary>Raises an Exception if the Array is empty
+        /// <summary>Raises an ArgumentException if the Array is empty
         /// (Useful for chaining)
         /// Returns the input Array</summary>
         /// <param name="errorMessage">The error message to include in the exception.</param>
         /// <returns>The input Array if not empty.</returns>
         member inline xs.FailIfEmpty (errorMessage: string) : 'T[] =
-            if xs.Length = 0 then raise <| Exception("Array.FailIfEmpty: " + errorMessage)
+            if xs.Length = 0 then raise <| ArgumentException("Array.FailIfEmpty: " + errorMessage)
             xs
 
-        /// <summary>Raises an Exception if the Array has less than count items.
+        /// <summary>Raises an ArgumentException if the Array has less than count items.
         /// (Useful for chaining)
         /// Returns the input Array</summary>
         /// <param name="count">The minimum count required.</param>
         /// <param name="errorMessage">The error message to include in the exception.</param>
         /// <returns>The input Array if it has enough items.</returns>
         member inline xs.FailIfLessThan(count, errorMessage: string) : 'T[] =
-            if xs.Length < count then raise <| Exception($"Array.FailIfLessThan {count}: {errorMessage}")
+            if xs.Length < count then raise <| ArgumentException($"Array.FailIfLessThan {count}: {errorMessage}")
             xs
 
 

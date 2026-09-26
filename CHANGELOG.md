@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- `arr.FailIfEmpty`, `arr.FailIfLessThan`, `Array.failIfEmpty` and `Array.failIfLessThan` raise an `ArgumentException` instead of a plain `Exception`, like ResizeArrayT.
 ### Fixed
 - `Array.rotate` returned a wrong result for amounts close to `Int32.MinValue` because of an integer overflow.
 
