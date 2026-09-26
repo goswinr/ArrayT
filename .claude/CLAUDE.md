@@ -12,7 +12,7 @@ ArrayT is an F# extension and module library for `Array<'T>` that provides bette
 # Build the solution
 dotnet build
 
-# Build in Release mode (generates NuGet package)
+# Build in Release mode, as CI and the release workflow do (every build also generates the NuGet package)
 dotnet build --configuration Release
 
 # Restore dotnet tools (Fable, FsDocs)
@@ -39,6 +39,7 @@ Test style:
 
 - Tests are written as `test ("name", fun _ -> ...)` inside `testList ("name", [ ... ])` (`open type Scriptorium.Quill.Test`).
 - Assertions use `assertThat actual (tag "message" >> isEqualTo expected)`, `isTrue`, `isFalse`, `isNull` and `throws` (`open Scriptorium.Nib.Assertion`).
+- `Tests/Helpers.fs` has the exception helpers `throwsRange`, `throwsNull`, `throwsArg` (exception type is only checked on .NET) and `throwsWith ["part"; ...]` (checks the message content on .NET and JS).
 - All test lists are run by a single `runTests [ ... ]` call in `Tests/Main.fs`; on JS the process exits once the run completes.
 - Test names must be unique within a list, Scriptorium rejects duplicate test paths.
 
@@ -49,17 +50,20 @@ Test style:
   - `Extensions.fs` - Extension members on `Array<'T>` (`.Get`, `.Set`, `.First`, `.Last`, `.Slice`, etc.)
   - `Module.fs` - `Array` module functions that extend FSharp.Core's Array module
 - `Tests/` - Test project that runs on both .NET and Fable/JS
+- `.github/workflows/` - `build.yml` builds and runs all tests; `releaseNuget.yml` runs it on a version tag, then publishes to nuget.org via trusted publishing (OIDC, no API key secret)
 - `Docs/` - FsDocs documentation assets
 
 ## Key Patterns
 
-- All public functions check for null input and throw via `nullExn`
+- All public `Array` module functions check for null input and throw via `nullExn` (the extension members don't)
 - Functions starting with `try...` return F# Option; all others throw descriptive exceptions on failure
 - Negative indexing (Python-style, -1 = last item) is supported via `GetNeg`/`SetNeg` and `getNeg`/`setNeg`
 - `DebugIdx` property provides indexer with descriptive exceptions: `arr.DebugIdx.[i]`
-- Version is managed via CHANGELOG.md using `Ionide.KeepAChangelog.Tasks`
+- Version is managed via CHANGELOG.md using `Ionide.KeepAChangelog.Tasks`; add user-facing changes under `## [Unreleased]`
 
 ## Fable Compatibility
 
 - Code uses `#if FABLE_COMPILER` / `#if FABLE_COMPILER_JAVASCRIPT` for platform-specific implementations
-- The library targets `netstandard2.0` and includes F# source files for Fable compilation
+- Members that need `typeof<'T>` (like `AsString`, `ToString(n)`) are `inline` so reflection works in Fable
+- Defining `UNCHECKED` (e.g. `dotnet fable --define UNCHECKED`) skips index checks in `Get`/`Set`/`Idx`/`Array.get`/`Array.set`; it only affects Fable, which compiles the library from source
+- The library targets `net8.0` and `net472` and includes F# source files for Fable compilation
