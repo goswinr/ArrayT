@@ -1345,6 +1345,94 @@ module Array =
         if arr.Length = 0 then fail arr "headAndTail: input is empty"
         arr.[0], Array.sub arr 1 (arr.Length - 1)
 
+    /// <summary>Tests if none of the elements of the Array satisfies the given predicate.
+    /// The predicate is applied to the elements of the input Array. If any application
+    /// returns true then the overall result is <c>false</c> and no further elements are tested.
+    /// Otherwise, true is returned.</summary>
+    /// <param name="predicate">The function to test the input elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns><c>false</c> if any result from <c>predicate</c> is <c>true</c>.</returns>
+    let notExists (predicate: 'T -> bool) (arr: 'T[]) : bool =
+        if isNull arr then nullExn "notExists"
+        not (Array.exists predicate arr)
+
+    /// <summary>Starting from last element going backwards. Applies the given function to successive elements, returning the first
+    /// result where function returns <c>Some(x)</c> for some <c>x</c>. If the function
+    /// never returns <c>Some(x)</c> then <see cref="T:System.Collections.Generic.KeyNotFoundException"/> is raised.</summary>
+    /// <param name="chooser">The function to generate options from the elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if every result from
+    /// <c>chooser</c> is <c>None</c>.</exception>
+    /// <returns>The first result. From the end of the Array.</returns>
+    let pickBack (chooser: 'T -> 'U option) (arr: 'T[]) : 'U =
+        if isNull arr then nullExn "pickBack"
+        let mutable i = arr.Length - 1
+        let mutable result = None
+        while i >= 0 && result.IsNone do
+            result <- chooser arr.[i]
+            i <- i - 1
+        match result with
+        | Some res -> res
+        | None -> failKey arr $"pickBack: Key not found in {arr.Length} elements"
+
+    /// <summary>Applies the given function to successive elements from the end of the Array, returning the first
+    /// result where function returns <c>Some(x)</c> for some <c>x</c>. If the function
+    /// never returns <c>Some(x)</c> then <c>None</c> is returned.</summary>
+    /// <param name="chooser">The function to transform the Array elements into options.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>The first transformed element searched from the end of the Array that is <c>Some(x)</c>.</returns>
+    let tryPickBack (chooser: 'T -> 'U option) (arr: 'T[]) : 'U option =
+        if isNull arr then nullExn "tryPickBack"
+        let mutable i = arr.Length - 1
+        let mutable result = None
+        while i >= 0 && result.IsNone do
+            result <- chooser arr.[i]
+            i <- i - 1
+        result
+
+    /// <summary>Like Array.zip, but when one of the two input Arrays is exhausted, the getDefaultVal function is used for the rest of the output.</summary>
+    /// <param name="getDefaultVal">A function that takes the current index and the current value of the longer Array and returns a default value for the shorter Array.</param>
+    /// <param name="arr1">The first input Array.</param>
+    /// <param name="arr2">The second input Array.</param>
+    /// <returns>The Array of tupled elements, as long as the longer input Array.</returns>
+    let zipDefault (getDefaultVal: int -> 'T -> 'T) (arr1: 'T[]) (arr2: 'T[]) : ('T * 'T)[] =
+        if isNull arr1 then nullExn "zipDefault first"
+        if isNull arr2 then nullExn "zipDefault second"
+        let len1 = arr1.Length
+        let len2 = arr2.Length
+        Array.init (max len1 len2) (fun i ->
+            if i >= len2 then // first is longer
+                let x = arr1.[i]
+                x, getDefaultVal i x
+            elif i >= len1 then // second is longer
+                let x = arr2.[i]
+                getDefaultVal i x, x
+            else
+                arr1.[i], arr2.[i]
+            )
+
+    /// <summary>Applies a key-generating function to each element of an Array and yields a Dictionary of
+    /// unique keys and respective elements that match to this key. As opposed to Array.groupBy the key may not be null or Option.None.</summary>
+    /// <param name="projection">A function that transforms an element of the Array into a comparable key. As opposed to Array.groupBy the key may not be null or Option.None.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>A Dictionary containing each unique key and an Array of its matching elements.</returns>
+    let groupByDict (projection: 'T -> 'Key) (arr: 'T[]) : Dictionary<'Key, 'T[]> =
+        if isNull arr then nullExn "groupByDict"
+        let groups = Dictionary<'Key, ResizeArray<'T>>()
+        for i = 0 to arr.Length - 1 do
+            let v = arr.[i]
+            let k = projection v
+            match groups.TryGetValue k with
+            | true, r -> r.Add v
+            | _ ->
+                let r = ResizeArray()
+                groups.[k] <- r
+                r.Add v
+        let dict = Dictionary<'Key, 'T[]>(groups.Count)
+        for kv in groups do
+            dict.[kv.Key] <- kv.Value.ToArray()
+        dict
+
 
 
 

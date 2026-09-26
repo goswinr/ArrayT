@@ -1188,6 +1188,48 @@ module Module2 =
             throwsNull (fun () -> Array.headAndTail (null: int[]) |> ignore)
         )
 
+        test ("Array.notExists", fun _ ->
+            let xs = [|1; 2; 3|]
+            assertThat (Array.notExists (fun x -> x > 5) xs) (tag "notExists true" >> isTrue)
+            assertThat (Array.notExists (fun x -> x = 2) xs) (tag "notExists false" >> isFalse)
+            assertThat (Array.notExists (fun _ -> true) [||]) (tag "notExists empty" >> isTrue)
+            throwsNull (fun () -> Array.notExists (fun _ -> true) (null: int[]) |> ignore)
+        )
+
+        test ("Array.pickBack and tryPickBack search from the end", fun _ ->
+            let xs = [|1; 2; 3; 4|]
+            let evenTimes10 x = if x % 2 = 0 then Some (x * 10) else None
+            assertThat (Array.pickBack evenTimes10 xs) (tag "pickBack" >> isEqualTo 40)
+            assertThat (Array.tryPickBack evenTimes10 xs) (tag "tryPickBack" >> isEqualTo (Some 40))
+            assertThat (Array.tryPickBack evenTimes10 [|1; 3|]) (tag "tryPickBack none" >> isEqualTo None)
+            CheckThrowsExn<KeyNotFoundException> (fun () -> Array.pickBack evenTimes10 [|1; 3|] |> ignore)
+            throwsWith ["Array.pickBack: Key not found in 2 elements"] (fun () -> Array.pickBack evenTimes10 [|1; 3|] |> ignore)
+            throwsNull (fun () -> Array.pickBack evenTimes10 (null: int[]) |> ignore)
+            throwsNull (fun () -> Array.tryPickBack evenTimes10 (null: int[]) |> ignore)
+        )
+
+        test ("Array.zipDefault", fun _ ->
+            let plusIndex i x = x + i
+            assertThat (Array.zipDefault plusIndex [|1; 2; 10|] [|4; 5|]) (tag "first longer" >> isEqualTo [|(1, 4); (2, 5); (10, 12)|])
+            assertThat (Array.zipDefault plusIndex [|4; 5|] [|1; 2; 10|]) (tag "second longer" >> isEqualTo [|(4, 1); (5, 2); (12, 10)|])
+            assertThat (Array.zipDefault plusIndex [|1; 2; 3|] [|4; 5; 6|]) (tag "equal length" >> isEqualTo [|(1, 4); (2, 5); (3, 6)|])
+            assertThat (Array.zipDefault (fun _ x -> x * 2) [|1; 2; 3|] [||]) (tag "second empty" >> isEqualTo [|(1, 2); (2, 4); (3, 6)|])
+            assertThat (Array.zipDefault (fun _ x -> x) [||] [|4; 5|]) (tag "first empty" >> isEqualTo [|(4, 4); (5, 5)|])
+            throwsNull (fun () -> Array.zipDefault plusIndex (null: int[]) [|1|] |> ignore)
+            throwsNull (fun () -> Array.zipDefault plusIndex [|1|] (null: int[]) |> ignore)
+        )
+
+        test ("Array.groupByDict", fun _ ->
+            let xs = [|"a"; "bb"; "c"; "dd"; "eee"|]
+            let d = Array.groupByDict String.length xs
+            assertThat d.Count (tag "groupByDict key count" >> isEqualTo 3)
+            assertThat d.[1] (tag "groupByDict key 1" >> isEqualTo [|"a"; "c"|])
+            assertThat d.[2] (tag "groupByDict key 2" >> isEqualTo [|"bb"; "dd"|])
+            assertThat d.[3] (tag "groupByDict key 3" >> isEqualTo [|"eee"|])
+            assertThat (Array.groupByDict String.length [||]).Count (tag "groupByDict empty" >> isEqualTo 0)
+            throwsNull (fun () -> Array.groupByDict String.length (null: string[]) |> ignore)
+        )
+
         test ("Array.findIndexi throws when not found or on null", fun _ ->
             let xs = [|10; 20; 30|]
             CheckThrowsExn<KeyNotFoundException> (fun () -> Array.findIndexi (fun i x -> i = x) xs |> ignore)

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Array.partitionBy`, `partitionWith`, `partition3By`, `partition4By`, `partition5By`, `partition3`, `partition4` and `partition5` from ResizeArrayT.
 - `Array.tryFindIndexi` and `findIndexi` from ResizeArrayT.
 - `Array.mapPrevNext` and `headAndTail` from ResizeArrayT.
+- `Array.notExists`, `pickBack`, `tryPickBack`, `zipDefault` and `groupByDict` from ResizeArrayT.
 ### Changed
 - `arr.Duplicate()` is marked obsolete, use `arr.Copy()` instead (as in ResizeArrayT).
 - **Breaking:** the predicate of `Array.filteri` takes the index and the element (`int -> 'T -> bool`) instead of only the index, like `ResizeArray.filteri` and `Array.mapi`. Replace `Array.filteri (fun i -> ...)` with `Array.filteri (fun i _ -> ...)`.
