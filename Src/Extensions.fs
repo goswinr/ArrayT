@@ -151,7 +151,7 @@ module AutoOpenArrayTExtensions =
             xs.Length > 0
 
         /// Checks if this.Length > 0
-        /// Same as xs.IsNotEmpty
+        /// Same as xs.IsNotEmpty. Unlike Array.hasItems, this property does not test for an exact count.
         member inline xs.HasItems : bool =
             xs.Length > 0
 

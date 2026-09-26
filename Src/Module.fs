@@ -540,7 +540,8 @@ module Array =
         if isNull arr then nullExn "isNotEmpty"
         arr.Length <> 0
 
-    /// <summary>Returns true if the given Array has count items.</summary>
+    /// <summary>Returns true if the given Array has count items.
+    /// Unlike the HasItems extension property, this function tests for an exact count.</summary>
     /// <param name="count">The exact count to check for.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>True if the Array has exactly the specified count.</returns>
