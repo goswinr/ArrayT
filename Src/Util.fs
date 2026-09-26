@@ -73,9 +73,16 @@ module UtilArray =
     // for Exceptions ( never inlined)
     // -------------------------------------------------------------
 
+    let itemInOneLineWithMaxChars charCount (item:'T) =
+        let s = $"{item}".Split('\n') |> Array.map (fun l -> l.Trim()) |> String.concat " "
+        if s.Length > charCount then
+            s.Substring(0, charCount) + " ..."
+        else
+            s
+
     /// <summary>Returns a string with the content of the array up to 'entriesToPrint' entries.
     /// Includes the index of each entry.
-    /// Includes the last entry (prints one extra if only one more remains to avoid "...").</summary>
+    /// Includes the last entry.</summary>
     /// <param name="entriesToPrint">The maximum number of entries to display.</param>
     /// <param name="arr">The input array.</param>
     /// <returns>A formatted string showing array contents.</returns>
@@ -85,13 +92,13 @@ module UtilArray =
             let b = Text.StringBuilder()
             b.AppendLine ":"  |> ignore
             for i,t in arr |> Seq.truncate (max 0 entriesToPrint) |> Seq.indexed do
-                b.AppendLine $"  {i}: {t}" |> ignore
+                b.AppendLine $"  {i}: {itemInOneLineWithMaxChars 200 t}" |> ignore
             // compare with c-1 instead of entriesToPrint+1 to avoid an overflow for Int32.MaxValue
             if c - 1 = entriesToPrint then
-                b.AppendLine $"  {c-1}: {arr[c-1]}" |> ignore // print one more line if it's the last instead of "..."
+                b.AppendLine $"  {c-1}: {itemInOneLineWithMaxChars 200 arr[c-1]}" |> ignore
             elif c - 1 > entriesToPrint then
                 b.AppendLine "  ..." |> ignore
-                b.AppendLine $"  {c-1}: {arr[c-1]}" |> ignore
+                b.AppendLine $"  {c-1}: {itemInOneLineWithMaxChars 200 arr[c-1]}" |> ignore
             b.ToString()
         else
             ""
