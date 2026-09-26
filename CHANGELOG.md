@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **Breaking:** the predicate of `Array.filteri` takes the index and the element (`int -> 'T -> bool`) instead of only the index, like `ResizeArray.filteri` and `Array.mapi`. Replace `Array.filteri (fun i -> ...)` with `Array.filteri (fun i _ -> ...)`.
 - `arr.FailIfEmpty`, `arr.FailIfLessThan`, `Array.failIfEmpty` and `Array.failIfLessThan` raise an `ArgumentException` instead of a plain `Exception`, like ResizeArrayT.
 ### Fixed
 - `Array.rotate` returned a wrong result for amounts close to `Int32.MinValue` because of an integer overflow.

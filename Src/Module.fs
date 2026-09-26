@@ -1078,16 +1078,17 @@ module Array =
 
 
     /// <summary>Returns a new collection containing only the elements of the collection
-    /// for which the given predicate run on the index returns <c>true</c>.</summary>
-    /// <param name="predicate">The function to test the current index.</param>
+    /// for which the given predicate, called with the index and the element, returns <c>true</c>.</summary>
+    /// <param name="predicate">The function to test the index and the element.</param>
     /// <param name="arr">The input array.</param>
     /// <returns>An array containing the elements for which the given predicate returns true.</returns>
-    let filteri (predicate: int -> bool) (arr: 'T[]) : 'T[] =
+    let filteri (predicate: int -> 'T -> bool) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "filteri"
         let res = ResizeArray()
         for i = 0 to arr.Length - 1 do
-            if predicate i then
-                res.Add(arr.[i])
+            let t = arr.[i]
+            if predicate i t then
+                res.Add(t)
         res.ToArray()
 
 

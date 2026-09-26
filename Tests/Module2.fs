@@ -1105,26 +1105,34 @@ module Module2 =
 
         test ("Array.filteri ", fun _ ->
             let arr = [|'a';'b';'c'|]
-            let result = arr|> Array.filteri (fun i -> i % 2 = 0)
+            let result = arr|> Array.filteri (fun i _ -> i % 2 = 0)
             assertThat (result = [|'a';'c'|]) (tag "filteri" >> isTrue)
             assertThat (Object.ReferenceEquals(arr, result)) (tag "filteri should return new array" >> isFalse)
         )
 
+        test ("Array.filteri passes the index and the element", fun _ ->
+            let arr = [|10; 11; 12; 13|]
+            let seen = ResizeArray()
+            let result = arr |> Array.filteri (fun i x -> seen.Add((i, x)); i > 0 && x % 2 = 0)
+            assertThat result (tag "filteri by index and element" >> isEqualTo [|12|])
+            assertThat (seen.ToArray()) (tag "filteri called with index and element" >> isEqualTo [|(0, 10); (1, 11); (2, 12); (3, 13)|])
+        )
+
         test ("Array.filteri returns empty for all false predicate", fun _ ->
             let xs = [|1; 2; 3|]
-            let result = Array.filteri (fun _ -> false) xs
+            let result = Array.filteri (fun _ _ -> false) xs
             assertThat (result = [||]) (tag "filteri all false" >> isTrue)
         )
 
         test ("Array.filteri returns all for all true predicate", fun _ ->
             let xs = [|1; 2; 3|]
-            let result = Array.filteri (fun _ -> true) xs
+            let result = Array.filteri (fun _ _ -> true) xs
             assertThat (result = [|1; 2; 3|]) (tag "filteri all true" >> isTrue)
         )
 
         test ("Array.filteri throws on null array", fun _ ->
             let xs : int[] = null
-            throwsNull (fun () -> Array.filteri (fun _ -> true) xs |> ignore)
+            throwsNull (fun () -> Array.filteri (fun _ _ -> true) xs |> ignore)
         )
 
         //--------------------------------------------------------------------------------------------------------------------
