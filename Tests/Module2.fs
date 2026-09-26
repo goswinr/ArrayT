@@ -344,6 +344,30 @@ module Module2 =
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
 
+        test ("Array.sliceIdx uses an inclusive end index", fun _ ->
+            let xs = [|0 .. 4|]
+            assertThat (Array.sliceIdx 0 0 xs) (tag "sliceIdx 0 0" >> isEqualTo [|0|])
+            assertThat (Array.sliceIdx 1 3 xs) (tag "sliceIdx 1 3" >> isEqualTo [|1; 2; 3|])
+            assertThat (Array.sliceIdx 2 4 xs) (tag "sliceIdx 2 4" >> isEqualTo [|2; 3; 4|])
+        )
+
+        test ("Array.sliceIdx rejects invalid ranges", fun _ ->
+            let xs = [|0 .. 4|]
+            throwsRange (fun () -> Array.sliceIdx -1 2 xs |> ignore)
+            throwsRange (fun () -> Array.sliceIdx 0 5 xs |> ignore)
+            throwsRange (fun () -> Array.sliceIdx 3 2 xs |> ignore)
+            throwsRange (fun () -> Array.sliceIdx -3 -1 xs |> ignore)
+            throwsNull  (fun () -> Array.sliceIdx 0 1 (null: int[]) |> ignore)
+        )
+
+        test ("Array.sliceLooped", fun _ ->
+            let xs = [|1 .. 10|]
+            assertThat (Array.sliceLooped -3 -1 xs) (tag "sliceLooped -3 -1" >> isEqualTo [|8; 9; 10|])
+            assertThat (Array.sliceLooped 10 11 xs) (tag "sliceLooped 10 11" >> isEqualTo [|1; 2|])
+            assertThat (Array.sliceLooped 5 4 xs) (tag "sliceLooped 5 4" >> isEqualTo [||])
+            throwsNull (fun () -> Array.sliceLooped 0 1 (null: int[]) |> ignore)
+        )
+
         test ("Array.trim trims from start and end", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             assertThat (Array.trim 1 1 xs = [|2; 3; 4|]) (tag "trim 1 1" >> isTrue)

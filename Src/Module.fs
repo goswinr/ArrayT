@@ -178,6 +178,7 @@ module Array =
     /// If the end index is one less than the start index an empty Array is returned.
     /// Raises an IndexOutOfRangeException if indices are out of range.
     /// If you don't want an exception to be raised for index overflow or overlap use Array.trim.
+    /// To reject negative indices use Array.sliceIdx, to normalize any index with modulo use Array.sliceLooped.
     /// (With LangVersion preview, F# also supports slicing from the end with the '^' prefix, e.g. xs.[1..^1] skips the first and last item.)</summary>
     /// <param name="startIdx">The start index (inclusive, can be negative).</param>
     /// <param name="endIdx">The end index (inclusive, can be negative).</param>
@@ -186,6 +187,30 @@ module Array =
     let slice (startIdx:int) (endIdx:int) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "slice"
         arr.Slice(startIdx, endIdx)
+
+    /// <summary>Returns a new Array containing the elements between the specified inclusive start and end indices.
+    /// This function rejects negative and out-of-bounds indices, while the F# slicing notation xs.[1..3] does not.
+    /// To allow negative indices use Array.slice, to normalize any index with modulo use Array.sliceLooped.</summary>
+    /// <param name="startIdx">The inclusive start index of the slice.</param>
+    /// <param name="endIdx">The inclusive end index of the slice.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>A new Array containing the requested range.</returns>
+    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when either index is outside the Array or startIdx is greater than endIdx.</exception>
+    let sliceIdx (startIdx:int) (endIdx:int) (arr: 'T[]) : 'T[] =
+        if isNull arr then nullExn "sliceIdx"
+        arr.SliceIdx(startIdx, endIdx)
+
+    /// <summary>Returns a new Array containing the elements between the specified start and end indices after normalizing both indices with modulo.
+    /// Both indices are inclusive, and negative and out-of-range indices are allowed.
+    /// If the normalized start index is greater than the normalized end index, an empty Array is returned.
+    /// For an empty input Array, an empty Array is returned.</summary>
+    /// <param name="startIdx">The inclusive start index to normalize.</param>
+    /// <param name="endIdx">The inclusive end index to normalize.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>A new Array containing the requested range.</returns>
+    let sliceLooped (startIdx:int) (endIdx:int) (arr: 'T[]) : 'T[] =
+        if isNull arr then nullExn "sliceLooped"
+        arr.SliceLooped(startIdx, endIdx)
 
 
     /// <summary>Trim items from start and end.

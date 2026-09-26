@@ -506,6 +506,38 @@ module Extensions =
             assertThat testCode2 (tag "Expected an IndexOutOfRangeException for end out of bounds" >> throws)
         )
 
+        test ("SliceIdx uses an inclusive end index", fun _ ->
+            let xs = [| 0 .. 4 |]
+            assertThat (xs.SliceIdx(0, 0)) (tag "Expected the first item" >> isEqualTo [| 0 |])
+            assertThat (xs.SliceIdx(1, 3)) (tag "Expected indices 1 through 3" >> isEqualTo [| 1; 2; 3 |])
+            assertThat (xs.SliceIdx(2, 4)) (tag "Expected indices 2 through 4" >> isEqualTo [| 2; 3; 4 |])
+            assertThat (xs.SliceIdx(0, 4)) (tag "Expected the full range" >> isEqualTo [| 0 .. 4 |])
+            assertThat (xs.SliceIdx(4, 4)) (tag "Expected the final item" >> isEqualTo [| 4 |])
+            assertThat (obj.ReferenceEquals(xs, xs.SliceIdx(0, 4))) (tag "Expected a new array" >> isFalse)
+        )
+
+        test ("SliceIdx rejects invalid ranges", fun _ ->
+            let xs = [| 0 .. 4 |]
+            throwsRange (fun () -> xs.SliceIdx(-1, 2) |> ignore)
+            throwsRange (fun () -> xs.SliceIdx(0, -1) |> ignore)
+            throwsRange (fun () -> xs.SliceIdx(5, 5) |> ignore)
+            throwsRange (fun () -> xs.SliceIdx(0, 5) |> ignore)
+            throwsRange (fun () -> xs.SliceIdx(3, 2) |> ignore)
+            throwsRange (fun () -> ([||]: int[]).SliceIdx(0, 0) |> ignore)
+            throwsWith ["Array.SliceIdx: Start index -1 is out of range"; "5 items"] (fun () -> xs.SliceIdx(-1, 2) |> ignore)
+            throwsWith ["Array.SliceIdx: End index 5 is out of range"] (fun () -> xs.SliceIdx(0, 5) |> ignore)
+            throwsWith ["Array.SliceIdx: Start index 3 is bigger than end index 2"] (fun () -> xs.SliceIdx(3, 2) |> ignore)
+        )
+
+        test ("SliceLooped normalizes indices with modulo", fun _ ->
+            let xs = [| 1; 2; 3 |]
+            assertThat (xs.SliceLooped(-1, 0)) (tag "-1..0 is empty" >> isEqualTo [||])
+            assertThat (xs.SliceLooped(-1, -1)) (tag "-1..-1 is the last item" >> isEqualTo [| 3 |])
+            assertThat (xs.SliceLooped(3, 4)) (tag "3..4 loops to 0..1" >> isEqualTo [| 1; 2 |])
+            assertThat (xs.SliceLooped(-3, -1)) (tag "-3..-1 is all items" >> isEqualTo [| 1; 2; 3 |])
+            assertThat (([||]: int[]).SliceLooped(0, 5)) (tag "empty input gives empty result" >> isEqualTo [||])
+        )
+
         test ("IsSingleton returns false for empty Array", fun _ ->
             let xs : int[] = [||]
             assertThat xs.IsSingleton (tag "Expected IsSingleton to be false for an empty Array" >> isFalse)

@@ -175,6 +175,20 @@ arr.Slice(-3, -1)   // [| 7; 8; 9 |]        (last 3 items)
 arr |> Array.slice 1 -2    // [| 1; 2; .. ; 8 |]
 ```
 
+`SliceIdx` rejects negative indices, `SliceLooped` wraps any index around with modulo:
+
+```fsharp
+arr.SliceIdx(2, 5)       // [| 2; 3; 4; 5 |]
+arr.SliceIdx(-3, -1)     // throws IndexOutOfRangeException
+arr.SliceLooped(-3, -1)  // [| 7; 8; 9 |]
+arr.SliceLooped(10, 12)  // [| 0; 1; 2 |]  (10 wraps to 0, 12 to 2)
+arr.SliceLooped(8, 11)   // [||]           (11 wraps to 1, which is before 8)
+
+// Module functions
+arr |> Array.sliceIdx 2 5
+arr |> Array.sliceLooped -3 -1
+```
+
 ### Trimming
 
 Remove items from the start and end:

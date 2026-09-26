@@ -224,6 +224,7 @@ module AutoOpenArrayTExtensions =
         /// The resulting array includes the end index.
         /// If the end index is one less than the start index an empty array is returned.
         /// The built in slicing notation (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
+        /// To reject negative indices use SliceIdx, to normalize any index with modulo use SliceLooped.
         /// Alternative: with LangVersion preview, F# also supports slicing from the end with the '^' prefix, e.g. xs.[1..^1] skips the first and last item.</summary>
         /// <param name="startIdx">The start index (inclusive, can be negative).</param>
         /// <param name="endIdx">The end index (inclusive, can be negative).</param>
@@ -251,6 +252,47 @@ module AutoOpenArrayTExtensions =
                 raise (IndexOutOfRangeException(err))
 
             Array.init len (fun i -> this.[st+i])
+
+        /// <summary>
+        /// Returns a new array containing the elements between the specified inclusive start and end indices.
+        /// This member rejects negative and out-of-bounds indices, while the F# slicing notation xs.[1..3] does not.
+        /// To allow negative indices use Slice, to normalize any index with modulo use SliceLooped.
+        /// </summary>
+        /// <param name="startIdx">The inclusive start index of the slice.</param>
+        /// <param name="endIdx">The inclusive end index of the slice.</param>
+        /// <returns>A new array containing the requested range.</returns>
+        /// <exception cref="T:System.IndexOutOfRangeException">Thrown when either index is outside the array or startIdx is greater than endIdx.</exception>
+        member xs.SliceIdx(startIdx:int , endIdx: int ) : 'T[] =
+            let count = xs.Length
+            if startIdx < 0 || startIdx >= count then
+                failIdx xs $"SliceIdx: Start index {startIdx} is out of range. Allowed values are 0 through {count - 1} for an Array of {count} items."
+            if endIdx < 0 || endIdx >= count then
+                failIdx xs $"SliceIdx: End index {endIdx} is out of range. Allowed values are 0 through {count - 1} for an Array of {count} items."
+            if startIdx > endIdx then
+                failIdx xs $"SliceIdx: Start index {startIdx} is bigger than end index {endIdx} for Array of {count} items"
+            Array.sub xs startIdx (endIdx - startIdx + 1)
+
+        /// <summary>
+        /// Returns a new array containing the elements between the specified start and end indices after normalizing both indices with modulo.
+        /// Both indices are inclusive, and negative and out-of-range indices are allowed.
+        /// If the normalized start index is greater than the normalized end index, an empty array is returned.
+        /// For an empty input array, an empty array is returned.
+        /// </summary>
+        /// <param name="startIdx">The inclusive start index to normalize.</param>
+        /// <param name="endIdx">The inclusive end index to normalize.</param>
+        /// <returns>A new array containing the requested range.</returns>
+        member xs.SliceLooped(startIdx:int , endIdx:int ) : 'T[] =
+            let count = xs.Length
+            if count = 0 then
+                [||]
+            else
+                let st = negIdxLooped startIdx count
+                let en = negIdxLooped endIdx count
+                let len = en - st + 1
+                if len < 0 then
+                    [||]
+                else
+                    Array.sub xs st len
 
 
         /// Creates a new Array with the same items as the input Array.

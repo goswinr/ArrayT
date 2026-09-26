@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `Array.sliceIdx` and `arr.SliceIdx` to slice with an inclusive end index, rejecting negative and out-of-range indices, like ResizeArrayT.
+- `Array.sliceLooped` and `arr.SliceLooped` to slice with indices normalized by modulo, like ResizeArrayT.
 ### Changed
 - **Breaking:** the predicate of `Array.filteri` takes the index and the element (`int -> 'T -> bool`) instead of only the index, like `ResizeArray.filteri` and `Array.mapi`. Replace `Array.filteri (fun i -> ...)` with `Array.filteri (fun i _ -> ...)`.
 - `arr.FailIfEmpty`, `arr.FailIfLessThan`, `Array.failIfEmpty` and `Array.failIfLessThan` raise an `ArgumentException` instead of a plain `Exception`, like ResizeArrayT.
