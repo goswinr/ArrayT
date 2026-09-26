@@ -287,6 +287,22 @@ Array.duplicatesBy String.length [| "hi"; "hey"; "go"; "bye" |]
 // [| "go"; "bye" |]    (the items where length 2 and length 3 repeat)
 ```
 
+### Partitioning
+
+```fsharp
+let small, medium, large =
+    [| 1; 15; 150; 7; 70 |] |> Array.partition3 (fun x -> x < 10) (fun x -> x < 100)
+// [| 1; 7 |], [| 15; 70 |], [| 150 |]   (each item goes to the first predicate that is true)
+
+// With different result types:
+let numbers, words =
+    [| "1"; "a"; "2" |]
+    |> Array.partitionBy (fun s -> match Int32.TryParse s with | true, i -> Choice1Of2 i | _ -> Choice2Of2 s)
+// [| 1; 2 |], [| "a" |]
+```
+
+`partition4`, `partition5`, `partition3By`, `partition4By` and `partition5By` work the same way.
+
 ### Searching
 
 ```fsharp
