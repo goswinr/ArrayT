@@ -1307,6 +1307,44 @@ module Array =
         | Some i -> i
         | None -> failKey arr "findIndexi did not find for given predicate in"
 
+    /// <summary>Treats the Array as a loop.
+    /// For each element, it gets the Prev-This and the This-Next combination using the combineAdjacent function.
+    /// Finally creates a new type using itself and the Prev-This and the This-Next combination for each element.
+    /// The first element uses the last element as previous, and the last element uses the first element as next.
+    /// On each element it caches the This-Next combination and uses it for the next element as Prev-This.</summary>
+    /// <param name="combineAdjacent">The function to combine two adjacent elements.</param>
+    /// <param name="mergePrevAndNextCombineResults">The function to create the result from the element, its Prev-This and its This-Next combination.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>A new Array with one result per input element.</returns>
+    let mapPrevNext (combineAdjacent: 'T -> 'T -> 'U) (mergePrevAndNextCombineResults: 'T -> 'U -> 'U -> 'V) (arr: 'T[]) : 'V[] =
+        if isNull arr then nullExn "mapPrevNext"
+        let len = arr.Length
+        if len = 0 then
+            [||]
+        else
+            let res = Array.zeroCreate len
+            let mutable this = arr.[0]
+            let mutable prevCombined = combineAdjacent arr.[len - 1] this
+            for i = 1 to len - 1 do
+                let next = arr.[i]
+                let nextCombined = combineAdjacent this next
+                res.[i - 1] <- mergePrevAndNextCombineResults this prevCombined nextCombined
+                this <- next
+                prevCombined <- nextCombined
+            // close the loop
+            let nextCombined = combineAdjacent this arr.[0]
+            res.[len - 1] <- mergePrevAndNextCombineResults this prevCombined nextCombined
+            res
+
+    /// <summary>Returns a tuple of the first element of the Array and a new Array containing the remaining elements.</summary>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>The first element and a new Array with the remaining elements.</returns>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    let inline headAndTail (arr: 'T[]) : 'T * 'T[] =
+        if isNull arr then nullExn "headAndTail"
+        if arr.Length = 0 then fail arr "headAndTail: input is empty"
+        arr.[0], Array.sub arr 1 (arr.Length - 1)
+
 
 
 

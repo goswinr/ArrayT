@@ -1169,6 +1169,25 @@ module Module2 =
             assertThat (xs |> Array.findIndexi (fun _ x -> x > 10)) (tag "findIndexi returns the first match" >> isEqualTo 1)
         )
 
+        test ("Array.mapPrevNext", fun _ ->
+            let combineAdjacent prev next = prev + "-" + next
+            let merge current prevResult nextResult = prevResult + ":" + current + ":" + nextResult
+            let result = Array.mapPrevNext combineAdjacent merge [|"a"; "b"; "c"; "d"|]
+            assertThat result (tag "mapPrevNext loops" >> isEqualTo [|"d-a:a:a-b"; "a-b:b:b-c"; "b-c:c:c-d"; "c-d:d:d-a"|])
+            assertThat (Array.mapPrevNext combineAdjacent merge [|"a"|]) (tag "mapPrevNext single" >> isEqualTo [|"a-a:a:a-a"|])
+            assertThat (Array.mapPrevNext combineAdjacent merge [||]) (tag "mapPrevNext empty" >> isEqualTo [||])
+            throwsNull (fun () -> Array.mapPrevNext combineAdjacent merge (null: string[]) |> ignore)
+        )
+
+        test ("Array.headAndTail", fun _ ->
+            let xs = [|1; 2; 3|]
+            assertThat (Array.headAndTail xs) (tag "headAndTail" >> isEqualTo (1, [|2; 3|]))
+            assertThat (Array.headAndTail [|7|]) (tag "headAndTail single" >> isEqualTo (7, [||]))
+            throwsArg (fun () -> Array.headAndTail ([||]: int[]) |> ignore)
+            throwsWith ["Array.headAndTail: input is empty"] (fun () -> Array.headAndTail ([||]: int[]) |> ignore)
+            throwsNull (fun () -> Array.headAndTail (null: int[]) |> ignore)
+        )
+
         test ("Array.findIndexi throws when not found or on null", fun _ ->
             let xs = [|10; 20; 30|]
             CheckThrowsExn<KeyNotFoundException> (fun () -> Array.findIndexi (fun i x -> i = x) xs |> ignore)
