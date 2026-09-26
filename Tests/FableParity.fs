@@ -904,46 +904,39 @@ module FableParity =
         )
 
         //--------------------------------------------------------------------------------------------------------------------
-        //------------------------------------------Duplicate/Copy (should produce independent copies)-------------------------
+        //------------------------------------------Copy (should produce independent copies)----------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        test ("Duplicate on reference type array creates independent copy", fun _ ->
+        test ("Copy on reference type array creates independent copy", fun _ ->
             let xs = [| "a"; "b"; "c" |]
-            let dup = xs.Duplicate()
+            let dup = xs.Copy()
             dup.[0] <- "z"
             assertThat xs.[0] (tag "original not modified" >> isEqualTo "a")
             assertThat dup.[0] (tag "dup modified" >> isEqualTo "z")
         )
 
-        test ("Duplicate on value type array creates independent copy", fun _ ->
+        test ("Copy on value type array creates independent copy", fun _ ->
             let xs = [| 1; 2; 3 |]
-            let dup = xs.Duplicate()
+            let dup = xs.Copy()
             dup.[0] <- 99
             assertThat xs.[0] (tag "original not modified" >> isEqualTo 1)
         )
 
-        test ("Duplicate on empty array", fun _ ->
+        test ("Copy on empty array", fun _ ->
             let xs : int[] = [||]
-            let dup = xs.Duplicate()
+            let dup = xs.Copy()
             assertThat dup.Length (tag "dup empty" >> isEqualTo 0)
         )
 
-        test ("Copy on reference type array creates independent copy", fun _ ->
-            let xs = [| "a"; "b"; "c" |]
-            let cp = xs.Copy()
-            cp.[0] <- "z"
-            assertThat xs.[0] (tag "original not modified" >> isEqualTo "a")
-        )
-
-        test ("Duplicate preserves null elements", fun _ ->
+        test ("Copy preserves null elements", fun _ ->
             let xs = [| "a"; null; "c" |]
-            let dup = xs.Duplicate()
+            let dup = xs.Copy()
             assertThat dup.[1] (tag "null preserved in dup" >> isNull)
         )
 
-        test ("Duplicate with duplicates", fun _ ->
+        test ("Copy with duplicates", fun _ ->
             let xs = [| 5; 5; 5 |]
-            let dup = xs.Duplicate()
+            let dup = xs.Copy()
             assertThat (dup = xs) (tag "dup equals original" >> isTrue)
             dup.[0] <- 99
             assertThat xs.[0] (tag "original not modified" >> isEqualTo 5)

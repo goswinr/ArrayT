@@ -43,7 +43,7 @@ module Module2 =
 
         test ("Array.get does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.get 1 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -99,7 +99,7 @@ module Module2 =
 
         test ("Array.getNeg does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.getNeg -1 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -159,7 +159,7 @@ module Module2 =
 
         test ("Array.getLooped does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.getLooped 5 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -207,7 +207,7 @@ module Module2 =
 
         test ("Array.first does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.first xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -339,7 +339,7 @@ module Module2 =
 
         test ("Array.slice does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.slice 1 3 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -409,7 +409,7 @@ module Module2 =
 
         test ("Array.trim does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.trim 1 1 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -436,7 +436,7 @@ module Module2 =
 
         test ("Array.windowed2 does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.windowed2 xs |> Seq.toArray
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -619,7 +619,7 @@ module Module2 =
 
         test ("Array.rotate does not modify input array", fun _ ->
             let xs = [|0; 1; 2; 3; 4; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.rotate 2 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -632,7 +632,7 @@ module Module2 =
 
         test ("Array.rotateDownTill does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.rotateDownTill (fun i -> i = 7) xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -645,7 +645,7 @@ module Module2 =
 
         test ("Array.rotateDownTillLast does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.rotateDownTillLast (fun i -> i = 7) xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -658,7 +658,7 @@ module Module2 =
 
         test ("Array.rotateUpTill does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.rotateUpTill (fun i -> i = 7) xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -678,7 +678,7 @@ module Module2 =
 
         test ("Array.rotateUpTillLast does not modify input array", fun _ ->
             let xs = [|0; 7; 2; 3; 7; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.rotateUpTillLast (fun i -> i = 7) xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -814,7 +814,7 @@ module Module2 =
 
         test ("Array.min2 does not modify input array", fun _ ->
             let xs = [|5; 1; 4; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.min2 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -1118,7 +1118,7 @@ module Module2 =
 
         test ("Array.countIf does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.countIf (fun x -> x > 1) xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -1190,7 +1190,7 @@ module Module2 =
 
         test ("Array.toResizeArray does not modify input array", fun _ ->
             let xs = [|1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.toResizeArray xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -1290,7 +1290,7 @@ module Module2 =
 
         test ("Array.duplicates does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 2; 4|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.duplicates xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
@@ -1395,7 +1395,7 @@ module Module2 =
 
         test ("Array.matches does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = Array.matches [|2; 3|] 1 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )

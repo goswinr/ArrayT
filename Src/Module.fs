@@ -395,7 +395,7 @@ module Array =
         if arr.Length = 0 then
             arr
         elif condition arr.[0] then
-            arr.Duplicate()
+            Array.copy arr
         else
             let rec findBackIdx i =
                 if i = -1 then
@@ -427,7 +427,7 @@ module Array =
         if arr.Length = 0 then
             arr
         elif condition arr.[arr.Length - 1] then
-            arr.Duplicate()
+            Array.copy arr
         else
             let rec findBackIdx i =
                 if i = -1 then
@@ -461,7 +461,7 @@ module Array =
         if arr.Length = 0 then
             arr
         elif condition arr.[0] then
-            arr.Duplicate()
+            Array.copy arr
         else
             let k = arr.Length
             let rec findIdx i =
@@ -494,7 +494,7 @@ module Array =
         if arr.Length = 0 then
             arr
         elif condition arr.[arr.Length - 1] then
-            arr.Duplicate()
+            Array.copy arr
         else
             let k = arr.Length
             let rec findIdx i =

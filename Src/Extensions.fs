@@ -295,13 +295,16 @@ module AutoOpenArrayTExtensions =
                     Array.sub xs st len
 
 
+        /// Use arr.Copy() instead.
         /// Creates a new Array with the same items as the input Array.
         /// Shallow copy only.
+        [<Obsolete("Use arr.Copy() instead.")>]
         member inline this.Duplicate(): 'T array =
             Array.copy this
 
         /// Creates a new Array with the same items as the input Array.
-        /// Shallow copy only.
+        /// Shallow copy only. Same as Array.copy.
+        /// (The built-in arr.Clone() does the same but returns obj.)
         member inline this.Copy(): 'T array =
             Array.copy this
 

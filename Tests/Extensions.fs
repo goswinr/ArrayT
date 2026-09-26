@@ -9,6 +9,10 @@ module Extensions =
     open type Scriptorium.Quill.Test
     open Exceptions
 
+#nowarn "44" // to test the obsolete Duplicate alias
+    let private obsoleteDuplicate (xs: int[]) : int[] = xs.Duplicate()
+#warnon "44"
+
     let tests =
       testList ("extensions Tests", [
 
@@ -33,7 +37,7 @@ module Extensions =
 
         )
         test ("Set", fun _ ->
-            let a = a.Duplicate()
+            let a = a.Copy()
             a.Set 2 3.0
             assertThat (a.Get 2) (tag "Set 2" >> isEqualTo 3.0)
             a[2] <- 4.0
@@ -294,11 +298,19 @@ module Extensions =
 
 
 
-        //---- xs.Duplicate ----
-        test ("Duplicate creates a shallow copy of the Array", fun _ ->
+        //---- xs.Copy ----
+        test ("Copy creates a shallow copy of the Array", fun _ ->
             let xs = [| 1; 2; 3|]
-            let ys = xs.Duplicate()
-            assertThat (ys = xs) (tag "Expected Clone to create a shallow copy of the Array" >> isTrue)
+            let ys = xs.Copy()
+            assertThat (ys = xs) (tag "Expected Copy to create a shallow copy of the Array" >> isTrue)
+            assertThat (obj.ReferenceEquals(xs, ys)) (tag "Expected Copy to create a new Array" >> isFalse)
+        )
+
+        test ("obsolete Duplicate still creates a copy", fun _ ->
+            let xs = [| 1; 2; 3|]
+            let ys = obsoleteDuplicate xs
+            assertThat (ys = xs) (tag "Expected Duplicate to create a shallow copy of the Array" >> isTrue)
+            assertThat (obj.ReferenceEquals(xs, ys)) (tag "Expected Duplicate to create a new Array" >> isFalse)
         )
 
 
@@ -381,49 +393,49 @@ module Extensions =
         //---- Immutability tests for extension members ----
         test ("Get does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = xs.Get 1
             assertThat (xs = original) (tag "Get should not modify input array" >> isTrue)
         )
 
         test ("GetNeg does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = xs.GetNeg -1
             assertThat (xs = original) (tag "GetNeg should not modify input array" >> isTrue)
         )
 
         test ("GetLooped does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = xs.GetLooped 5
             assertThat (xs = original) (tag "GetLooped should not modify input array" >> isTrue)
         )
 
-        test ("Duplicate creates independent copy", fun _ ->
+        test ("Copy creates independent copy", fun _ ->
             let xs = [| 1; 2; 3|]
-            let dup = xs.Duplicate()
+            let dup = xs.Copy()
             dup.[0] <- 99
             assertThat xs.[0] (tag "Original array should not be modified when duplicate is changed" >> isEqualTo 1)
         )
 
         test ("Slice does not modify input array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = xs.Slice(1, 3)
             assertThat (xs = original) (tag "Slice should not modify input array" >> isTrue)
         )
 
         test ("First getter does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = xs.First
             assertThat (xs = original) (tag "First getter should not modify input array" >> isTrue)
         )
 
         test ("Last getter does not modify input array", fun _ ->
             let xs = [| 1; 2; 3|]
-            let original = xs.Duplicate()
+            let original = xs.Copy()
             let _ = xs.Last
             assertThat (xs = original) (tag "Last getter should not modify input array" >> isTrue)
         )
