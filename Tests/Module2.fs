@@ -1159,6 +1159,24 @@ module Module2 =
             throwsNull (fun () -> Array.filteri (fun _ _ -> true) xs |> ignore)
         )
 
+        test ("Array.tryFindIndexi and findIndexi use zero-based indices", fun _ ->
+            let xs = [|10; 20; 30|]
+            assertThat (xs |> Array.tryFindIndexi (fun i x -> i = 0 && x = 10)) (tag "tryFindIndexi first" >> isEqualTo (Some 0))
+            assertThat (xs |> Array.tryFindIndexi (fun i x -> i = 2 && x = 30)) (tag "tryFindIndexi last" >> isEqualTo (Some 2))
+            assertThat (xs |> Array.tryFindIndexi (fun i x -> i = x)) (tag "tryFindIndexi none" >> isEqualTo None)
+            assertThat (([||]: int[]) |> Array.tryFindIndexi (fun _ _ -> true)) (tag "tryFindIndexi empty" >> isEqualTo None)
+            assertThat (xs |> Array.findIndexi (fun i x -> i = 1 && x = 20)) (tag "findIndexi" >> isEqualTo 1)
+            assertThat (xs |> Array.findIndexi (fun _ x -> x > 10)) (tag "findIndexi returns the first match" >> isEqualTo 1)
+        )
+
+        test ("Array.findIndexi throws when not found or on null", fun _ ->
+            let xs = [|10; 20; 30|]
+            CheckThrowsExn<KeyNotFoundException> (fun () -> Array.findIndexi (fun i x -> i = x) xs |> ignore)
+            throwsWith ["Array.findIndexi did not find"] (fun () -> Array.findIndexi (fun i x -> i = x) xs |> ignore)
+            throwsNull (fun () -> Array.tryFindIndexi (fun _ _ -> true) (null: int[]) |> ignore)
+            throwsNull (fun () -> Array.findIndexi (fun _ _ -> true) (null: int[]) |> ignore)
+        )
+
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Collection conversion-----------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------

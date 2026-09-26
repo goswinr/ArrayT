@@ -1279,6 +1279,34 @@ module Array =
                 res.Add(t)
         res.ToArray()
 
+    /// <summary>Returns the zero-based index of the first element in the Array that satisfies the given indexed predicate.</summary>
+    /// <param name="predicate">The function to test each indexed element against.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>The index of the first element that satisfies the predicate, or None if not found.</returns>
+    let inline tryFindIndexi (predicate: int -> 'T -> bool) (arr: 'T[]) : option<int> =
+        if isNull arr then nullExn "tryFindIndexi"
+        let mutable i = 0
+        let mutable result = None
+        let k = arr.Length
+        while i < k do
+            if predicate i arr.[i] then
+                result <- Some i
+                i <- k // break the loop
+            else
+                i <- i + 1
+        result
+
+    /// <summary>Returns the zero-based index of the first element in the Array that satisfies the given indexed predicate.</summary>
+    /// <param name="predicate">The function to test each indexed element against.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>The index of the first element that satisfies the predicate.</returns>
+    /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when no element satisfies the predicate.</exception>
+    let findIndexi (predicate: int -> 'T -> bool) (arr: 'T[]) : int =
+        if isNull arr then nullExn "findIndexi"
+        match tryFindIndexi predicate arr with
+        | Some i -> i
+        | None -> failKey arr "findIndexi did not find for given predicate in"
+
 
 
 

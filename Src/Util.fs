@@ -178,6 +178,19 @@ module UtilArray =
             #endif
         raise (IndexOutOfRangeException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
+    /// <summary>Raises a KeyNotFoundException with a descriptive message about array operation failure.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <param name="funcAndReason">A string describing the function and reason for failure.</param>
+    /// <returns>Never returns (always raises).</returns>
+    let failKey (arr:'T[]) (funcAndReason:string) : 'a =
+        let t =
+            #if FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT
+                "'T"
+            #else
+                (typeof<'T>).Name
+            #endif
+        raise (Collections.Generic.KeyNotFoundException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
+
 
 
     /// <summary>A simple Wrapper for an array.
