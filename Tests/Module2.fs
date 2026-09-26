@@ -580,6 +580,14 @@ module Module2 =
             assertThat (xs |> Array.rotate  13 = (xs|> Array.rotate  1)) (tag "rotate 13" >> isTrue)
         )
 
+        test ("Array.rotate by Int32.MinValue and MaxValue does not overflow", fun _ ->
+            let xs = [|0; 1; 2; 3; 4; 5|]
+            // Int32.MinValue % 6 = -2 and Int32.MaxValue % 6 = 1
+            assertThat (xs |> Array.rotate Int32.MinValue) (tag "rotate MinValue" >> isEqualTo (xs |> Array.rotate -2))
+            assertThat (xs |> Array.rotate Int32.MaxValue) (tag "rotate MaxValue" >> isEqualTo (xs |> Array.rotate 1))
+            assertThat (Array.rotate Int32.MinValue ([||]: int[])) (tag "rotate empty" >> isEqualTo [||])
+        )
+
         test ("Array.rotate throws on null array", fun _ ->
             let xs : int[] = null
             throwsNull (fun () -> Array.rotate 1 xs |> ignore)

@@ -352,8 +352,11 @@ module Array =
     let inline rotate amount (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "rotate"
         let r = Array.zeroCreate (arr.Length)
-        for i = 0 to arr.Length - 1 do
-            r.[i] <- arr.[negIdxLooped (i - amount) arr.Length]
+        if arr.Length > 0 then
+            // Normalize first so subtracting Int32.MinValue cannot overflow.
+            let normalizedAmount = negIdxLooped amount arr.Length
+            for i = 0 to arr.Length - 1 do
+                r.[i] <- arr.[negIdxLooped (i - normalizedAmount) arr.Length]
         r
 
     /// <summary>Considers array circular and move elements up till condition is met for the first item.
