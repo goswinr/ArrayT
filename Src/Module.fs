@@ -917,6 +917,169 @@ module Array =
         l
 
 
+    /// <summary>Splits the collection into two collections, containing the elements for which the
+    /// given function returns <c>Choice1Of2</c> or <c>Choice2Of2</c>, respectively. This function is similar to
+    /// <c>Array.partition</c>, but it allows the returned collections to have different element types.</summary>
+    /// <param name="partitioner">The function to transform and classify each input element into one of two output types.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>A tuple of two Arrays. The first containing values from Choice1Of2 results and the second
+    /// containing values from Choice2Of2 results.</returns>
+    let inline partitionBy (partitioner: 'T -> Choice<'U1,'U2>) (arr: 'T[]) : 'U1[] * 'U2[] =
+        if isNull arr then nullExn "partitionBy"
+        let results1 = ResizeArray()
+        let results2 = ResizeArray()
+        for i = 0 to arr.Length - 1 do
+            match partitioner arr.[i] with
+            | Choice1Of2 value -> results1.Add value
+            | Choice2Of2 value -> results2.Add value
+        results1.ToArray(), results2.ToArray()
+
+    /// <summary>Splits the collection into two Arrays, by applying the given partitioning function
+    /// to each element. Returns Choice1Of2 elements in the first Array and
+    /// Choice2Of2 elements in the second Array. Element order is preserved in both of the created Arrays.
+    /// This is the same function as Array.partitionBy, provided under the name
+    /// used by the F# core <c>Array</c> module since FSharp.Core 10.1.</summary>
+    /// <param name="partitioner">The function to transform and classify each input element into one of two output types.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>A tuple of two Arrays. The first containing values from Choice1Of2 results and the second
+    /// containing values from Choice2Of2 results.</returns>
+    let inline partitionWith (partitioner: 'T -> Choice<'U1, 'U2>) (arr: 'T[]) : 'U1[] * 'U2[] =
+        if isNull arr then nullExn "partitionWith"
+        partitionBy partitioner arr
+
+    /// <summary>Splits the collection into three collections, containing the elements for which the
+    /// given function returns <c>Choice1Of3</c>, <c>Choice2Of3</c> or <c>Choice3Of3</c>, respectively. This function is similar to
+    /// <c>Array.partition3</c>, but it allows the returned collections to have different element types.</summary>
+    /// <param name="partitioner">The function to test the input elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>Three Arrays.</returns>
+    let partition3By (partitioner: 'T -> Choice<'U1,'U2,'U3>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] =
+        if isNull arr then nullExn "partition3By"
+        let results1 = ResizeArray()
+        let results2 = ResizeArray()
+        let results3 = ResizeArray()
+        for i = 0 to arr.Length - 1 do
+            match partitioner arr.[i] with
+            | Choice1Of3 value -> results1.Add value
+            | Choice2Of3 value -> results2.Add value
+            | Choice3Of3 value -> results3.Add value
+        results1.ToArray(), results2.ToArray(), results3.ToArray()
+
+    /// <summary>Splits the collection into four collections, containing the elements for which the
+    /// given function returns <c>Choice1Of4</c>, <c>Choice2Of4</c>, <c>Choice3Of4</c> or <c>Choice4Of4</c>, respectively. This function is similar to
+    /// <c>Array.partition4</c>, but it allows the returned collections to have different element types.</summary>
+    /// <param name="partitioner">The function to test the input elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>Four Arrays.</returns>
+    let partition4By (partitioner: 'T -> Choice<'U1,'U2,'U3,'U4>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] * 'U4[] =
+        if isNull arr then nullExn "partition4By"
+        let results1 = ResizeArray()
+        let results2 = ResizeArray()
+        let results3 = ResizeArray()
+        let results4 = ResizeArray()
+        for i = 0 to arr.Length - 1 do
+            match partitioner arr.[i] with
+            | Choice1Of4 value -> results1.Add value
+            | Choice2Of4 value -> results2.Add value
+            | Choice3Of4 value -> results3.Add value
+            | Choice4Of4 value -> results4.Add value
+        results1.ToArray(), results2.ToArray(), results3.ToArray(), results4.ToArray()
+
+    /// <summary>Splits the collection into five collections, containing the elements for which the
+    /// given function returns <c>Choice1Of5</c>, <c>Choice2Of5</c>, <c>Choice3Of5</c>, <c>Choice4Of5</c> or <c>Choice5Of5</c>, respectively. This function is similar to
+    /// <c>Array.partition5</c>, but it allows the returned collections to have different element types.</summary>
+    /// <param name="partitioner">The function to test the input elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>Five Arrays.</returns>
+    let partition5By (partitioner: 'T -> Choice<'U1,'U2,'U3,'U4,'U5>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] * 'U4[] * 'U5[] =
+        if isNull arr then nullExn "partition5By"
+        let results1 = ResizeArray()
+        let results2 = ResizeArray()
+        let results3 = ResizeArray()
+        let results4 = ResizeArray()
+        let results5 = ResizeArray()
+        for i = 0 to arr.Length - 1 do
+            match partitioner arr.[i] with
+            | Choice1Of5 value -> results1.Add value
+            | Choice2Of5 value -> results2.Add value
+            | Choice3Of5 value -> results3.Add value
+            | Choice4Of5 value -> results4.Add value
+            | Choice5Of5 value -> results5.Add value
+        results1.ToArray(), results2.ToArray(), results3.ToArray(), results4.ToArray(), results5.ToArray()
+
+    /// <summary>Splits the collection into three collections,
+    /// first containing the elements for which the given predicate1 returns <c>true</c>,
+    /// second containing the elements for which the given predicate2 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// third the rest.</summary>
+    /// <param name="predicate1">The first function to test the input elements.</param>
+    /// <param name="predicate2">The second function to test the input elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>Three Arrays.</returns>
+    let partition3 (predicate1: 'T -> bool) (predicate2: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] =
+        if isNull arr then nullExn "partition3"
+        let p1True = ResizeArray()
+        let p2True = ResizeArray()
+        let allFalse = ResizeArray()
+        for i = 0 to arr.Length - 1 do
+            let el = arr.[i]
+            if predicate1 el then p1True.Add el
+            elif predicate2 el then p2True.Add el
+            else allFalse.Add el
+        p1True.ToArray(), p2True.ToArray(), allFalse.ToArray()
+
+    /// <summary>Splits the collection into four collections,
+    /// first containing the elements for which the given predicate1 returns <c>true</c>,
+    /// second containing the elements for which the given predicate2 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// third containing the elements for which the given predicate3 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// fourth the rest.</summary>
+    /// <param name="predicate1">The first function to test the input elements.</param>
+    /// <param name="predicate2">The second function to test the input elements.</param>
+    /// <param name="predicate3">The third function to test the input elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>Four Arrays.</returns>
+    let partition4 (predicate1: 'T -> bool) (predicate2: 'T -> bool) (predicate3: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] * 'T[] =
+        if isNull arr then nullExn "partition4"
+        let p1True = ResizeArray()
+        let p2True = ResizeArray()
+        let p3True = ResizeArray()
+        let allFalse = ResizeArray()
+        for i = 0 to arr.Length - 1 do
+            let el = arr.[i]
+            if predicate1 el then p1True.Add el
+            elif predicate2 el then p2True.Add el
+            elif predicate3 el then p3True.Add el
+            else allFalse.Add el
+        p1True.ToArray(), p2True.ToArray(), p3True.ToArray(), allFalse.ToArray()
+
+    /// <summary>Splits the collection into five collections,
+    /// first containing the elements for which the given predicate1 returns <c>true</c>,
+    /// second containing the elements for which the given predicate2 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// third containing the elements for which the given predicate3 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// fourth containing the elements for which the given predicate4 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// fifth the rest.</summary>
+    /// <param name="predicate1">The first function to test the input elements.</param>
+    /// <param name="predicate2">The second function to test the input elements.</param>
+    /// <param name="predicate3">The third function to test the input elements.</param>
+    /// <param name="predicate4">The fourth function to test the input elements.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>Five Arrays.</returns>
+    let partition5 (predicate1: 'T -> bool) (predicate2: 'T -> bool) (predicate3: 'T -> bool) (predicate4: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] * 'T[] * 'T[] =
+        if isNull arr then nullExn "partition5"
+        let p1True = ResizeArray()
+        let p2True = ResizeArray()
+        let p3True = ResizeArray()
+        let p4True = ResizeArray()
+        let allFalse = ResizeArray()
+        for i = 0 to arr.Length - 1 do
+            let el = arr.[i]
+            if predicate1 el then p1True.Add el
+            elif predicate2 el then p2True.Add el
+            elif predicate3 el then p3True.Add el
+            elif predicate4 el then p4True.Add el
+            else allFalse.Add el
+        p1True.ToArray(), p2True.ToArray(), p3True.ToArray(), p4True.ToArray(), allFalse.ToArray()
+
+
     /// <summary>Applies a function to array
     /// If resulting array meets the resultPredicate it is returned, otherwise the original input is returned.</summary>
     /// <param name="resultPredicate">The predicate to test the result.</param>

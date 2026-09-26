@@ -1218,6 +1218,54 @@ module Module2 =
         )
 
         //--------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------Partitioning--------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------------
+
+        test ("Array.partitionBy and partitionWith", fun _ ->
+            let classify x = if x % 2 = 0 then Choice1Of2 (x * 10) else Choice2Of2 (string x)
+            let xs = [|1; 2; 3; 4; 5|]
+            let evens, odds = Array.partitionBy classify xs
+            assertThat evens (tag "partitionBy Choice1Of2 in order" >> isEqualTo [|20; 40|])
+            assertThat odds (tag "partitionBy Choice2Of2 in order" >> isEqualTo [|"1"; "3"; "5"|])
+            let evensW, oddsW = Array.partitionWith classify xs
+            assertThat evensW (tag "partitionWith agrees with partitionBy" >> isEqualTo evens)
+            assertThat oddsW (tag "partitionWith agrees with partitionBy 2" >> isEqualTo odds)
+            let e1, e2 = Array.partitionBy classify [||]
+            assertThat (e1.Length + e2.Length) (tag "partitionBy empty" >> isEqualTo 0)
+            throwsNull (fun () -> Array.partitionBy classify (null: int[]) |> ignore)
+            throwsNull (fun () -> Array.partitionWith classify (null: int[]) |> ignore)
+        )
+
+        test ("Array.partition3By, partition4By and partition5By", fun _ ->
+            let xs = [|0 .. 9|]
+            let a, b, c = xs |> Array.partition3By (fun x -> match x % 3 with 0 -> Choice1Of3 x | 1 -> Choice2Of3 (float x) | _ -> Choice3Of3 (string x))
+            assertThat a (tag "partition3By 1" >> isEqualTo [|0; 3; 6; 9|])
+            assertThat b (tag "partition3By 2" >> isEqualTo [|1.0; 4.0; 7.0|])
+            assertThat c (tag "partition3By 3" >> isEqualTo [|"2"; "5"; "8"|])
+            let a, b, c, d = xs |> Array.partition4By (fun x -> match x % 4 with 0 -> Choice1Of4 x | 1 -> Choice2Of4 x | 2 -> Choice3Of4 x | _ -> Choice4Of4 x)
+            assertThat (a, b, c, d) (tag "partition4By" >> isEqualTo ([|0; 4; 8|], [|1; 5; 9|], [|2; 6|], [|3; 7|]))
+            let a, b, c, d, e = xs |> Array.partition5By (fun x -> match x % 5 with 0 -> Choice1Of5 x | 1 -> Choice2Of5 x | 2 -> Choice3Of5 x | 3 -> Choice4Of5 x | _ -> Choice5Of5 x)
+            assertThat (a, b, c, d, e) (tag "partition5By" >> isEqualTo ([|0; 5|], [|1; 6|], [|2; 7|], [|3; 8|], [|4; 9|]))
+            throwsNull (fun () -> Array.partition3By (fun x -> Choice1Of3 x) (null: int[]) |> ignore)
+            throwsNull (fun () -> Array.partition4By (fun x -> Choice1Of4 x) (null: int[]) |> ignore)
+            throwsNull (fun () -> Array.partition5By (fun x -> Choice1Of5 x) (null: int[]) |> ignore)
+        )
+
+        test ("Array.partition3, partition4 and partition5 test the predicates in order", fun _ ->
+            let xs = [|0 .. 9|]
+            let isEven x = x % 2 = 0
+            let isDiv3 x = x % 3 = 0
+            let isDiv5 x = x % 5 = 0
+            let isDiv7 x = x % 7 = 0
+            assertThat (Array.partition3 isEven isDiv3 xs) (tag "partition3" >> isEqualTo ([|0; 2; 4; 6; 8|], [|3; 9|], [|1; 5; 7|]))
+            assertThat (Array.partition4 isEven isDiv3 isDiv5 xs) (tag "partition4" >> isEqualTo ([|0; 2; 4; 6; 8|], [|3; 9|], [|5|], [|1; 7|]))
+            assertThat (Array.partition5 isEven isDiv3 isDiv5 isDiv7 xs) (tag "partition5" >> isEqualTo ([|0; 2; 4; 6; 8|], [|3; 9|], [|5|], [|7|], [|1|]))
+            throwsNull (fun () -> Array.partition3 isEven isDiv3 (null: int[]) |> ignore)
+            throwsNull (fun () -> Array.partition4 isEven isDiv3 isDiv5 (null: int[]) |> ignore)
+            throwsNull (fun () -> Array.partition5 isEven isDiv3 isDiv5 isDiv7 (null: int[]) |> ignore)
+        )
+
+        //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Conditional transformation------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
