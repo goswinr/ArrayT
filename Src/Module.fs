@@ -184,13 +184,25 @@ module Array =
     /// <param name="endIdx">The end index (inclusive, can be negative).</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A new array containing the sliced elements.</returns>
+    /// <exception cref="T:System.IndexOutOfRangeException">Thrown when either index is out of range or the start index is after the end index.</exception>
+    let sliceNeg (startIdx:int) (endIdx:int) (arr: 'T[]) : 'T[] =
+        if isNull arr then nullExn "sliceNeg"
+        arr.SliceNeg(startIdx, endIdx)
+
+    /// <summary>Use Array.sliceNeg instead.
+    /// Slice the Array given an inclusive start and end index. Allows for negative indices too. ( -1 is last item, like Python)</summary>
+    /// <param name="startIdx">The start index (inclusive, can be negative).</param>
+    /// <param name="endIdx">The end index (inclusive, can be negative).</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>A new array containing the sliced elements.</returns>
+    [<Obsolete("Use Array.sliceNeg instead. The name slice is avoided because in .NET the .Slice method of some collections, like List<'T> and Span<'T>, takes a start index and a length, not an inclusive end index.")>]
     let slice (startIdx:int) (endIdx:int) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "slice"
-        arr.Slice(startIdx, endIdx)
+        arr.SliceNeg(startIdx, endIdx)
 
     /// <summary>Returns a new Array containing the elements between the specified inclusive start and end indices.
     /// This function rejects negative and out-of-bounds indices, while the F# slicing notation xs.[1..3] does not.
-    /// To allow negative indices use Array.slice, to normalize any index with modulo use Array.sliceLooped.</summary>
+    /// To allow negative indices use Array.sliceNeg, to normalize any index with modulo use Array.sliceLooped.</summary>
     /// <param name="startIdx">The inclusive start index of the slice.</param>
     /// <param name="endIdx">The inclusive end index of the slice.</param>
     /// <param name="arr">The input Array.</param>
@@ -214,8 +226,8 @@ module Array =
 
 
     /// <summary>Trim items from start and end.
-    /// If the sum of fromStartCount and fromEndCount is bigger than arr.Length it returns an empty Array.
-    /// If you want an exception to be raised for index overlap (total trimming is bigger than count) use Array.slice with negative end index.</summary>
+    /// If the sum of fromStartCount and fromEndCount is equal to or greater than arr.Length, it returns an empty Array.
+    /// If you want an exception to be raised for index overlap (total trimming is bigger than count) use Array.sliceNeg with a negative end index.</summary>
     /// <param name="fromStartCount">The number of items to remove from the start.</param>
     /// <param name="fromEndCount">The number of items to remove from the end.</param>
     /// <param name="arr">The input Array.</param>

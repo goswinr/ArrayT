@@ -718,75 +718,75 @@ module FableParity =
         )
 
         //--------------------------------------------------------------------------------------------------------------------
-        //------------------------------------------Slice with various types---------------------------------------------------
+        //------------------------------------------SliceNeg with various types------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        test ("Slice on reference type array", fun _ ->
+        test ("SliceNeg on reference type array", fun _ ->
             let xs = [| "a"; "b"; "c"; "d"; "e" |]
-            let result = xs.Slice(1, 3)
-            assertThat (result = [| "b"; "c"; "d" |]) (tag "Slice ref" >> isTrue)
+            let result = xs.SliceNeg(1, 3)
+            assertThat (result = [| "b"; "c"; "d" |]) (tag "SliceNeg ref" >> isTrue)
         )
 
-        test ("Slice with negative indices on reference types", fun _ ->
+        test ("SliceNeg with negative indices on reference types", fun _ ->
             let xs = [| "a"; "b"; "c"; "d"; "e" |]
-            let result = xs.Slice(-3, -1)
-            assertThat (result = [| "c"; "d"; "e" |]) (tag "Slice neg ref" >> isTrue)
+            let result = xs.SliceNeg(-3, -1)
+            assertThat (result = [| "c"; "d"; "e" |]) (tag "SliceNeg neg ref" >> isTrue)
         )
 
-        test ("Slice single element", fun _ ->
+        test ("SliceNeg single element", fun _ ->
             let xs = [| 1; 2; 3 |]
-            let result = xs.Slice(1, 1)
-            assertThat (result = [| 2 |]) (tag "Slice single element" >> isTrue)
+            let result = xs.SliceNeg(1, 1)
+            assertThat (result = [| 2 |]) (tag "SliceNeg single element" >> isTrue)
         )
 
-        test ("Slice full array", fun _ ->
+        test ("SliceNeg full array", fun _ ->
             let xs = [| 1; 2; 3 |]
-            let result = xs.Slice(0, 2)
-            assertThat (result = [| 1; 2; 3 |]) (tag "Slice full" >> isTrue)
+            let result = xs.SliceNeg(0, 2)
+            assertThat (result = [| 1; 2; 3 |]) (tag "SliceNeg full" >> isTrue)
         )
 
-        test ("Slice with negative start positive end", fun _ ->
+        test ("SliceNeg with negative start positive end", fun _ ->
             let xs = [| "a"; "b"; "c"; "d"; "e" |]
-            let result = xs.Slice(-2, 4)
-            assertThat (result = [| "d"; "e" |]) (tag "Slice mixed indices ref" >> isTrue)
+            let result = xs.SliceNeg(-2, 4)
+            assertThat (result = [| "d"; "e" |]) (tag "SliceNeg mixed indices ref" >> isTrue)
         )
 
-        test ("Slice throws on invalid indices", fun _ ->
+        test ("SliceNeg throws on invalid indices", fun _ ->
             let xs = [| 1; 2; 3 |]
-            throwsRange (fun () -> xs.Slice(3, 4) |> ignore)
-            throwsRange (fun () -> xs.Slice(0, 5) |> ignore)
+            throwsRange (fun () -> xs.SliceNeg(3, 4) |> ignore)
+            throwsRange (fun () -> xs.SliceNeg(0, 5) |> ignore)
         )
 
-        test ("Slice with start equal to end returns single element", fun _ ->
+        test ("SliceNeg with start equal to end returns single element", fun _ ->
             let xs = [| 1; 2; 3 |]
-            let result = xs.Slice(2, 2)
-            assertThat (result = [| 3 |]) (tag "Slice single at end" >> isTrue)
+            let result = xs.SliceNeg(2, 2)
+            assertThat (result = [| 3 |]) (tag "SliceNeg single at end" >> isTrue)
         )
 
-        test ("Slice throws when start is clearly after end", fun _ ->
+        test ("SliceNeg throws when start is clearly after end", fun _ ->
             let xs = [| 1; 2; 3; 4; 5 |]
-            throwsRange (fun () -> xs.Slice(3, 1) |> ignore)
+            throwsRange (fun () -> xs.SliceNeg(3, 1) |> ignore)
         )
 
-        test ("Slice with null elements in reference array", fun _ ->
+        test ("SliceNeg with null elements in reference array", fun _ ->
             let xs = [| "a"; null; "c"; null; "e" |]
-            let result = xs.Slice(1, 3)
-            assertThat result.Length (tag "Slice null elements count" >> isEqualTo 3)
-            assertThat result.[0] (tag "Slice null[0]" >> isNull)
-            assertThat result.[1] (tag "Slice null[1]" >> isEqualTo "c")
-            assertThat result.[2] (tag "Slice null[2]" >> isNull)
+            let result = xs.SliceNeg(1, 3)
+            assertThat result.Length (tag "SliceNeg null elements count" >> isEqualTo 3)
+            assertThat result.[0] (tag "SliceNeg null[0]" >> isNull)
+            assertThat result.[1] (tag "SliceNeg null[1]" >> isEqualTo "c")
+            assertThat result.[2] (tag "SliceNeg null[2]" >> isNull)
         )
 
-        test ("Slice with duplicates", fun _ ->
+        test ("SliceNeg with duplicates", fun _ ->
             let xs = [| 5; 5; 5; 5; 5 |]
-            let result = xs.Slice(1, 3)
-            assertThat (result = [| 5; 5; 5 |]) (tag "Slice duplicates" >> isTrue)
+            let result = xs.SliceNeg(1, 3)
+            assertThat (result = [| 5; 5; 5 |]) (tag "SliceNeg duplicates" >> isTrue)
         )
 
-        test ("Slice does not modify original", fun _ ->
+        test ("SliceNeg does not modify original", fun _ ->
             let xs = [| "a"; "b"; "c" |]
             let original = Array.copy xs
-            let result = xs.Slice(0, 1)
+            let result = xs.SliceNeg(0, 1)
             result.[0] <- "z"
             assertThat xs.[0] (tag "original not modified by Slice mutation" >> isEqualTo "a")
             assertThat (xs = original) (tag "original unchanged" >> isTrue)
@@ -1142,10 +1142,10 @@ module FableParity =
             assertThat (xs.GetNeg -3) (tag "dup GetNeg -3" >> isEqualTo "x")
         )
 
-        test ("Slice with all-same elements", fun _ ->
+        test ("SliceNeg with all-same elements", fun _ ->
             let xs = [| 7; 7; 7; 7; 7 |]
-            let result = xs.Slice(1, 3)
-            assertThat (result = [| 7; 7; 7 |]) (tag "Slice all same" >> isTrue)
+            let result = xs.SliceNeg(1, 3)
+            assertThat (result = [| 7; 7; 7 |]) (tag "SliceNeg all same" >> isTrue)
         )
 
         test ("Last/First/Second/Third with duplicates", fun _ ->

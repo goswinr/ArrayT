@@ -9,8 +9,10 @@ module Extensions =
     open type Scriptorium.Quill.Test
     open Exceptions
 
-#nowarn "44" // to test the obsolete Duplicate alias
+#nowarn "44" // to test the obsolete Duplicate and Slice aliases
     let private obsoleteDuplicate (xs: int[]) : int[] = xs.Duplicate()
+    let private obsoleteSlice (xs: int[]) startIdx endIdx : int[] = xs.Slice(startIdx, endIdx)
+    let private obsoleteSliceFn startIdx endIdx (xs: int[]) : int[] = Array.slice startIdx endIdx xs
 #warnon "44"
 
     let tests =
@@ -332,7 +334,7 @@ module Extensions =
 
         test ("GetSlice raises exception when start index is out of range", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
-            let testCode = fun () -> xs.Slice(5,8) |> ignore
+            let testCode = fun () -> xs.SliceNeg(5,8) |> ignore
             assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
         )
 
@@ -419,11 +421,11 @@ module Extensions =
             assertThat xs.[0] (tag "Original array should not be modified when duplicate is changed" >> isEqualTo 1)
         )
 
-        test ("Slice does not modify input array", fun _ ->
+        test ("SliceNeg does not modify input array", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
             let original = xs.Copy()
-            let _ = xs.Slice(1, 3)
-            assertThat (xs = original) (tag "Slice should not modify input array" >> isTrue)
+            let _ = xs.SliceNeg(1, 3)
+            assertThat (xs = original) (tag "SliceNeg should not modify input array" >> isTrue)
         )
 
         test ("First getter does not modify input array", fun _ ->
@@ -498,24 +500,45 @@ module Extensions =
             assertThat xs.[100 % 3] (tag "SetLooped should wrap large positive index" >> isEqualTo 99)
         )
 
-        test ("Slice with negative start and positive end", fun _ ->
+        test ("SliceNeg with negative start and positive end", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
-            let result = xs.Slice(-3, 4)
-            assertThat (result = [|3; 4; 5|]) (tag "Slice should work with mixed indices" >> isTrue)
+            let result = xs.SliceNeg(-3, 4)
+            assertThat (result = [|3; 4; 5|]) (tag "SliceNeg should work with mixed indices" >> isTrue)
         )
 
-        test ("Slice throws when start is after end", fun _ ->
+        test ("SliceNeg throws when start is after end", fun _ ->
             let xs = [| 1; 2; 3; 4; 5|]
-            let testCode = fun () -> xs.Slice(3, 1) |> ignore
+            let testCode = fun () -> xs.SliceNeg(3, 1) |> ignore
             assertThat testCode (tag "Expected an IndexOutOfRangeException" >> throws)
         )
 
-        test ("Slice throws when indices are out of bounds", fun _ ->
+        test ("SliceNeg throws when indices are out of bounds", fun _ ->
             let xs = [| 1; 2; 3|]
-            let testCode1 = fun () -> xs.Slice(5, 6) |> ignore
-            let testCode2 = fun () -> xs.Slice(0, 5) |> ignore
+            let testCode1 = fun () -> xs.SliceNeg(5, 6) |> ignore
+            let testCode2 = fun () -> xs.SliceNeg(0, 5) |> ignore
             assertThat testCode1 (tag "Expected an IndexOutOfRangeException for start out of bounds" >> throws)
             assertThat testCode2 (tag "Expected an IndexOutOfRangeException for end out of bounds" >> throws)
+        )
+
+        test ("SliceNeg error messages include the array content", fun _ ->
+            let xs = [| 10; 20; 30 |]
+            throwsRange (fun () -> xs.SliceNeg(2, 0) |> ignore)
+            throwsWith ["Array.SliceNeg: Start index 2 is bigger than end index 0"; "with 3 items"; "2: 30"] (fun () -> xs.SliceNeg(2, 0) |> ignore)
+        )
+
+        test ("SliceNeg and SliceIdx name an empty input in the message", fun _ ->
+            let empty : int[] = [||]
+            throwsRange (fun () -> empty.SliceNeg(0, 0) |> ignore)
+            throwsWith ["Array.SliceNeg: Can't slice an empty Array"] (fun () -> empty.SliceNeg(0, -1) |> ignore)
+            throwsWith ["Array.SliceNeg: Can't slice an empty Array"] (fun () -> Array.sliceNeg 0 0 empty |> ignore)
+            throwsWith ["Array.SliceIdx: Can't slice an empty Array"] (fun () -> empty.SliceIdx(0, 0) |> ignore)
+        )
+
+        test ("obsolete Slice and slice still work like SliceNeg", fun _ ->
+            let xs = [| 1; 2; 3; 4; 5 |]
+            assertThat (obsoleteSlice xs 1 -2) (tag "arr.Slice(1, -2)" >> isEqualTo [| 2; 3; 4 |])
+            assertThat (obsoleteSliceFn 1 -2 xs) (tag "Array.slice 1 -2" >> isEqualTo [| 2; 3; 4 |])
+            throwsNull (fun () -> obsoleteSliceFn 0 1 (null: int[]) |> ignore)
         )
 
         test ("SliceIdx uses an inclusive end index", fun _ ->

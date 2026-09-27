@@ -16,7 +16,7 @@ It also works in Javascript and Typescript with [Fable](https://fable.io/).
 
 ## Motivation
 I was always annoyed that an IndexOutOfRangeException does not include the actual index that was out of bounds nor the actual size of the array.
-This library fixes that in `array.Get`, `array.Set`, `array.Slice` and other item access functions.
+This library fixes that in `array.Get`, `array.Set`, `array.SliceNeg` and other item access functions.
 
 This library was designed for use with F# scripting.<br>
 Functions and methods never return null.<br>
@@ -161,19 +161,22 @@ arr.GetLooped(-4)   // "c"
 
 ### Slicing with negative indices
 
-Unlike the built-in `a.[1..3]` slice syntax, `Slice` supports negative indices:
+Unlike the built-in `a.[1..3]` slice syntax, `SliceNeg` supports negative indices:
 
 ```fsharp
 let arr = [| 0; 1; 2; 3; 4; 5; 6; 7; 8; 9 |]
 
-arr.Slice(2, 5)     // [| 2; 3; 4; 5 |]     (inclusive on both ends)
-arr.Slice(0, -1)    // [| 0; 1; .. ; 9 |]   (full copy, -1 = last)
-arr.Slice(1, -2)    // [| 1; 2; .. ; 8 |]   (skip first and last)
-arr.Slice(-3, -1)   // [| 7; 8; 9 |]        (last 3 items)
+arr.SliceNeg(2, 5)     // [| 2; 3; 4; 5 |]     (inclusive on both ends)
+arr.SliceNeg(0, -1)    // [| 0; 1; .. ; 9 |]   (full copy, -1 = last)
+arr.SliceNeg(1, -2)    // [| 1; 2; .. ; 8 |]   (skip first and last)
+arr.SliceNeg(-3, -1)   // [| 7; 8; 9 |]        (last 3 items)
 
 // Module function
-arr |> Array.slice 1 -2    // [| 1; 2; .. ; 8 |]
+arr |> Array.sliceNeg 1 -2    // [| 1; 2; .. ; 8 |]
 ```
+
+(`arr.Slice` and `Array.slice` still work, but are obsolete: in .NET the `.Slice` method of some collections, like `List<'T>` and `Span<'T>`, takes a start index and a length.
+For a start index and a length use `Array.sub`.)
 
 `SliceIdx` rejects negative indices, `SliceLooped` wraps any index around with modulo:
 

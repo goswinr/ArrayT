@@ -310,51 +310,51 @@ module Module2 =
         //------------------------------------------Slicing and trimming------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
 
-        test ("Array.slice returns slice with positive indices", fun _ ->
+        test ("Array.sliceNeg returns slice with positive indices", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            assertThat (Array.slice 1 3 xs = [|2; 3; 4|]) (tag "slice 1 3" >> isTrue)
+            assertThat (Array.sliceNeg 1 3 xs = [|2; 3; 4|]) (tag "sliceNeg 1 3" >> isTrue)
         )
 
-        test ("Array.slice returns slice with negative indices", fun _ ->
+        test ("Array.sliceNeg returns slice with negative indices", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            assertThat (Array.slice -2 -1 xs = [|4; 5|]) (tag "slice -2 -1" >> isTrue)
-            assertThat (Array.slice 1 -2 xs = [|2; 3; 4|]) (tag "slice 1 -2" >> isTrue)
+            assertThat (Array.sliceNeg -2 -1 xs = [|4; 5|]) (tag "sliceNeg -2 -1" >> isTrue)
+            assertThat (Array.sliceNeg 1 -2 xs = [|2; 3; 4|]) (tag "sliceNeg 1 -2" >> isTrue)
         )
 
-        test ("Array.slice returns single item", fun _ ->
+        test ("Array.sliceNeg returns single item", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            assertThat (Array.slice 2 2 xs = [|3|]) (tag "slice 2 2" >> isTrue)
+            assertThat (Array.sliceNeg 2 2 xs = [|3|]) (tag "sliceNeg 2 2" >> isTrue)
         )
 
-        test ("Array.slice throws on invalid range", fun _ ->
+        test ("Array.sliceNeg throws on invalid range", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            throwsRange (fun () -> Array.slice 3 1 xs |> ignore)
+            throwsRange (fun () -> Array.sliceNeg 3 1 xs |> ignore)
         )
 
-        test ("Array.slice returns empty array when end index is one less than start index", fun _ ->
+        test ("Array.sliceNeg returns empty array when end index is one less than start index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            assertThat (Array.slice 3 2 xs = [||]) (tag "slice 3 2" >> isTrue)
-            assertThat (Array.slice 0 -6 xs = [||]) (tag "slice 0 -6, like trim 0 5" >> isTrue)
+            assertThat (Array.sliceNeg 3 2 xs = [||]) (tag "sliceNeg 3 2" >> isTrue)
+            assertThat (Array.sliceNeg 0 -6 xs = [||]) (tag "sliceNeg 0 -6, like trim 0 5" >> isTrue)
         )
 
-        test ("Array.slice error messages name the offending index", fun _ ->
+        test ("Array.sliceNeg error messages name the offending index", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
-            throwsWith ["Start index 3 is bigger than end index 1"] (fun () -> Array.slice 3 1 xs |> ignore)
-            throwsWith ["End index -99 is out of range"] (fun () -> Array.slice 1 -99 xs |> ignore)
-            throwsWith ["End index -6 is out of range"] (fun () -> Array.slice 1 -6 xs |> ignore)
-            throwsWith ["End index 5 is out of range"] (fun () -> Array.slice 1 5 xs |> ignore)
-            throwsWith ["Start index -6 is out of range"] (fun () -> Array.slice -6 2 xs |> ignore)
+            throwsWith ["Start index 3 is bigger than end index 1"] (fun () -> Array.sliceNeg 3 1 xs |> ignore)
+            throwsWith ["End index -99 is out of range"] (fun () -> Array.sliceNeg 1 -99 xs |> ignore)
+            throwsWith ["End index -6 is out of range"] (fun () -> Array.sliceNeg 1 -6 xs |> ignore)
+            throwsWith ["End index 5 is out of range"] (fun () -> Array.sliceNeg 1 5 xs |> ignore)
+            throwsWith ["Start index -6 is out of range"] (fun () -> Array.sliceNeg -6 2 xs |> ignore)
         )
 
-        test ("Array.slice throws on null array", fun _ ->
+        test ("Array.sliceNeg throws on null array", fun _ ->
             let xs : int[] = null
-            throwsNull (fun () -> Array.slice 0 1 xs |> ignore)
+            throwsNull (fun () -> Array.sliceNeg 0 1 xs |> ignore)
         )
 
-        test ("Array.slice does not modify input array", fun _ ->
+        test ("Array.sliceNeg does not modify input array", fun _ ->
             let xs = [|1; 2; 3; 4; 5|]
             let original = xs.Copy()
-            let _ = Array.slice 1 3 xs
+            let _ = Array.sliceNeg 1 3 xs
             assertThat (xs = original) (tag "input array should not be modified" >> isTrue)
         )
 

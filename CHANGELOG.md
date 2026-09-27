@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- `arr.SliceNeg` and `Array.sliceNeg` to slice with an inclusive end index and negative indices (-1 is the last item), like ResizeArrayT and Str. They replace `arr.Slice` and `Array.slice`.
 - `Array.sliceIdx` and `arr.SliceIdx` to slice with an inclusive end index, rejecting negative and out-of-range indices, like ResizeArrayT.
 - `Array.sliceLooped` and `arr.SliceLooped` to slice with indices normalized by modulo, like ResizeArrayT.
 - `Array.partitionBy`, `partitionWith`, `partition3By`, `partition4By`, `partition5By`, `partition3`, `partition4` and `partition5` from ResizeArrayT.
@@ -17,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `arr.Duplicate()` is marked obsolete, use `arr.Copy()` instead (as in ResizeArrayT).
 - **Breaking:** the predicate of `Array.filteri` takes the index and the element (`int -> 'T -> bool`) instead of only the index, like `ResizeArray.filteri` and `Array.mapi`. Replace `Array.filteri (fun i -> ...)` with `Array.filteri (fun i _ -> ...)`.
 - `arr.FailIfEmpty`, `arr.FailIfLessThan`, `Array.failIfEmpty` and `Array.failIfLessThan` raise an `ArgumentException` instead of a plain `Exception`, like ResizeArrayT.
+- `arr.Slice` and `Array.slice` are marked obsolete, use `arr.SliceNeg` and `Array.sliceNeg` instead. In .NET the `.Slice` method of some collections, like `List<'T>` and `Span<'T>`, takes a start index and a length, not an inclusive end index.
+- The exception messages of `arr.SliceNeg` and `Array.sliceNeg` include the array content, like `arr.SliceIdx` and ResizeArrayT.
+- `arr.SliceNeg`, `Array.sliceNeg`, `arr.SliceIdx` and `Array.sliceIdx` fail with a "Can't slice an empty Array" message on empty input, like ResizeArrayT and Str.
 ### Fixed
 - `Array.rotate` returned a wrong result for amounts close to `Int32.MinValue` because of an integer overflow.
 - `Array.min3`, `max3`, `min3By`, `max3By`, `min3IndicesBy` and `max3IndicesBy` did not keep the original order of tied items among the first three when the type's equality disagrees with its comparison. They now use the stable sorting of ResizeArrayT, which only uses comparison, and no longer need equality on the item or key type.

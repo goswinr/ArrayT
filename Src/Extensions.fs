@@ -229,34 +229,43 @@ module AutoOpenArrayTExtensions =
         /// <param name="startIdx">The start index (inclusive, can be negative).</param>
         /// <param name="endIdx">The end index (inclusive, can be negative).</param>
         /// <returns>A new array containing the sliced elements.</returns>
-        member this.Slice(startIdx:int , endIdx: int ) : 'T array=
+        /// <exception cref="T:System.IndexOutOfRangeException">Thrown when either index is out of range or the start index is after the end index.</exception>
+        member xs.SliceNeg(startIdx:int , endIdx: int ) : 'T array=
 
             // overrides of existing methods are unfortunately silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
             // member inline this.GetSlice(startIdx, endIdx) =
 
-            let count = this.Length
+            let count = xs.Length
+            if count = 0 then
+                failIdx xs $"SliceNeg: Can't slice an empty Array. startIdx: {startIdx} endIdx: {endIdx}"
             let st  = if startIdx < 0 then count + startIdx else startIdx
             let en  = if endIdx   < 0 then count + endIdx   else endIdx
             let len = en - st + 1 // zero if end is one less than start, like Array.trim when all items are trimmed
 
             if st < 0 || st > count - 1 then
-                let err = $"Array.Slice: Start index {startIdx} is out of range. Allowed values are -{count} up to {count-1} for Array of {count} items"
-                raise (IndexOutOfRangeException(err))
+                failIdx xs $"SliceNeg: Start index {startIdx} is out of range. Allowed values are -{count} up to {count-1} for Array of {count} items"
 
             if en > count - 1 || (len < 0 && en < 0) then
-                let err = $"Array.Slice: End index {endIdx} is out of range. Allowed values are -{count} up to {count-1} for Array of {count} items"
-                raise (IndexOutOfRangeException(err))
+                failIdx xs $"SliceNeg: End index {endIdx} is out of range. Allowed values are -{count} up to {count-1} for Array of {count} items"
 
             if len < 0 then
-                let err = $"Array.Slice: Start index {startIdx} is bigger than end index {endIdx} for Array of {count} items"
-                raise (IndexOutOfRangeException(err))
+                failIdx xs $"SliceNeg: Start index {startIdx} is bigger than end index {endIdx} for Array of {count} items"
 
-            Array.init len (fun i -> this.[st+i])
+            Array.sub xs st len
+
+        /// <summary>Use arr.SliceNeg(startIdx, endIdx) instead.
+        /// Slice the array given an inclusive start and end index. Allows for negative indices too. ( -1 is last item, like Python)</summary>
+        /// <param name="startIdx">The start index (inclusive, can be negative).</param>
+        /// <param name="endIdx">The end index (inclusive, can be negative).</param>
+        /// <returns>A new array containing the sliced elements.</returns>
+        [<Obsolete("Use arr.SliceNeg(startIdx, endIdx) instead. The name Slice is avoided because in .NET the .Slice method of some collections, like List<'T> and Span<'T>, takes a start index and a length, not an inclusive end index.")>]
+        member xs.Slice(startIdx:int , endIdx: int ) : 'T array=
+            xs.SliceNeg(startIdx, endIdx)
 
         /// <summary>
         /// Returns a new array containing the elements between the specified inclusive start and end indices.
         /// This member rejects negative and out-of-bounds indices, while the F# slicing notation xs.[1..3] does not.
-        /// To allow negative indices use Slice, to normalize any index with modulo use SliceLooped.
+        /// To allow negative indices use SliceNeg, to normalize any index with modulo use SliceLooped.
         /// </summary>
         /// <param name="startIdx">The inclusive start index of the slice.</param>
         /// <param name="endIdx">The inclusive end index of the slice.</param>
@@ -264,6 +273,8 @@ module AutoOpenArrayTExtensions =
         /// <exception cref="T:System.IndexOutOfRangeException">Thrown when either index is outside the array or startIdx is greater than endIdx.</exception>
         member xs.SliceIdx(startIdx:int , endIdx: int ) : 'T[] =
             let count = xs.Length
+            if count = 0 then
+                failIdx xs $"SliceIdx: Can't slice an empty Array. startIdx: {startIdx} endIdx: {endIdx}"
             if startIdx < 0 || startIdx >= count then
                 failIdx xs $"SliceIdx: Start index {startIdx} is out of range. Allowed values are 0 through {count - 1} for an Array of {count} items."
             if endIdx < 0 || endIdx >= count then
