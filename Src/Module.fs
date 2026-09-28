@@ -1423,23 +1423,30 @@ module Array =
             )
 
     /// <summary>Applies a key-generating function to each element of an Array and yields a Dictionary of
-    /// unique keys and respective elements that match to this key. As opposed to Array.groupBy the key may not be null or Option.None.</summary>
-    /// <param name="projection">A function that transforms an element of the Array into a comparable key. As opposed to Array.groupBy the key may not be null or Option.None.</param>
+    /// unique keys and respective elements that match to this key.
+    /// Uses F# structural equality for grouping and dictionary lookups on both .NET and Fable.
+    /// Keys must support equality. Element order within each group is preserved.
+    /// As opposed to Array.groupBy the key may not be null or Option.None.</summary>
+    /// <param name="projection">A function that transforms an element of the Array into a key supporting equality. Null and Option.None keys are rejected.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A Dictionary containing each unique key and an Array of its matching elements.</returns>
+    /// <exception cref="T:System.ArgumentNullException">Thrown when the input Array is null or a projected key is null or Option.None.</exception>
     let groupByDict (projection: 'T -> 'Key) (arr: 'T[]) : Dictionary<'Key, 'T[]> =
         if isNull arr then nullExn "groupByDict"
-        let groups = Dictionary<'Key, ResizeArray<'T>>()
+        let comparer = HashIdentity.Structural<'Key>
+        let groups = Dictionary<'Key, ResizeArray<'T>>(comparer)
         for i = 0 to arr.Length - 1 do
             let v = arr.[i]
             let k = projection v
+            if isNull (box k) then
+                raise (ArgumentNullException("projection", "Array.groupByDict: the projected key is null or None."))
             match groups.TryGetValue k with
             | true, r -> r.Add v
             | _ ->
                 let r = ResizeArray()
                 groups.[k] <- r
                 r.Add v
-        let dict = Dictionary<'Key, 'T[]>(groups.Count)
+        let dict = Dictionary<'Key, 'T[]>(groups.Count, comparer)
         for kv in groups do
             dict.[kv.Key] <- kv.Value.ToArray()
         dict

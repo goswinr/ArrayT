@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- **Breaking:** `Array.groupByDict` now requires `'Key : equality` and uses F# structural equality for grouping and dictionary lookups on both .NET and Fable. Structurally equal array keys now form one group on .NET too.
+### Fixed
+- `Array.groupByDict` explicitly rejects null and `None` keys with an `ArgumentNullException` on .NET and an error in Fable, matching its documented restriction.
+
 ## [0.28.0] - 2026-09-27
 ### Added
 - `arr.SliceNeg` and `Array.sliceNeg` to slice with an inclusive end index and negative indices (-1 is the last item), like ResizeArrayT and Str. They replace `arr.Slice` and `Array.slice`.
@@ -103,6 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - copy from ResizeArray library 0.19.0
 
+[Unreleased]: https://github.com/goswinr/ArrayT/compare/0.28.0...HEAD
 [0.28.0]: https://github.com/goswinr/ArrayT/compare/0.27.0...0.28.0
 [0.27.0]: https://github.com/goswinr/ArrayT/compare/0.26.1...0.27.0
 [0.26.1]: https://github.com/goswinr/ArrayT/compare/0.26.0...0.26.1

@@ -1259,6 +1259,24 @@ module Module2 =
             throwsNull (fun () -> Array.zipDefault plusIndex [|1|] (null: int[]) |> ignore)
         )
 
+        test ("Array.groupByDict uses structural keys and preserves group order", fun _ ->
+            let xs = [|1; 2; 3; 4; 5|]
+            let mutable calls = 0
+            let d = Array.groupByDict (fun x -> calls <- calls + 1; [|x % 2|]) xs
+            assertThat d.Count (tag "structurally equal arrays form one group" >> isEqualTo 2)
+            assertThat d.[[|1|]] (tag "fresh key lookup and input order" >> isEqualTo [|1; 3; 5|])
+            assertThat d.[[|0|]] (tag "other group" >> isEqualTo [|2; 4|])
+            assertThat calls (tag "projection runs once per item" >> isEqualTo xs.Length)
+            let nested = Array.groupByDict (fun x -> Some ([|x % 2|], "key")) xs
+            assertThat nested.[Some ([|1|], "key")] (tag "nested structural key" >> isEqualTo [|1; 3; 5|])
+        )
+
+        test ("Array.groupByDict rejects null and None keys", fun _ ->
+            throwsNull (fun () -> Array.groupByDict (fun _ -> (null: string)) [|1|] |> ignore)
+            throwsNull (fun () -> Array.groupByDict (fun _ -> (None: int option)) [|1|] |> ignore)
+            throwsWith ["groupByDict"; "null or None"] (fun () -> Array.groupByDict (fun _ -> (None: int option)) [|1|] |> ignore)
+        )
+
         test ("Array.groupByDict", fun _ ->
             let xs = [|"a"; "bb"; "c"; "dd"; "eee"|]
             let d = Array.groupByDict String.length xs

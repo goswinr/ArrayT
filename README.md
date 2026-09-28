@@ -192,6 +192,16 @@ arr |> Array.sliceIdx 2 5
 arr |> Array.sliceLooped -3 -1
 ```
 
+### Grouping into a dictionary
+
+`Array.groupByDict` uses F# structural equality for grouping and dictionary lookups on both .NET and Fable.
+Keys must support equality (`'Key : equality`); null and `None` keys are rejected. Elements within each group keep their input order.
+
+```fsharp
+let groups = [|1; 2; 3; 4; 5|] |> Array.groupByDict (fun x -> [|x % 2|])
+groups.[[|1|]]    // [|1; 3; 5|], looked up using a fresh, structurally equal array key
+```
+
 ### Trimming
 
 Remove items from the start and end:
