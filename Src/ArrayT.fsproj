@@ -67,6 +67,7 @@
 
     <Compile Include="Util.fs" />
     <Compile Include="Extensions.fs" />
+    <Compile Include="MinMax.fs" />
     <Compile Include="Module.fs" />
   </ItemGroup>
 

@@ -70,6 +70,119 @@ module UtilArray =
         toStringCore t arr
 
     // -------------------------------------------------------------
+    // IEEE 754:2019 minimum and maximum of float and float32
+    // -------------------------------------------------------------
+    // IEEE 754:2019 defines two different operations for the minimum and the maximum:
+    // 'minimum' and 'maximum' propagate NaN, 'minimumNumber' and 'maximumNumber' skip NaN.
+    // All four treat -0.0 as smaller than +0.0.
+    // See https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
+    // Array.min_IEEE754, max_IEEE754, minNumber and maxNumber use these functions when 'T is float or float32.
+    // They are not inline, so that the call sites of those inline functions stay small.
+
+    /// <summary>Casts x to 'U. Only use it when 'T and 'U are known to be the same type at runtime.</summary>
+    /// <param name="x">The value to cast.</param>
+    /// <returns>The same value, typed as 'U.</returns>
+    let inline retype (x: 'T) : 'U = unbox<'U> (box x)
+
+    /// <summary>True for -0.0. For float and float32.</summary>
+    /// <param name="x">The float to test.</param>
+    /// <returns>True if x is -0.0.</returns>
+    let inline isNegZero (x: ^F) : bool =
+        x = LanguagePrimitives.GenericZero && LanguagePrimitives.GenericOne / x < LanguagePrimitives.GenericZero
+
+    /// <summary>The IEEE 754:2019 'minimum' of two floats: NaN propagates and -0.0 is smaller than +0.0.</summary>
+    /// <param name="a">The first float.</param>
+    /// <param name="b">The second float.</param>
+    /// <returns>The smaller float, or NaN.</returns>
+    let inline minimumOf (a: ^F) (b: ^F) : ^F =
+        if a < b then a
+        elif b < a then b
+        elif a = b then (if isNegZero b then b else a) // -0.0 = +0.0 is true
+        elif a <> a then a // a is NaN
+        else b // b is NaN
+
+    /// <summary>The IEEE 754:2019 'maximum' of two floats: NaN propagates and +0.0 is bigger than -0.0.</summary>
+    /// <param name="a">The first float.</param>
+    /// <param name="b">The second float.</param>
+    /// <returns>The bigger float, or NaN.</returns>
+    let inline maximumOf (a: ^F) (b: ^F) : ^F =
+        if a > b then a
+        elif b > a then b
+        elif a = b then (if isNegZero a then b else a)
+        elif a <> a then a
+        else b
+
+    /// <summary>The IEEE 754:2019 'minimumNumber' of two floats: NaN is skipped and -0.0 is smaller than +0.0.
+    /// Returns NaN only if both are NaN.</summary>
+    /// <param name="a">The first float.</param>
+    /// <param name="b">The second float.</param>
+    /// <returns>The smaller float that is not NaN.</returns>
+    let inline minimumNumberOf (a: ^F) (b: ^F) : ^F =
+        if a < b then a
+        elif b < a then b
+        elif a = b then (if isNegZero b then b else a)
+        elif b <> b then a // b is NaN
+        else b // a is NaN
+
+    /// <summary>The IEEE 754:2019 'maximumNumber' of two floats: NaN is skipped and +0.0 is bigger than -0.0.
+    /// Returns NaN only if both are NaN.</summary>
+    /// <param name="a">The first float.</param>
+    /// <param name="b">The second float.</param>
+    /// <returns>The bigger float that is not NaN.</returns>
+    let inline maximumNumberOf (a: ^F) (b: ^F) : ^F =
+        if a > b then a
+        elif b > a then b
+        elif a = b then (if isNegZero a then b else a)
+        elif b <> b then a
+        else b
+
+    let inline private reduceFloats ([<InlineIfLambda>] op: ^F -> ^F -> ^F) (arr: ^F[]) : ^F =
+        let mutable acc = arr.[0]
+        for i = 1 to arr.Length - 1 do
+            acc <- op acc arr.[i]
+        acc
+
+    /// <summary>The IEEE 754:2019 'minimum' of a non-empty float array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The smallest float, or NaN.</returns>
+    let minimumFloat (arr: float[]) : float = reduceFloats minimumOf arr
+
+    /// <summary>The IEEE 754:2019 'minimum' of a non-empty float32 array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The smallest float32, or NaN.</returns>
+    let minimumFloat32 (arr: float32[]) : float32 = reduceFloats minimumOf arr
+
+    /// <summary>The IEEE 754:2019 'maximum' of a non-empty float array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The biggest float, or NaN.</returns>
+    let maximumFloat (arr: float[]) : float = reduceFloats maximumOf arr
+
+    /// <summary>The IEEE 754:2019 'maximum' of a non-empty float32 array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The biggest float32, or NaN.</returns>
+    let maximumFloat32 (arr: float32[]) : float32 = reduceFloats maximumOf arr
+
+    /// <summary>The IEEE 754:2019 'minimumNumber' of a non-empty float array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The smallest float that is not NaN.</returns>
+    let minimumNumberFloat (arr: float[]) : float = reduceFloats minimumNumberOf arr
+
+    /// <summary>The IEEE 754:2019 'minimumNumber' of a non-empty float32 array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The smallest float32 that is not NaN.</returns>
+    let minimumNumberFloat32 (arr: float32[]) : float32 = reduceFloats minimumNumberOf arr
+
+    /// <summary>The IEEE 754:2019 'maximumNumber' of a non-empty float array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The biggest float that is not NaN.</returns>
+    let maximumNumberFloat (arr: float[]) : float = reduceFloats maximumNumberOf arr
+
+    /// <summary>The IEEE 754:2019 'maximumNumber' of a non-empty float32 array.</summary>
+    /// <param name="arr">The input array.</param>
+    /// <returns>The biggest float32 that is not NaN.</returns>
+    let maximumNumberFloat32 (arr: float32[]) : float32 = reduceFloats maximumNumberOf arr
+
+    // -------------------------------------------------------------
     // for Exceptions ( never inlined)
     // -------------------------------------------------------------
 

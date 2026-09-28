@@ -590,133 +590,124 @@ module Array =
             arr.[i] <- arr.[j]
             arr.[j] <- ti
 
+    // #endregion
+    // #region MinMax Module
 
-    // internal, only for finding MinMax values
-    module private MinMax =
+    // The MinMax module with the NaN handling is in MinMax.fs.
 
-        // funcName is the name of the public function, for the error message
-        let inline simple2 (funcName: string) cmpF (arr: 'T[]) : 'T * 'T =
-            if arr.Length < 2 then fail arr $"{funcName}: Count must be at least two"
-            let mutable m1 = arr.[0]
-            let mutable m2 = arr.[1]
-            for i = 1 to arr.Length - 1 do
-                let this = arr.[i]
-                if cmpF this m1 then
-                    m2 <- m1
-                    m1 <- this
-                elif cmpF this m2 then
-                    m2 <- this
-            m1, m2
+    /// <summary>Returns the smallest of all elements of the Array.
+    /// NaN propagates: if any element is NaN, NaN is returned. Use Array.minNumber to skip NaN instead.
+    /// Unlike Array.min from FSharp.Core, the result does not depend on where NaN is in the Array.</summary>
+    /// <remarks>This is the 'minimum' operation of IEEE 754:2019: NaN propagates and -0.0 is smaller than +0.0.
+    /// Array.minNumber is the 'minimumNumber' operation of IEEE 754:2019, it skips NaN.
+    /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
+    /// If several elements are equally small, the first one of them is returned.</remarks>
+    /// <param name="arr">The input Array.</param>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <returns>The minimum element, or NaN.</returns>
+    let inline min_IEEE754 (arr: 'T[]) : 'T =
+        if isNull arr then nullExn "min_IEEE754"
+        if arr.Length = 0 then fail arr "min_IEEE754: Count must be at least one"
+        if typeof<'T> = typeof<float> then retype (minimumFloat (retype arr))
+        elif typeof<'T> = typeof<float32> then retype (minimumFloat32 (retype arr))
+        else MinMax.propagateNaN (>=) arr
 
+    /// <summary>Returns the greatest of all elements of the Array.
+    /// NaN propagates: if any element is NaN, NaN is returned. Use Array.maxNumber to skip NaN instead.
+    /// Unlike Array.max from FSharp.Core, the result does not depend on where NaN is in the Array.</summary>
+    /// <remarks>This is the 'maximum' operation of IEEE 754:2019: NaN propagates and +0.0 is bigger than -0.0.
+    /// Array.maxNumber is the 'maximumNumber' operation of IEEE 754:2019, it skips NaN.
+    /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
+    /// If several elements are equally great, the first one of them is returned.</remarks>
+    /// <param name="arr">The input Array.</param>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <returns>The maximum element, or NaN.</returns>
+    let inline max_IEEE754 (arr: 'T[]) : 'T =
+        if isNull arr then nullExn "max_IEEE754"
+        if arr.Length = 0 then fail arr "max_IEEE754: Count must be at least one"
+        if typeof<'T> = typeof<float> then retype (maximumFloat (retype arr))
+        elif typeof<'T> = typeof<float32> then retype (maximumFloat32 (retype arr))
+        else MinMax.propagateNaN (<=) arr
 
-        // A stable sorting network for three values. Since cmp is strict (< or >),
-        // equal values always stay in their original order.
-        // Only cmp is used, not '=', so this also works for types whose equality disagrees with their comparison.
-        let inline sort3 cmp a b c : 'T * 'T * 'T =
-            if cmp b a then
-                if cmp c b then c, b, a
-                elif cmp c a then b, c, a
-                else b, a, c
-            else
-                if cmp c a then c, a, b
-                elif cmp c b then a, c, b
-                else a, b, c
+    /// <summary>Returns the smallest of all elements of the Array, NaN is skipped.
+    /// NaN is only returned if all elements are NaN. Use Array.min_IEEE754 to propagate NaN instead.</summary>
+    /// <remarks>This is the 'minimumNumber' operation of IEEE 754:2019: NaN is skipped and -0.0 is smaller than +0.0.
+    /// Array.min_IEEE754 is the 'minimum' operation of IEEE 754:2019, it propagates NaN.
+    /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
+    /// If several elements are equally small, the first one of them is returned.</remarks>
+    /// <param name="arr">The input Array.</param>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <returns>The minimum element that is not NaN.</returns>
+    let inline minNumber (arr: 'T[]) : 'T =
+        if isNull arr then nullExn "minNumber"
+        if arr.Length = 0 then fail arr "minNumber: Count must be at least one"
+        if typeof<'T> = typeof<float> then retype (minimumNumberFloat (retype arr))
+        elif typeof<'T> = typeof<float32> then retype (minimumNumberFloat32 (retype arr))
+        else MinMax.skipNaN "minNumber" (<) arr
 
-        // The index counterpart of sort3, comparing projected values while keeping
-        // the original index order for equal keys.
-        let inline indexOfSort3By f cmp aa bb cc : int * int * int =
-            let a = f aa
-            let b = f bb
-            let c = f cc
-            if cmp b a then
-                if cmp c b then 2, 1, 0
-                elif cmp c a then 1, 2, 0
-                else 1, 0, 2
-            else
-                if cmp c a then 2, 0, 1
-                elif cmp c b then 0, 2, 1
-                else 0, 1, 2
+    /// <summary>Returns the greatest of all elements of the Array, NaN is skipped.
+    /// NaN is only returned if all elements are NaN. Use Array.max_IEEE754 to propagate NaN instead.</summary>
+    /// <remarks>This is the 'maximumNumber' operation of IEEE 754:2019: NaN is skipped and +0.0 is bigger than -0.0.
+    /// Array.max_IEEE754 is the 'maximum' operation of IEEE 754:2019, it propagates NaN.
+    /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
+    /// If several elements are equally great, the first one of them is returned.</remarks>
+    /// <param name="arr">The input Array.</param>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <returns>The maximum element that is not NaN.</returns>
+    let inline maxNumber (arr: 'T[]) : 'T =
+        if isNull arr then nullExn "maxNumber"
+        if arr.Length = 0 then fail arr "maxNumber: Count must be at least one"
+        if typeof<'T> = typeof<float> then retype (maximumNumberFloat (retype arr))
+        elif typeof<'T> = typeof<float32> then retype (maximumNumberFloat32 (retype arr))
+        else MinMax.skipNaN "maxNumber" (>) arr
 
-        let inline simple3 (funcName: string) cmpF (arr: 'T[]) : 'T * 'T * 'T =
-            if arr.Length < 3 then fail arr $"{funcName}: Count must be at least three"
-            let e1 = arr.[0]
-            let e2 = arr.[1]
-            let e3 = arr.[2]
-            // sort first 3
-            let mutable m1, m2, m3 = sort3 cmpF e1 e2 e3 // otherwise would fail on sorting first 3, test on Array([5;6;3;1;2;0])|> Array.max3
-            for i = 3 to arr.Length - 1 do
-                let this = arr.[i]
-                if cmpF this m1 then
-                    m3 <- m2
-                    m2 <- m1
-                    m1 <- this
-                elif cmpF this m2 then
-                    m3 <- m2
-                    m2 <- this
-                elif cmpF this m3 then
-                    m3 <- this
-            m1, m2, m3
+    /// <summary>Returns the element of the Array with the smallest projected key, NaN keys are skipped.
+    /// An element with a NaN key is never returned, unless all keys are NaN, then the first element is returned.
+    /// This also applies to keys that contain NaN, like the tuple (nan, 1).
+    /// The result does not depend on where NaN keys are in the Array.</summary>
+    /// <remarks>This is like Array.minNumber applied to the keys: NaN keys are skipped, they do not propagate.
+    /// Array.minBy from FSharp.Core on .NET instead returns the first element if its key is NaN, but skips NaN keys at all other positions.
+    /// A NaN key does not propagate like in Array.min_IEEE754, because the returned element would not show that its key was NaN.
+    /// If several keys are equally small, the first element of them is returned.
+    /// Unlike in Array.minNumber, this is also the case for the keys -0.0 and +0.0.
+    /// If the Array has only one element, the projection is not called.
+    /// Same as ResizeArray.minBy in ResizeArrayT.</remarks>
+    /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <returns>The element with the smallest key that is not NaN, or the first element if all keys are NaN.</returns>
+    let inline minNumberBy (projection: 'T -> 'Key) (arr: 'T[]) : 'T =
+        if isNull arr then nullExn "minNumberBy"
+        if arr.Length = 1 then
+            arr.[0] // if len = 1 then don't call the projection not even once !
+        else
+            arr.[MinMax.indexByFun "minNumberBy" (<) projection arr]
 
-        let inline indexByFun (funcName: string) cmpF func (arr: 'T[]) : int =
-            if arr.Length < 1 then fail arr $"{funcName}: Count must be at least one"
-            let mutable f = func arr.[0]
-            let mutable mf = f
-            let mutable ii = 0
-            for i = 1 to arr.Length - 1 do
-                f <- func arr.[i]
-                if cmpF f mf then
-                    ii <- i
-                    mf <- f
-            ii
+    /// <summary>Returns the element of the Array with the greatest projected key, NaN keys are skipped.
+    /// An element with a NaN key is never returned, unless all keys are NaN, then the first element is returned.
+    /// This also applies to keys that contain NaN, like the tuple (nan, 1).
+    /// The result does not depend on where NaN keys are in the Array.</summary>
+    /// <remarks>This is like Array.maxNumber applied to the keys: NaN keys are skipped, they do not propagate.
+    /// Array.maxBy from FSharp.Core on .NET instead returns the first element if its key is NaN, but skips NaN keys at all other positions.
+    /// A NaN key does not propagate like in Array.max_IEEE754, because the returned element would not show that its key was NaN.
+    /// If several keys are equally great, the first element of them is returned.
+    /// Unlike in Array.maxNumber, this is also the case for the keys -0.0 and +0.0.
+    /// If the Array has only one element, the projection is not called.
+    /// Same as ResizeArray.maxBy in ResizeArrayT.</remarks>
+    /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <returns>The element with the greatest key that is not NaN, or the first element if all keys are NaN.</returns>
+    let inline maxNumberBy (projection: 'T -> 'Key) (arr: 'T[]) : 'T =
+        if isNull arr then nullExn "maxNumberBy"
+        if arr.Length = 1 then
+            arr.[0] // if len = 1 then don't call the projection not even once !
+        else
+            arr.[MinMax.indexByFun "maxNumberBy" (>) projection arr]
 
-        let inline index2ByFun (funcName: string) cmpF func (arr: 'T[]) : int * int =
-            if arr.Length < 2 then fail arr $"{funcName}: Count must be at least two"
-            let mutable i1 = 0
-            let mutable i2 = 1
-            let mutable mf1 = func arr.[i1]
-            let mutable mf2 = func arr.[i2]
-            let mutable f = mf1 // placeholder
-            for i = 1 to arr.Length - 1 do
-                f <- func arr.[i]
-                if cmpF f mf1 then
-                    i2 <- i1
-                    i1 <- i
-                    mf2 <- mf1
-                    mf1 <- f
-                elif cmpF f mf2 then
-                    i2 <- i
-                    mf2 <- f
-            i1, i2
-
-        let inline index3ByFun (funcName: string) (cmpOp: 'U -> 'U -> bool) (byFun: 'T -> 'U) (arr: 'T[]) : int * int * int =
-            if arr.Length < 3 then fail arr $"{funcName}: Count must be at least three"
-            // sort first 3
-            let mutable i1, i2, i3 = indexOfSort3By byFun cmpOp arr.[0] arr.[1] arr.[2] // otherwise would fail on sorting first 3, test on Array([5;6;3;1;2;0])|> Array.max3
-            let mutable e1 = byFun arr.[i1]
-            let mutable e2 = byFun arr.[i2]
-            let mutable e3 = byFun arr.[i3]
-            let mutable f = e1 // placeholder
-            for i = 3 to arr.Length - 1 do
-                f <- byFun arr.[i]
-                if cmpOp f e1 then
-                    i3 <- i2
-                    i2 <- i1
-                    i1 <- i
-                    e3 <- e2
-                    e2 <- e1
-                    e1 <- f
-                elif cmpOp f e2 then
-                    i3 <- i2
-                    i2 <- i
-                    e3 <- e2
-                    e2 <- f
-                elif cmpOp f e3 then
-                    i3 <- i
-                    e3 <- f
-            i1, i2, i3
-
-    /// <summary>Returns the index of the smallest of all elements of the Array, compared via Operators.min on the function result.
-    /// If several elements are equally small, the index of the first one is returned.</summary>
+    /// <summary>Returns the index of the smallest of all elements of the Array, using generic comparison on the projected keys.
+    /// NaN keys are ignored: if all keys are NaN, 0 is returned.
+    /// If several keys are equally small, the index of the first one is returned.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
@@ -725,8 +716,9 @@ module Array =
         if isNull arr then nullExn "minIndexBy"
         arr |> MinMax.indexByFun "minIndexBy" (<) projection
 
-    /// <summary>Returns the index of the greatest of all elements of the Array, compared via Operators.max on the function result.
-    /// If several elements are equally great, the index of the first one is returned.</summary>
+    /// <summary>Returns the index of the greatest of all elements of the Array, using generic comparison on the projected keys.
+    /// NaN keys are ignored: if all keys are NaN, 0 is returned.
+    /// If several keys are equally great, the index of the first one is returned.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
@@ -735,9 +727,9 @@ module Array =
         if isNull arr then nullExn "maxIndexBy"
         arr |> MinMax.indexByFun "maxIndexBy" (>) projection
 
-
     /// <summary>Returns the smallest and the second smallest element of the Array.
-    /// If they are equal then the order is kept</summary>
+    /// If they are equal then the order is kept.
+    /// NaN is ranked after all other values, so NaN is only returned if there are not enough other values.</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the smallest and second smallest elements.</returns>
     let inline min2 (arr: 'T[]) : 'T * 'T =
@@ -745,7 +737,8 @@ module Array =
         arr |> MinMax.simple2 "min2" (<)
 
     /// <summary>Returns the biggest and the second biggest element of the Array.
-    /// If they are equal then the  order is kept</summary>
+    /// If they are equal then the order is kept.
+    /// NaN is ranked after all other values, so NaN is only returned if there are not enough other values.</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the biggest and second biggest elements.</returns>
     let inline max2 (arr: 'T[]) : 'T * 'T =
@@ -753,10 +746,10 @@ module Array =
         arr |> MinMax.simple2 "max2" (>)
 
 
-
     /// <summary>Returns the smallest and the second smallest element of the Array.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so elements with a NaN key are only returned if there are not enough other elements.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the smallest and second smallest elements.</returns>
@@ -767,7 +760,8 @@ module Array =
 
     /// <summary>Returns the biggest and the second biggest element of the Array.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so elements with a NaN key are only returned if there are not enough other elements.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the biggest and second biggest elements.</returns>
@@ -778,7 +772,8 @@ module Array =
 
     /// <summary>Returns the indices of the smallest and the second smallest element of the Array.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so indices of NaN keys are only returned if there are not enough other keys.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the indices of the smallest and second smallest elements.</returns>
@@ -788,7 +783,8 @@ module Array =
 
     /// <summary>Returns the indices of the biggest and the second biggest element of the Array.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so indices of NaN keys are only returned if there are not enough other keys.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the indices of the biggest and second biggest elements.</returns>
@@ -799,7 +795,8 @@ module Array =
 
     /// <summary>Returns the smallest three elements of the Array.
     /// The first element is the smallest, the second is the second smallest and the third is the third smallest.
-    /// If they are equal then the order is kept</summary>
+    /// If they are equal then the order is kept.
+    /// NaN is ranked after all other values, so NaN is only returned if there are not enough other values.</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the three smallest elements.</returns>
     let inline min3 (arr: 'T[]) : 'T * 'T * 'T =
@@ -808,7 +805,8 @@ module Array =
 
     /// <summary>Returns the biggest three elements of the Array.
     /// The first element is the biggest, the second is the second biggest and the third is the third biggest.
-    /// If they are equal then the order is kept</summary>
+    /// If they are equal then the order is kept.
+    /// NaN is ranked after all other values, so NaN is only returned if there are not enough other values.</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the three biggest elements.</returns>
     let inline max3 (arr: 'T[]) : 'T * 'T * 'T =
@@ -818,7 +816,8 @@ module Array =
     /// <summary>Returns the smallest three elements of the Array.
     /// The first element is the smallest, the second is the second smallest and the third is the third smallest.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so elements with a NaN key are only returned if there are not enough other elements.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the three smallest elements.</returns>
@@ -830,7 +829,8 @@ module Array =
     /// <summary>Returns the biggest three elements of the Array.
     /// The first element is the biggest, the second is the second biggest and the third is the third biggest.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so elements with a NaN key are only returned if there are not enough other elements.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the three biggest elements.</returns>
@@ -842,7 +842,8 @@ module Array =
     /// <summary>Returns the indices of the three smallest elements of the Array.
     /// The first element is the index of the smallest, the second is the index of the second smallest and the third is the index of the third smallest.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so indices of NaN keys are only returned if there are not enough other keys.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the indices of the three smallest elements.</returns>
@@ -853,13 +854,17 @@ module Array =
     /// <summary>Returns the indices of the three biggest elements of the Array.
     /// The first element is the index of the biggest, the second is the index of the second biggest and the third is the index of the third biggest.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the order is kept</summary>
+    /// If they are equal after function is applied then the order is kept.
+    /// NaN keys are ranked after all other keys, so indices of NaN keys are only returned if there are not enough other keys.</summary>
     /// <param name="f">The function to transform elements for comparison.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A tuple of the indices of the three biggest elements.</returns>
     let inline max3IndicesBy (f: 'T -> 'Key) (arr: 'T[]) : int * int * int =
         if isNull arr then nullExn "max3IndicesBy"
         arr |> MinMax.index3ByFun "max3IndicesBy" (>) f
+
+    // #endregion
+    // #region Count Functions
 
 
     /// <summary>Return the length or count of the collection.

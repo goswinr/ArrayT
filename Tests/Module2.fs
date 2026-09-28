@@ -26,6 +26,54 @@ type TieItem =
 module Module2 =
  open Exceptions
 
+ /// Shows a float so that NaN, -0.0 and +0.0 can be told apart, since -0.0 = +0.0 is true.
+ let private show (x: float) =
+    if Double.IsNaN x then "NaN"
+    elif x = 0.0 then (if 1.0 / x < 0.0 then "-0" else "+0")
+    else string x
+
+ let private show32 (x: float32) = show (float x)
+
+ /// For a stable sort: NaN comes last, other values ascending. -0.0 and +0.0 are equal.
+ let private nanLastAsc (a: float) (b: float) =
+    match Double.IsNaN a, Double.IsNaN b with
+    | true, true -> 0
+    | true, false -> 1
+    | false, true -> -1
+    | false, false -> compare a b
+
+ /// For a stable sort: NaN comes last, other values descending. -0.0 and +0.0 are equal.
+ let private nanLastDesc (a: float) (b: float) =
+    match Double.IsNaN a, Double.IsNaN b with
+    | true, true -> 0
+    | true, false -> 1
+    | false, true -> -1
+    | false, false -> compare b a
+
+ /// Reference for the IEEE 754:2019 'minimumNumber': NaN is skipped and -0.0 is smaller than +0.0.
+ let private refMinNumber (vs: float list) =
+    match vs |> List.filter (fun v -> not (Double.IsNaN v)) with
+    | [] -> nan
+    | ns -> ns |> List.reduce (fun a b -> if b < a || (b = a && show b = "-0") then b else a)
+
+ /// Reference for the IEEE 754:2019 'maximumNumber': NaN is skipped and +0.0 is bigger than -0.0.
+ let private refMaxNumber (vs: float list) =
+    match vs |> List.filter (fun v -> not (Double.IsNaN v)) with
+    | [] -> nan
+    | ns -> ns |> List.reduce (fun a b -> if b > a || (b = a && show b = "+0") then b else a)
+
+ /// All lists of length 1 to 4 made of NaN, -0.0, +0.0, -1.0 and 1.0.
+ let private nanInputs =
+    let values = [nan; -0.0; 0.0; -1.0; 1.0]
+    [ for a in values do
+        [a]
+        for b in values do
+            [a; b]
+            for c in values do
+                [a; b; c]
+                for d in values do
+                    [a; b; c; d] ]
+
  let tests =
     testList ("Module Tests", [
 
@@ -1075,6 +1123,156 @@ module Module2 =
             let xs : string[] = null
             throwsNull (fun () -> Array.maxIndexBy String.length xs |> ignore)
         )
+
+        test ("Array.min_IEEE754 and max_IEEE754 propagate NaN, minNumber and maxNumber skip it", fun _ ->
+            assertThat (show -0.0) (tag "the -0.0 literal is negative zero" >> isEqualTo "-0")
+            // the table from https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950 , inputs in either order
+            let table = [
+                // input        min    max    minNumber maxNumber
+                [3.0; 7.0],  ("3",   "7",   "3",   "7")
+                [3.0; nan],  ("NaN", "NaN", "3",   "3")
+                [nan; nan],  ("NaN", "NaN", "NaN", "NaN")
+                [-0.0; 0.0], ("-0",  "+0",  "-0",  "+0") ]
+            for input, (mi, ma, miN, maN) in table do
+                for vs in [input; List.rev input] do
+                    let xs = Array.ofList vs
+                    assertThat (show (Array.min_IEEE754 xs)) (tag $"min_IEEE754 {vs}" >> isEqualTo mi)
+                    assertThat (show (Array.max_IEEE754 xs)) (tag $"max_IEEE754 {vs}" >> isEqualTo ma)
+                    assertThat (show (Array.minNumber xs))   (tag $"minNumber {vs}"   >> isEqualTo miN)
+                    assertThat (show (Array.maxNumber xs))   (tag $"maxNumber {vs}"   >> isEqualTo maN)
+                    let fs = Array.map float32 xs
+                    assertThat (show32 (Array.min_IEEE754 fs)) (tag $"float32 min_IEEE754 {vs}" >> isEqualTo mi)
+                    assertThat (show32 (Array.max_IEEE754 fs)) (tag $"float32 max_IEEE754 {vs}" >> isEqualTo ma)
+                    assertThat (show32 (Array.minNumber fs))   (tag $"float32 minNumber {vs}"   >> isEqualTo miN)
+                    assertThat (show32 (Array.maxNumber fs))   (tag $"float32 maxNumber {vs}"   >> isEqualTo maN)
+        )
+
+        test ("Array.min_IEEE754, max_IEEE754, minNumber and maxNumber match a reference with NaN, -0.0 and +0.0 at every position", fun _ ->
+            for vs in nanInputs do
+                let hasNaN = vs |> List.exists Double.IsNaN
+                let minN = refMinNumber vs
+                let maxN = refMaxNumber vs
+                let xs = Array.ofList vs
+                assertThat (show (Array.min_IEEE754 xs)) (tag $"min_IEEE754 {vs}" >> isEqualTo (if hasNaN then "NaN" else show minN))
+                assertThat (show (Array.max_IEEE754 xs)) (tag $"max_IEEE754 {vs}" >> isEqualTo (if hasNaN then "NaN" else show maxN))
+                assertThat (show (Array.minNumber xs))   (tag $"minNumber {vs}"   >> isEqualTo (show minN))
+                assertThat (show (Array.maxNumber xs))   (tag $"maxNumber {vs}"   >> isEqualTo (show maxN))
+                let fs = Array.map float32 xs
+                assertThat (show32 (Array.min_IEEE754 fs)) (tag $"float32 min_IEEE754 {vs}" >> isEqualTo (if hasNaN then "NaN" else show minN))
+                assertThat (show32 (Array.max_IEEE754 fs)) (tag $"float32 max_IEEE754 {vs}" >> isEqualTo (if hasNaN then "NaN" else show maxN))
+                assertThat (show32 (Array.minNumber fs))   (tag $"float32 minNumber {vs}"   >> isEqualTo (show minN))
+                assertThat (show32 (Array.maxNumber fs))   (tag $"float32 maxNumber {vs}"   >> isEqualTo (show maxN))
+        )
+
+        test ("Array.min_IEEE754, max_IEEE754, minNumber and maxNumber work on any comparable type, keep the first of equal items and check their input", fun _ ->
+            assertThat (Array.min_IEEE754 [| 3; 1; 2 |]) (tag "min_IEEE754 int" >> isEqualTo 1)
+            assertThat (Array.max_IEEE754 [| "b"; "c"; "a" |]) (tag "max_IEEE754 string" >> isEqualTo "c")
+            assertThat (Array.minNumber [| 3; 1; 2 |]) (tag "minNumber int" >> isEqualTo 1)
+            assertThat (Array.maxNumber [| "b"; "c"; "a" |]) (tag "maxNumber string" >> isEqualTo "c")
+            let ties = [| { Value = 2; Name = "a" }; { Value = 1; Name = "b" }; { Value = 1; Name = "c" }; { Value = 2; Name = "d" } |]
+            assertThat (Array.min_IEEE754 ties).Name (tag "min_IEEE754 ties" >> isEqualTo "b")
+            assertThat (Array.max_IEEE754 ties).Name (tag "max_IEEE754 ties" >> isEqualTo "a")
+            assertThat (Array.minNumber ties).Name   (tag "minNumber ties"   >> isEqualTo "b")
+            assertThat (Array.maxNumber ties).Name   (tag "maxNumber ties"   >> isEqualTo "a")
+            let empty : float[] = [||]
+            let nullArr : float[] = null
+            throwsWith ["Array.min_IEEE754: Count must be at least one"] (fun () -> Array.min_IEEE754 empty |> ignore)
+            throwsWith ["Array.max_IEEE754: Count must be at least one"] (fun () -> Array.max_IEEE754 empty |> ignore)
+            throwsWith ["Array.minNumber: Count must be at least one"] (fun () -> Array.minNumber empty |> ignore)
+            throwsWith ["Array.maxNumber: Count must be at least one"] (fun () -> Array.maxNumber empty |> ignore)
+            throwsWith ["Array.minNumberBy: Count must be at least one"] (fun () -> Array.minNumberBy id empty |> ignore)
+            throwsWith ["Array.maxNumberBy: Count must be at least one"] (fun () -> Array.maxNumberBy id empty |> ignore)
+            throwsNull (fun () -> Array.min_IEEE754 nullArr |> ignore)
+            throwsNull (fun () -> Array.max_IEEE754 nullArr |> ignore)
+            throwsNull (fun () -> Array.minNumber nullArr |> ignore)
+            throwsNull (fun () -> Array.maxNumber nullArr |> ignore)
+            throwsNull (fun () -> Array.minNumberBy id nullArr |> ignore)
+            throwsNull (fun () -> Array.maxNumberBy id nullArr |> ignore)
+        )
+
+        test ("Array.minNumberBy, maxNumberBy and the other By functions ignore NaN keys at any position", fun _ ->
+            let xs = [| nan; 3.0; nan; 1.0; 2.0; nan |]
+            assertThat (Array.minNumberBy id xs)   (tag "minNumberBy"   >> isEqualTo 1.0)
+            assertThat (Array.maxNumberBy id xs)   (tag "maxNumberBy"   >> isEqualTo 3.0)
+            assertThat (Array.minIndexBy id xs)    (tag "minIndexBy"    >> isEqualTo 3)
+            assertThat (Array.maxIndexBy id xs)    (tag "maxIndexBy"    >> isEqualTo 1)
+            assertThat (Array.min2By id xs)        (tag "min2By"        >> isEqualTo (1.0, 2.0))
+            assertThat (Array.max2IndicesBy id xs) (tag "max2IndicesBy" >> isEqualTo (1, 4))
+            assertThat (Array.min3IndicesBy id xs) (tag "min3IndicesBy" >> isEqualTo (3, 4, 1))
+            assertThat (Array.max3By id xs)        (tag "max3By"        >> isEqualTo (3.0, 2.0, 1.0))
+            assertThat (Array.min3 xs)             (tag "min3"          >> isEqualTo (1.0, 2.0, 3.0))
+            assertThat (Array.max2 xs)             (tag "max2"          >> isEqualTo (3.0, 2.0))
+            // unlike min_IEEE754 and max_IEEE754, which propagate NaN
+            assertThat (Double.IsNaN (Array.min_IEEE754 xs)) (tag "min_IEEE754 propagates NaN" >> isTrue)
+            assertThat (Double.IsNaN (Array.max_IEEE754 xs)) (tag "max_IEEE754 propagates NaN" >> isTrue)
+            // not enough keys that are not NaN: NaN keys come last, in their original order
+            let ys = [| nan; 5.0; nan |]
+            assertThat (Array.min3IndicesBy id ys) (tag "min3IndicesBy one number" >> isEqualTo (1, 0, 2))
+            assertThat (Array.max2IndicesBy id ys) (tag "max2IndicesBy one number" >> isEqualTo (1, 0))
+            // all keys are NaN: the first element
+            let nans = [| ("a", nan); ("b", nan); ("c", nan) |]
+            assertThat (Array.minNumberBy snd nans |> fst) (tag "minNumberBy all NaN" >> isEqualTo "a")
+            assertThat (Array.maxNumberBy snd nans |> fst) (tag "maxNumberBy all NaN" >> isEqualTo "a")
+            assertThat (Array.minIndexBy snd nans)         (tag "minIndexBy all NaN"  >> isEqualTo 0)
+            // float32 keys
+            let fs = [| nanf; 2.0f; nanf; -1.0f |]
+            assertThat (Array.minNumberBy id fs) (tag "float32 minNumberBy" >> isEqualTo -1.0f)
+            assertThat (Array.maxNumberBy id fs) (tag "float32 maxNumberBy" >> isEqualTo 2.0f)
+            // like ResizeArray.minBy the projection is not called for a single element
+            let calls = ref 0
+            let one = Array.minNumberBy (fun (x: float) -> calls.Value <- calls.Value + 1; x) [| 7.0 |]
+            assertThat (one, calls.Value) (tag "minNumberBy single element" >> isEqualTo (7.0, 0))
+        )
+
+        test ("Array By functions and min2, max2, min3, max3 rank NaN last, matching a stable sort", fun _ ->
+            for vs in nanInputs do
+                let n = vs.Length
+                // the index is in the item, to see which of several equal keys was returned
+                let items = vs |> List.mapi (fun i v -> (i, v)) |> Array.ofList
+                let key (_: int, v: float) = v
+                let idx (i: int, _: float) = i
+                // List.sortWith is a stable sort
+                let stableIdx cmp = [0 .. n - 1] |> List.sortWith (fun i j -> cmp vs.[i] vs.[j])
+                let asc = stableIdx nanLastAsc
+                let desc = stableIdx nanLastDesc
+                let values (idxs: int list) = idxs |> List.map (fun i -> show vs.[i])
+                assertThat (Array.minIndexBy key items)        (tag $"minIndexBy {vs}"  >> isEqualTo asc.[0])
+                assertThat (Array.maxIndexBy key items)        (tag $"maxIndexBy {vs}"  >> isEqualTo desc.[0])
+                assertThat (idx (Array.minNumberBy key items)) (tag $"minNumberBy {vs}" >> isEqualTo asc.[0])
+                assertThat (idx (Array.maxNumberBy key items)) (tag $"maxNumberBy {vs}" >> isEqualTo desc.[0])
+                let xs = Array.ofList vs
+                if n >= 2 then
+                    assertThat (Array.min2IndicesBy key items) (tag $"min2IndicesBy {vs}" >> isEqualTo (asc.[0], asc.[1]))
+                    assertThat (Array.max2IndicesBy key items) (tag $"max2IndicesBy {vs}" >> isEqualTo (desc.[0], desc.[1]))
+                    let a, b = Array.min2By key items
+                    assertThat (idx a, idx b) (tag $"min2By {vs}" >> isEqualTo (asc.[0], asc.[1]))
+                    let a, b = Array.max2By key items
+                    assertThat (idx a, idx b) (tag $"max2By {vs}" >> isEqualTo (desc.[0], desc.[1]))
+                    let a, b = Array.min2 xs
+                    assertThat [show a; show b] (tag $"min2 {vs}" >> isEqualTo (values asc.[0..1]))
+                    let a, b = Array.max2 xs
+                    assertThat [show a; show b] (tag $"max2 {vs}" >> isEqualTo (values desc.[0..1]))
+                if n >= 3 then
+                    assertThat (Array.min3IndicesBy key items) (tag $"min3IndicesBy {vs}" >> isEqualTo (asc.[0], asc.[1], asc.[2]))
+                    assertThat (Array.max3IndicesBy key items) (tag $"max3IndicesBy {vs}" >> isEqualTo (desc.[0], desc.[1], desc.[2]))
+                    let a, b, c = Array.min3By key items
+                    assertThat (idx a, idx b, idx c) (tag $"min3By {vs}" >> isEqualTo (asc.[0], asc.[1], asc.[2]))
+                    let a, b, c = Array.max3By key items
+                    assertThat (idx a, idx b, idx c) (tag $"max3By {vs}" >> isEqualTo (desc.[0], desc.[1], desc.[2]))
+                    let a, b, c = Array.min3 xs
+                    assertThat [show a; show b; show c] (tag $"min3 {vs}" >> isEqualTo (values asc.[0..2]))
+                    let a, b, c = Array.max3 xs
+                    assertThat [show a; show b; show c] (tag $"max3 {vs}" >> isEqualTo (values desc.[0..2]))
+        )
+
+        #if !FABLE_COMPILER
+        test ("Array.minNumberBy and maxNumberBy also ignore keys that contain NaN, like a tuple", fun _ ->
+            let xs = [| (nan, 0); (2.0, 1); (nan, 2); (1.0, 3) |]
+            assertThat (Array.minNumberBy id xs) (tag "minNumberBy tuple" >> isEqualTo (1.0, 3))
+            assertThat (Array.maxNumberBy id xs) (tag "maxNumberBy tuple" >> isEqualTo (2.0, 1))
+            assertThat (Array.min3IndicesBy id xs) (tag "min3IndicesBy tuple" >> isEqualTo (3, 1, 0))
+        )
+        #endif
 
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Swap function-------------------------------------------------------------

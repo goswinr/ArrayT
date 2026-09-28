@@ -48,6 +48,7 @@ Test style:
 - `Src/` - Main library source
   - `Util.fs` - Internal utilities for exceptions and index handling (`UtilArray` module, `DebugIndexer` type)
   - `Extensions.fs` - Extension members on `Array<'T>` (`.Get`, `.Set`, `.First`, `.Last`, `.SliceNeg`, etc.)
+  - `MinMax.fs` - Internal `MinMax` module with the inline helpers and NaN handling for the min and max functions
   - `Module.fs` - `Array` module functions that extend FSharp.Core's Array module
 - `Tests/` - Test project that runs on both .NET and Fable/JS
 - `.github/workflows/` - `build.yml` builds and runs all tests; `releaseNuget.yml` runs it on a version tag, then publishes to nuget.org via trusted publishing (OIDC, no API key secret)

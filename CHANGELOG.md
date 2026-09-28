@@ -6,10 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `Array.min_IEEE754` and `max_IEEE754` propagate NaN (if any element is NaN, NaN is returned) and treat -0.0 as smaller than +0.0, as the IEEE 754:2019 'minimum' and 'maximum' operations. Unlike `Array.min` and `max` from FSharp.Core, the result does not depend on where NaN is in the array.
+- `Array.minNumber` and `maxNumber` skip NaN and treat -0.0 as smaller than +0.0, as the IEEE 754:2019 'minimumNumber' and 'maximumNumber' operations. See https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
+- `Array.minNumberBy` and `maxNumberBy` skip NaN keys, like `Array.minNumber` and `maxNumber` skip NaN values, and like `ResizeArray.minBy` and `maxBy` in ResizeArrayT. An element with a NaN key is only returned if all keys are NaN. Unlike `Array.minBy` and `maxBy` from FSharp.Core, the result does not depend on where NaN keys are in the array.
 ### Changed
 - **Breaking:** `Array.groupByDict` now requires `'Key : equality` and uses F# structural equality for grouping and dictionary lookups on both .NET and Fable. Structurally equal array keys now form one group on .NET too.
 ### Fixed
 - `Array.groupByDict` explicitly rejects null and `None` keys with an `ArgumentNullException` on .NET and an error in Fable, matching its documented restriction.
+- `Array.minIndexBy`, `maxIndexBy`, `min2By`, `max2By`, `min2IndicesBy`, `max2IndicesBy`, `min3By`, `max3By`, `min3IndicesBy` and `max3IndicesBy` ignore NaN keys at any position, NaN keys are ranked after all other keys. Before, a NaN key at the start of the array was returned.
+- `Array.min2`, `max2`, `min3` and `max3` rank NaN after all other values. Before, the result depended on where NaN was in the array.
 
 ## [0.28.0] - 2026-09-27
 ### Added
