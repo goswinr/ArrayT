@@ -77,6 +77,17 @@ module Module2 =
  let tests =
     testList ("Module Tests", [
 
+        test ("ArrayT exception types retain their .NET base types", fun _ ->
+            CheckThrowsExn<ArgumentException> (fun () -> Array.failIfEmpty "empty" [||] |> ignore)
+            CheckThrowsExn<ArgumentNullException> (fun () -> Array.get 0 (null: int[]) |> ignore)
+            CheckThrowsExn<IndexOutOfRangeException> (fun () -> Array.get 0 [||] |> ignore)
+            CheckThrowsExn<KeyNotFoundException> (fun () -> Array.findIndexi (fun _ _ -> false) [|1|] |> ignore)
+        )
+
+        // test ("Array.zeroCreateUndef rejects negative length with an ArrayTArgumentException", fun _ ->
+        //     throwsArg (fun () -> Array.zeroCreateUndef<string> -1 |> ignore)
+        // )
+
         //--------------------------------------------------------------------------------------------------------------------
         //------------------------------------------Basic Get/Set functions---------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------
@@ -1440,7 +1451,7 @@ module Module2 =
             assertThat (Array.pickBack evenTimes10 xs) (tag "pickBack" >> isEqualTo 40)
             assertThat (Array.tryPickBack evenTimes10 xs) (tag "tryPickBack" >> isEqualTo (Some 40))
             assertThat (Array.tryPickBack evenTimes10 [|1; 3|]) (tag "tryPickBack none" >> isEqualTo None)
-            CheckThrowsExn<KeyNotFoundException> (fun () -> Array.pickBack evenTimes10 [|1; 3|] |> ignore)
+            CheckThrowsExn<ArrayTKeyNotFoundException> (fun () -> Array.pickBack evenTimes10 [|1; 3|] |> ignore)
             throwsWith ["Array.pickBack: Key not found in 2 elements"] (fun () -> Array.pickBack evenTimes10 [|1; 3|] |> ignore)
             throwsNull (fun () -> Array.pickBack evenTimes10 (null: int[]) |> ignore)
             throwsNull (fun () -> Array.tryPickBack evenTimes10 (null: int[]) |> ignore)
@@ -1488,7 +1499,7 @@ module Module2 =
 
         test ("Array.findIndexi throws when not found or on null", fun _ ->
             let xs = [|10; 20; 30|]
-            CheckThrowsExn<KeyNotFoundException> (fun () -> Array.findIndexi (fun i x -> i = x) xs |> ignore)
+            CheckThrowsExn<ArrayTKeyNotFoundException> (fun () -> Array.findIndexi (fun i x -> i = x) xs |> ignore)
             throwsWith ["Array.findIndexi did not find"] (fun () -> Array.findIndexi (fun i x -> i = x) xs |> ignore)
             throwsNull (fun () -> Array.tryFindIndexi (fun _ _ -> true) (null: int[]) |> ignore)
             throwsNull (fun () -> Array.findIndexi (fun _ _ -> true) (null: int[]) |> ignore)

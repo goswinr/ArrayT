@@ -48,9 +48,9 @@ module Array =
     /// <returns>The new array.</returns>
     let inline zeroCreateUndef<'T when 'T : not struct> (len:int) : 'T [] =
         #if UNCHECKED && (FABLE_COMPILER_JAVASCRIPT || FABLE_COMPILER_TYPESCRIPT)
-            Fable.Core.JsInterop.emitJsExpr (len) "new Array($0)"
+        Fable.Core.JsInterop.emitJsExpr (len) "new Array($0)"
         #else
-            Array.zeroCreate<'T> len
+        Array.zeroCreate<'T> len
         #endif
 
 
@@ -60,7 +60,7 @@ module Array =
     // functions added that are not in FSharp.Core Array module)
     //----------------------------------------------------
 
-    /// <summary>Raises an ArgumentException if the Array is empty.
+    /// <summary>Raises an ArrayTArgumentException if the Array is empty.
     /// (Useful for chaining)
     /// Returns the input Array</summary>
     /// <param name="errorMessage">The error message to include in the exception.</param>
@@ -68,10 +68,10 @@ module Array =
     /// <returns>The input Array if not empty.</returns>
     let inline failIfEmpty (errorMessage: string) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "failIfEmpty"
-        if arr.Length = 0 then raise <| ArgumentException("Array.FailIfEmpty: " + errorMessage)
+        if arr.Length = 0 then raise <| ArrayTArgumentException("Array.FailIfEmpty: " + errorMessage)
         arr
 
-    /// <summary>Raises an ArgumentException if the Array has less then count items.
+    /// <summary>Raises an ArrayTArgumentException if the Array has less then count items.
     /// (Useful for chaining)
     /// Returns the input Array</summary>
     /// <param name="count">The minimum count required.</param>
@@ -80,7 +80,7 @@ module Array =
     /// <returns>The input Array if it has enough items.</returns>
     let failIfLessThan (count:int) (errorMessage: string) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "failIfLessThan"
-        if arr.Length < count then raise <| ArgumentException($"Array.FailIfLessThan {count}: {errorMessage}")
+        if arr.Length < count then raise <| ArrayTArgumentException($"Array.FailIfLessThan {count}: {errorMessage}")
         arr
 
 
@@ -603,7 +603,7 @@ module Array =
     /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
     /// If several elements are equally small, the first one of them is returned.</remarks>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The minimum element, or NaN.</returns>
     let inline min_IEEE754 (arr: 'T[]) : 'T =
         if isNull arr then nullExn "min_IEEE754"
@@ -620,7 +620,7 @@ module Array =
     /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
     /// If several elements are equally great, the first one of them is returned.</remarks>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The maximum element, or NaN.</returns>
     let inline max_IEEE754 (arr: 'T[]) : 'T =
         if isNull arr then nullExn "max_IEEE754"
@@ -636,7 +636,7 @@ module Array =
     /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
     /// If several elements are equally small, the first one of them is returned.</remarks>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The minimum element that is not NaN.</returns>
     let inline minNumber (arr: 'T[]) : 'T =
         if isNull arr then nullExn "minNumber"
@@ -652,7 +652,7 @@ module Array =
     /// Both are legitimate, but different operations, see https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
     /// If several elements are equally great, the first one of them is returned.</remarks>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The maximum element that is not NaN.</returns>
     let inline maxNumber (arr: 'T[]) : 'T =
         if isNull arr then nullExn "maxNumber"
@@ -674,7 +674,7 @@ module Array =
     /// Same as ResizeArray.minBy in ResizeArrayT.</remarks>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The element with the smallest key that is not NaN, or the first element if all keys are NaN.</returns>
     let inline minNumberBy (projection: 'T -> 'Key) (arr: 'T[]) : 'T =
         if isNull arr then nullExn "minNumberBy"
@@ -696,7 +696,7 @@ module Array =
     /// Same as ResizeArray.maxBy in ResizeArrayT.</remarks>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The element with the greatest key that is not NaN, or the first element if all keys are NaN.</returns>
     let inline maxNumberBy (projection: 'T -> 'Key) (arr: 'T[]) : 'T =
         if isNull arr then nullExn "maxNumberBy"
@@ -710,7 +710,7 @@ module Array =
     /// If several keys are equally small, the index of the first one is returned.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The index of the smallest element.</returns>
     let inline minIndexBy (projection: 'T -> 'Key) (arr: 'T[]) : int =
         if isNull arr then nullExn "minIndexBy"
@@ -721,7 +721,7 @@ module Array =
     /// If several keys are equally great, the index of the first one is returned.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     /// <returns>The index of the maximum element.</returns>
     let inline maxIndexBy (projection: 'T -> 'Key) (arr: 'T[]) : int =
         if isNull arr then nullExn "maxIndexBy"
@@ -1316,7 +1316,7 @@ module Array =
     /// <param name="predicate">The function to test each indexed element against.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>The index of the first element that satisfies the predicate.</returns>
-    /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown when no element satisfies the predicate.</exception>
+    /// <exception cref="T:ArrayT.ArrayTKeyNotFoundException">Thrown when no element satisfies the predicate.</exception>
     let findIndexi (predicate: int -> 'T -> bool) (arr: 'T[]) : int =
         if isNull arr then nullExn "findIndexi"
         match tryFindIndexi predicate arr with
@@ -1355,7 +1355,7 @@ module Array =
     /// <summary>Returns a tuple of the first element of the Array and a new Array containing the remaining elements.</summary>
     /// <param name="arr">The input Array.</param>
     /// <returns>The first element and a new Array with the remaining elements.</returns>
-    /// <exception cref="T:System.ArgumentException">Thrown when the input Array is empty.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentException">Thrown when the input Array is empty.</exception>
     let inline headAndTail (arr: 'T[]) : 'T * 'T[] =
         if isNull arr then nullExn "headAndTail"
         if arr.Length = 0 then fail arr "headAndTail: input is empty"
@@ -1374,10 +1374,10 @@ module Array =
 
     /// <summary>Starting from last element going backwards. Applies the given function to successive elements, returning the first
     /// result where function returns <c>Some(x)</c> for some <c>x</c>. If the function
-    /// never returns <c>Some(x)</c> then <see cref="T:System.Collections.Generic.KeyNotFoundException"/> is raised.</summary>
+    /// never returns <c>Some(x)</c> then <see cref="T:ArrayT.ArrayTKeyNotFoundException"/> is raised.</summary>
     /// <param name="chooser">The function to generate options from the elements.</param>
     /// <param name="arr">The input Array.</param>
-    /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if every result from
+    /// <exception cref="T:ArrayT.ArrayTKeyNotFoundException">Thrown if every result from
     /// <c>chooser</c> is <c>None</c>.</exception>
     /// <returns>The first result. From the end of the Array.</returns>
     let pickBack (chooser: 'T -> 'U option) (arr: 'T[]) : 'U =
@@ -1435,7 +1435,7 @@ module Array =
     /// <param name="projection">A function that transforms an element of the Array into a key supporting equality. Null and Option.None keys are rejected.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A Dictionary containing each unique key and an Array of its matching elements.</returns>
-    /// <exception cref="T:System.ArgumentNullException">Thrown when the input Array is null or a projected key is null or Option.None.</exception>
+    /// <exception cref="T:ArrayT.ArrayTArgumentNullException">Thrown when the input Array is null or a projected key is null or Option.None.</exception>
     let groupByDict (projection: 'T -> 'Key) (arr: 'T[]) : Dictionary<'Key, 'T[]> =
         if isNull arr then nullExn "groupByDict"
         let comparer = HashIdentity.Structural<'Key>
@@ -1444,7 +1444,7 @@ module Array =
             let v = arr.[i]
             let k = projection v
             if isNull (box k) then
-                raise (ArgumentNullException("projection", "Array.groupByDict: the projected key is null or None."))
+                raise (ArrayTArgumentNullException("projection", "Array.groupByDict: the projected key is null or None."))
             match groups.TryGetValue k with
             | true, r -> r.Add v
             | _ ->

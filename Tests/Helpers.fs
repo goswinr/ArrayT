@@ -3,6 +3,7 @@ namespace Tests
 open Scriptorium.Nib.Assertion
 
 open System
+open ArrayT
 
 
 /// Helpers to check thrown exceptions, used by all test lists.
@@ -25,8 +26,8 @@ module Exceptions =
 
 
     let throwsRange f : unit = CheckThrowsExn<IndexOutOfRangeException> f
-    let throwsNull  f : unit = CheckThrowsExn<ArgumentNullException> f
-    let throwsArg   f : unit = CheckThrowsExn<ArgumentException> f
+    let throwsNull  f : unit = CheckThrowsExn<ArrayTArgumentNullException> f
+    let throwsArg   f : unit = CheckThrowsExn<ArrayTArgumentException> f
 
     /// Check that the lambda throws and that the exception message contains all the given parts.
     /// Works the same on .NET and in Fable.

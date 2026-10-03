@@ -17,11 +17,14 @@ It also works in Javascript and Typescript with [Fable](https://fable.io/).
 ## Motivation
 I was always annoyed that an IndexOutOfRangeException does not include the actual index that was out of bounds nor the actual size of the array.
 This library fixes that in `array.Get`, `array.Set`, `array.SliceNeg` and other item access functions.
+That was the initial motivation for creating this library.
+It became a more general library for safer and more convenient array manipulation in F#.
 
 This library was designed for use with F# scripting.<br>
 Functions and methods never return null.<br>
 Only functions starting with `try...` will return an F# Option.<br>
-Otherwise when a function fails on invalid input it will throw a descriptive exception.
+When ArrayT rejects invalid input, it throws a descriptive exception such as `ArrayTArgumentException`, `ArrayTArgumentNullException`, or `ArrayTKeyNotFoundException`.
+Each type inherits from its corresponding .NET exception type, so existing .NET exception handlers still work. Index errors use `IndexOutOfRangeException` directly because that type is sealed.
 
 See also https://github.com/goswinr/ResizeArray/ for a similar library for `ResizeArray<'T>`.
 
@@ -32,7 +35,7 @@ See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-array.html)
 
 - Extension members on `Array` like <br>
 `.Get idx` `.Set idx item` `.First` `.Last` `.SecondLast` `xs.DebugIdx.[i]` and more..<br>
-With nicer IndexOutOfRangeExceptions that include the bad index and the actual size.<br>
+With nicer `IndexOutOfRangeException` messages that include the bad index and the actual size.<br>
 See [docs](https://goswinr.github.io/ArrayT/reference/arrayt-autoopenarraytextensions.html)
 
 

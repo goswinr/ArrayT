@@ -216,11 +216,11 @@ module UtilArray =
         else
             ""
 
-    /// <summary>Raises an ArgumentNullException for a null array input.</summary>
+    /// <summary>Raises an ArrayTArgumentNullException for a null array input.</summary>
     /// <param name="funcName">The name of the function that received null input.</param>
     /// <returns>Never returns (always raises).</returns>
     let nullExn (funcName:string) : 'a =
-        raise (ArgumentNullException("Array." + funcName + ": input is null!"))
+        raise (ArrayTArgumentNullException(null, "Array." + funcName + ": input is null!"))
 
     /// <summary>Raises an IndexOutOfRangeException for invalid get operations.</summary>
     /// <param name="i">The invalid index.</param>
@@ -265,7 +265,7 @@ module UtilArray =
             #endif
         raise (IndexOutOfRangeException($"Array.{funcName}: Expected {expected} in:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
-    /// <summary>Raises an ArgumentException with a descriptive message about array operation failure.</summary>
+    /// <summary>Raises an ArrayTArgumentException with a descriptive message about array operation failure.</summary>
     /// <param name="arr">The input array.</param>
     /// <param name="funcAndReason">A string describing the function and reason for failure.</param>
     /// <returns>Never returns (always raises).</returns>
@@ -276,7 +276,7 @@ module UtilArray =
             #else
                 (typeof<'T>).Name
             #endif
-        raise (ArgumentException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
+        raise (ArrayTArgumentException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
     /// <summary>Raises an IndexOutOfRangeException with a descriptive message about array operation failure.</summary>
     /// <param name="arr">The input array.</param>
@@ -291,7 +291,7 @@ module UtilArray =
             #endif
         raise (IndexOutOfRangeException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
-    /// <summary>Raises a KeyNotFoundException with a descriptive message about array operation failure.</summary>
+    /// <summary>Raises an ArrayTKeyNotFoundException with a descriptive message about array operation failure.</summary>
     /// <param name="arr">The input array.</param>
     /// <param name="funcAndReason">A string describing the function and reason for failure.</param>
     /// <returns>Never returns (always raises).</returns>
@@ -302,7 +302,7 @@ module UtilArray =
             #else
                 (typeof<'T>).Name
             #endif
-        raise (Collections.Generic.KeyNotFoundException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
+        raise (ArrayTKeyNotFoundException($"Array.{funcAndReason}:\n{toStringCore t arr}{contentAsString 5 arr}"))
 
 
 
