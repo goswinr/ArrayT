@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net8.0;net472</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework> <!-- not the plural TargetFrameworks. fails with FsDocs https://fsprojects.github.io/FSharp.Formatting/apidocs.html -->
 
     <LangVersion>preview</LangVersion>
     <NeutralLanguage>en</NeutralLanguage>

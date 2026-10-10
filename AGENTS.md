@@ -26,7 +26,7 @@ Opening the `ArrayT` namespace exposes the extension members and the extra `Arra
 
 ## Build and test
 
-Run builds from the repository root with the .NET 10 SDK. The library targets `net8.0`, `net10.0` and `net472`; tests target `net8.0` and `net10.0`. Install the .NET 8 runtime too. FsDocs uses the first library target, `net8.0`. Every build also creates the NuGet package (`GeneratePackageOnBuild`).
+Run builds from the repository root with the .NET 10 SDK. The library targets `netstandard2.0` only (a single `TargetFramework`, not the plural `TargetFrameworks`, which fails with FsDocs); the tests target `net8.0` only, so install the .NET 8 runtime too. FsDocs needs no framework override because there is only one library target. Every build also creates the NuGet package (`GeneratePackageOnBuild`).
 
 ```bash
 dotnet build ArrayT.sln
@@ -37,8 +37,7 @@ dotnet build --configuration Release   # as CI and the release workflow do
 Run tests from `Tests/`:
 
 ```bash
-dotnet run --framework net8.0   # .NET 8 tests
-dotnet run --framework net10.0  # .NET 10 tests
+dotnet run           # .NET 8 tests
 npm test             # JavaScript tests via Fable and Node.js, then TypeScript compilation of Src
 npm run buildTS      # TypeScript compilation of Src only
 npm run watchTS      # Watch mode for TypeScript development
@@ -46,7 +45,7 @@ npm run watchTS      # Watch mode for TypeScript development
 
 For a first JavaScript test run or a clean environment, run `dotnet tool restore` from the repository root and `npm ci` in `Tests/`.
 
-CI (`.github/workflows/build.yml`) builds in Release and runs all three test targets. `releaseNuget.yml` runs on a version tag, checks the tag against the `CHANGELOG.md` version, and publishes to nuget.org via trusted publishing (OIDC, no API key secret).
+CI (`.github/workflows/build.yml`) builds the library in Release (`netstandard2.0`), runs the .NET 8 tests and then the JavaScript tests. `releaseNuget.yml` runs on a version tag, checks the tag against the `CHANGELOG.md` version, and publishes to nuget.org via trusted publishing (OIDC, no API key secret).
 
 ## Test conventions
 

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Array.minNumber` and `maxNumber` skip NaN and treat -0.0 as smaller than +0.0, as the IEEE 754:2019 'minimumNumber' and 'maximumNumber' operations. See https://github.com/dotnet/fsharp/issues/13207#issuecomment-1194411950
 - `Array.minNumberBy` and `maxNumberBy` skip NaN keys, like `Array.minNumber` and `maxNumber` skip NaN values, and like `ResizeArray.minBy` and `maxBy` in ResizeArrayT. An element with a NaN key is only returned if all keys are NaN. Unlike `Array.minBy` and `maxBy` from FSharp.Core, the result does not depend on where NaN keys are in the array.
 ### Changed
+- ArrayT now targets `netstandard2.0` only, instead of `net8.0` and `net472`. It still works on .NET Framework 4.6.1+, .NET Core and modern .NET. The tests run on `net8.0`.
 - ArrayT now raises specific `ArrayT...Exception` types for argument, null, and missing-key errors. Each inherits from its corresponding .NET exception type, so existing handlers continue to work. Index errors remain `IndexOutOfRangeException` because that .NET type is sealed.
 - **Breaking:** `Array.groupByDict` now requires `'Key : equality` and uses F# structural equality for grouping and dictionary lookups on both .NET and Fable. Structurally equal array keys now form one group on .NET too.
 ### Fixed
