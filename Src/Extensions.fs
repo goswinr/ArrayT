@@ -1,6 +1,7 @@
 namespace ArrayT
 
 open System
+open System.ComponentModel
 
 #nowarn "44" //for opening the hidden but not Obsolete UtilArray module
 open UtilArray
@@ -9,7 +10,7 @@ open UtilArray
 /// Extension methods for Array<'T>.
 /// Like .Last , .IsNotEmpty ,..
 /// This module is automatically opened when the namespace ArrayT is opened.
-[<AutoOpen>]
+[<AutoOpen; EditorBrowsable(EditorBrowsableState.Never)>]
 module AutoOpenArrayTExtensions =
 
     type ``[]``<'T>  with //Generic Array

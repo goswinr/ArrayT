@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- Hide AutoOpen modules from editor completion lists with EditorBrowsable(EditorBrowsableState.Never).
+
 ## [0.29.0] - 2026-10-10
 ### Added
 - `Array.min_IEEE754` and `max_IEEE754` propagate NaN (if any element is NaN, NaN is returned) and treat -0.0 as smaller than +0.0, as the IEEE 754:2019 'minimum' and 'maximum' operations. Unlike `Array.min` and `max` from FSharp.Core, the result does not depend on where NaN is in the array.
