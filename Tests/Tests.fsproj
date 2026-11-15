@@ -8,7 +8,7 @@
 
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Scriptorium.Quill" Version="0.7.1" /> <!-- test DSL and runner, for .NET and Fable JS/TS -->
+    <PackageReference Include="Scriptorium.Quill" Version="0.7.2" /> <!-- test DSL and runner, for .NET and Fable JS/TS -->
     <PackageReference Include="Scriptorium.Nib" Version="0.4.1" />   <!-- assertions -->
     <PackageReference Include="FSharp.Core" Version="10.0.101" /><!-- `Include` syntax for dependabot. Scriptorium needs at least 10.0.101 -->
 
