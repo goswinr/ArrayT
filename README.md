@@ -57,6 +57,12 @@ this namespace contains:
 
 - this will also auto open the extension members on `Array<'T>`
 
+## Versions ending in `-fsharp11`
+NuGet prereleases such as `0.30.0-fsharp11` need FSharp.Core 11.0.101 or later, while the regular versions need only FSharp.Core 6.0.7.<br>
+In them, the functions with multi-argument callbacks `filteri`, `findIndexi`, `tryFindIndexi` and `mapPrevNext` are `inline` with `[<InlineIfLambda; OptimizeClosureIfNotInlined>]`, like in FSharp.Core 11. This makes them faster when called with a lambda.<br>
+Use them only if your code is compiled with F# 11 (.NET 11 SDK) or later. With older compilers, callbacks that are not lambdas are called more slowly than in the regular versions.<br>
+They are built from the [fsharp11](https://github.com/goswinr/ArrayT/tree/fsharp11) branch, see the [benchmarks](https://github.com/goswinr/ArrayT/blob/main/Benchmarks/InlineIfLambda/README.md).
+
 ## Examples
 
 ### Better error messages
