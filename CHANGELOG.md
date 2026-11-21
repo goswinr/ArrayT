@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **Breaking:** ArrayT now needs FSharp.Core 11.0.101 or later, the first version with `OptimizeClosureIfNotInlinedAttribute`, instead of 6.0.7. Building it needs the .NET 11 SDK (F# 11).
+- `Array.filteri`, `findIndexi`, `tryFindIndexi` and `mapPrevNext` are `inline` with `[<InlineIfLambda; OptimizeClosureIfNotInlined>]`, as in FSharp.Core 11. A lambda argument is inlined into the loop, any other function is adapted once with `OptimizedClosures`. For lambdas they were measured 1.6 to 7 times faster on .NET, see `Benchmarks/InlineIfLambda`.
+- Code that calls these functions and is compiled with an F# version older than 11 does not adapt a function argument that is not a lambda, it is called through `FSharpFunc.InvokeFast` for each element, as in 0.29.0.
 - Hide AutoOpen modules from editor completion lists with EditorBrowsable(EditorBrowsableState.Never).
-- `Array.filteri`, `findIndexi`, `mapPrevNext` and `zipDefault` adapt their multi-argument callback once with `OptimizedClosures` instead of calling it through `FSharpFunc.InvokeFast` for each element. Measured 1.3 to 5 times faster on .NET, see `Benchmarks/InlineIfLambda`.
+- `Array.zipDefault` adapts its callback once with `OptimizedClosures` instead of calling it through `FSharpFunc.InvokeFast` for each element.
 - `Array.pickBack`, `tryPickBack`, `partition3`, `partition4`, `partition5`, `partition3By`, `partition4By` and `partition5By` are `inline` with `[<InlineIfLambda>]`. A lambda argument is inlined into the loop, measured 1.15 to 3.4 times faster on .NET.
 
 ## [0.29.0] - 2026-10-10

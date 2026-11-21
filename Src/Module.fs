@@ -1286,13 +1286,12 @@ module Array =
     /// <param name="predicate">The function to test the index and the element.</param>
     /// <param name="arr">The input array.</param>
     /// <returns>An array containing the elements for which the given predicate returns true.</returns>
-    let filteri (predicate: int -> 'T -> bool) (arr: 'T[]) : 'T[] =
+    let inline filteri ([<InlineIfLambda; OptimizeClosureIfNotInlined>] predicate: int -> 'T -> bool) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "filteri"
-        let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt predicate // see Benchmarks/InlineIfLambda
         let res = ResizeArray()
         for i = 0 to arr.Length - 1 do
             let t = arr.[i]
-            if f.Invoke(i, t) then
+            if predicate i t then
                 res.Add(t)
         res.ToArray()
 
@@ -1300,7 +1299,7 @@ module Array =
     /// <param name="predicate">The function to test each indexed element against.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>The index of the first element that satisfies the predicate, or None if not found.</returns>
-    let inline tryFindIndexi (predicate: int -> 'T -> bool) (arr: 'T[]) : option<int> =
+    let inline tryFindIndexi ([<InlineIfLambda; OptimizeClosureIfNotInlined>] predicate: int -> 'T -> bool) (arr: 'T[]) : option<int> =
         if isNull arr then nullExn "tryFindIndexi"
         let mutable i = 0
         let mutable result = None
@@ -1318,10 +1317,9 @@ module Array =
     /// <param name="arr">The input Array.</param>
     /// <returns>The index of the first element that satisfies the predicate.</returns>
     /// <exception cref="T:ArrayT.ArrayTKeyNotFoundException">Thrown when no element satisfies the predicate.</exception>
-    let findIndexi (predicate: int -> 'T -> bool) (arr: 'T[]) : int =
+    let inline findIndexi ([<InlineIfLambda; OptimizeClosureIfNotInlined>] predicate: int -> 'T -> bool) (arr: 'T[]) : int =
         if isNull arr then nullExn "findIndexi"
-        let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt predicate // see Benchmarks/InlineIfLambda
-        match tryFindIndexi (fun i x -> f.Invoke(i, x)) arr with
+        match tryFindIndexi predicate arr with
         | Some i -> i
         | None -> failKey arr "findIndexi did not find for given predicate in"
 
@@ -1334,27 +1332,28 @@ module Array =
     /// <param name="mergePrevAndNextCombineResults">The function to create the result from the element, its Prev-This and its This-Next combination.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>A new Array with one result per input element.</returns>
-    let mapPrevNext (combineAdjacent: 'T -> 'T -> 'U) (mergePrevAndNextCombineResults: 'T -> 'U -> 'U -> 'V) (arr: 'T[]) : 'V[] =
+    let inline mapPrevNext
+        ([<InlineIfLambda; OptimizeClosureIfNotInlined>] combineAdjacent: 'T -> 'T -> 'U)
+        ([<InlineIfLambda; OptimizeClosureIfNotInlined>] mergePrevAndNextCombineResults: 'T -> 'U -> 'U -> 'V)
+        (arr: 'T[])
+        : 'V[] =
         if isNull arr then nullExn "mapPrevNext"
         let len = arr.Length
         if len = 0 then
             [||]
         else
-            // see Benchmarks/InlineIfLambda
-            let combine = OptimizedClosures.FSharpFunc<_, _, _>.Adapt combineAdjacent
-            let merge = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt mergePrevAndNextCombineResults
             let res = Array.zeroCreate len
             let mutable this = arr.[0]
-            let mutable prevCombined = combine.Invoke(arr.[len - 1], this)
+            let mutable prevCombined = combineAdjacent arr.[len - 1] this
             for i = 1 to len - 1 do
                 let next = arr.[i]
-                let nextCombined = combine.Invoke(this, next)
-                res.[i - 1] <- merge.Invoke(this, prevCombined, nextCombined)
+                let nextCombined = combineAdjacent this next
+                res.[i - 1] <- mergePrevAndNextCombineResults this prevCombined nextCombined
                 this <- next
                 prevCombined <- nextCombined
             // close the loop
-            let nextCombined = combine.Invoke(this, arr.[0])
-            res.[len - 1] <- merge.Invoke(this, prevCombined, nextCombined)
+            let nextCombined = combineAdjacent this arr.[0]
+            res.[len - 1] <- mergePrevAndNextCombineResults this prevCombined nextCombined
             res
 
     /// <summary>Returns a tuple of the first element of the Array and a new Array containing the remaining elements.</summary>

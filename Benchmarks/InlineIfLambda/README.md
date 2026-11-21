@@ -167,9 +167,11 @@ The results above were measured before these changes. `current` now runs the sam
    `partition3` to `partition5`, `partition3By` to `partition5By`) `inline` with `[<InlineIfLambda>]`.
    Of these, only `filteri`, `findIndexi`, `mapPrevNext`, `pickBack` and `partition3` were
    measured; the others follow the same patterns.
-2. **With FSharp.Core 11 as the minimum:** make the two-argument functions `inline` with
-   `[<InlineIfLambda; OptimizeClosureIfNotInlined>]` instead, as in FSharp.Core 11 and in
-   ResizeArrayT's `fsharp11` variant.
+2. **With FSharp.Core 11 as the minimum (done, see the changelog):** make the two-argument functions
+   `inline` with `[<InlineIfLambda; OptimizeClosureIfNotInlined>]` instead, as in FSharp.Core 11 and
+   in ResizeArrayT's `fsharp11` variant. `current` for `filteri`, `findIndexi` and `mapPrevNext` now
+   runs the same code as `optimizeClosure`, and `tryFindIndexi` has both attributes too. `zipDefault`
+   keeps the adaptation of step 1, because its callback is called inside the closure for `Array.init`.
 3. Leave functions that are already inline (`minIndexBy` and the other min/max functions,
    `countIf`, `partitionBy`) as they are.
 

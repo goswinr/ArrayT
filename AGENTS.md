@@ -26,7 +26,7 @@ Opening the `ArrayT` namespace exposes the extension members and the extra `Arra
 
 ## Build and test
 
-Run builds from the repository root with the .NET 10 SDK. The library targets `netstandard2.0` only (a single `TargetFramework`, not the plural `TargetFrameworks`, which fails with FsDocs); the tests target `net8.0` only, so install the .NET 8 runtime too. FsDocs needs no framework override because there is only one library target. Every build also creates the NuGet package (`GeneratePackageOnBuild`).
+Run builds from the repository root with the .NET 11 SDK (F# 11, needed for `[<OptimizeClosureIfNotInlined>]`). The library requires FSharp.Core 11.0.101 or later. The library targets `netstandard2.0` only (a single `TargetFramework`, not the plural `TargetFrameworks`, which fails with FsDocs); the tests target `net8.0` only, so install the .NET 8 runtime too. FsDocs needs no framework override because there is only one library target. Every build also creates the NuGet package (`GeneratePackageOnBuild`).
 
 ```bash
 dotnet build ArrayT.sln
