@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Hide AutoOpen modules from editor completion lists with EditorBrowsable(EditorBrowsableState.Never).
+- `Array.filteri`, `findIndexi`, `mapPrevNext` and `zipDefault` adapt their multi-argument callback once with `OptimizedClosures` instead of calling it through `FSharpFunc.InvokeFast` for each element. Measured 1.3 to 5 times faster on .NET, see `Benchmarks/InlineIfLambda`.
+- `Array.pickBack`, `tryPickBack`, `partition3`, `partition4`, `partition5`, `partition3By`, `partition4By` and `partition5By` are `inline` with `[<InlineIfLambda>]`. A lambda argument is inlined into the loop, measured 1.15 to 3.4 times faster on .NET.
 
 ## [0.29.0] - 2026-10-10
 ### Added

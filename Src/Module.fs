@@ -969,7 +969,7 @@ module Array =
     /// <param name="partitioner">The function to test the input elements.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>Three Arrays.</returns>
-    let partition3By (partitioner: 'T -> Choice<'U1,'U2,'U3>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] =
+    let inline partition3By ([<InlineIfLambda>] partitioner: 'T -> Choice<'U1,'U2,'U3>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] =
         if isNull arr then nullExn "partition3By"
         let results1 = ResizeArray()
         let results2 = ResizeArray()
@@ -987,7 +987,7 @@ module Array =
     /// <param name="partitioner">The function to test the input elements.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>Four Arrays.</returns>
-    let partition4By (partitioner: 'T -> Choice<'U1,'U2,'U3,'U4>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] * 'U4[] =
+    let inline partition4By ([<InlineIfLambda>] partitioner: 'T -> Choice<'U1,'U2,'U3,'U4>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] * 'U4[] =
         if isNull arr then nullExn "partition4By"
         let results1 = ResizeArray()
         let results2 = ResizeArray()
@@ -1007,7 +1007,7 @@ module Array =
     /// <param name="partitioner">The function to test the input elements.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>Five Arrays.</returns>
-    let partition5By (partitioner: 'T -> Choice<'U1,'U2,'U3,'U4,'U5>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] * 'U4[] * 'U5[] =
+    let inline partition5By ([<InlineIfLambda>] partitioner: 'T -> Choice<'U1,'U2,'U3,'U4,'U5>) (arr: 'T[]) : 'U1[] * 'U2[] * 'U3[] * 'U4[] * 'U5[] =
         if isNull arr then nullExn "partition5By"
         let results1 = ResizeArray()
         let results2 = ResizeArray()
@@ -1031,7 +1031,7 @@ module Array =
     /// <param name="predicate2">The second function to test the input elements.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>Three Arrays.</returns>
-    let partition3 (predicate1: 'T -> bool) (predicate2: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] =
+    let inline partition3 ([<InlineIfLambda>] predicate1: 'T -> bool) ([<InlineIfLambda>] predicate2: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] =
         if isNull arr then nullExn "partition3"
         let p1True = ResizeArray()
         let p2True = ResizeArray()
@@ -1053,7 +1053,7 @@ module Array =
     /// <param name="predicate3">The third function to test the input elements.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>Four Arrays.</returns>
-    let partition4 (predicate1: 'T -> bool) (predicate2: 'T -> bool) (predicate3: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] * 'T[] =
+    let inline partition4 ([<InlineIfLambda>] predicate1: 'T -> bool) ([<InlineIfLambda>] predicate2: 'T -> bool) ([<InlineIfLambda>] predicate3: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] * 'T[] =
         if isNull arr then nullExn "partition4"
         let p1True = ResizeArray()
         let p2True = ResizeArray()
@@ -1079,7 +1079,7 @@ module Array =
     /// <param name="predicate4">The fourth function to test the input elements.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>Five Arrays.</returns>
-    let partition5 (predicate1: 'T -> bool) (predicate2: 'T -> bool) (predicate3: 'T -> bool) (predicate4: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] * 'T[] * 'T[] =
+    let inline partition5 ([<InlineIfLambda>] predicate1: 'T -> bool) ([<InlineIfLambda>] predicate2: 'T -> bool) ([<InlineIfLambda>] predicate3: 'T -> bool) ([<InlineIfLambda>] predicate4: 'T -> bool) (arr: 'T[]) : 'T[] * 'T[] * 'T[] * 'T[] * 'T[] =
         if isNull arr then nullExn "partition5"
         let p1True = ResizeArray()
         let p2True = ResizeArray()
@@ -1288,10 +1288,11 @@ module Array =
     /// <returns>An array containing the elements for which the given predicate returns true.</returns>
     let filteri (predicate: int -> 'T -> bool) (arr: 'T[]) : 'T[] =
         if isNull arr then nullExn "filteri"
+        let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt predicate // see Benchmarks/InlineIfLambda
         let res = ResizeArray()
         for i = 0 to arr.Length - 1 do
             let t = arr.[i]
-            if predicate i t then
+            if f.Invoke(i, t) then
                 res.Add(t)
         res.ToArray()
 
@@ -1319,7 +1320,8 @@ module Array =
     /// <exception cref="T:ArrayT.ArrayTKeyNotFoundException">Thrown when no element satisfies the predicate.</exception>
     let findIndexi (predicate: int -> 'T -> bool) (arr: 'T[]) : int =
         if isNull arr then nullExn "findIndexi"
-        match tryFindIndexi predicate arr with
+        let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt predicate // see Benchmarks/InlineIfLambda
+        match tryFindIndexi (fun i x -> f.Invoke(i, x)) arr with
         | Some i -> i
         | None -> failKey arr "findIndexi did not find for given predicate in"
 
@@ -1338,18 +1340,21 @@ module Array =
         if len = 0 then
             [||]
         else
+            // see Benchmarks/InlineIfLambda
+            let combine = OptimizedClosures.FSharpFunc<_, _, _>.Adapt combineAdjacent
+            let merge = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt mergePrevAndNextCombineResults
             let res = Array.zeroCreate len
             let mutable this = arr.[0]
-            let mutable prevCombined = combineAdjacent arr.[len - 1] this
+            let mutable prevCombined = combine.Invoke(arr.[len - 1], this)
             for i = 1 to len - 1 do
                 let next = arr.[i]
-                let nextCombined = combineAdjacent this next
-                res.[i - 1] <- mergePrevAndNextCombineResults this prevCombined nextCombined
+                let nextCombined = combine.Invoke(this, next)
+                res.[i - 1] <- merge.Invoke(this, prevCombined, nextCombined)
                 this <- next
                 prevCombined <- nextCombined
             // close the loop
-            let nextCombined = combineAdjacent this arr.[0]
-            res.[len - 1] <- mergePrevAndNextCombineResults this prevCombined nextCombined
+            let nextCombined = combine.Invoke(this, arr.[0])
+            res.[len - 1] <- merge.Invoke(this, prevCombined, nextCombined)
             res
 
     /// <summary>Returns a tuple of the first element of the Array and a new Array containing the remaining elements.</summary>
@@ -1380,7 +1385,7 @@ module Array =
     /// <exception cref="T:ArrayT.ArrayTKeyNotFoundException">Thrown if every result from
     /// <c>chooser</c> is <c>None</c>.</exception>
     /// <returns>The first result. From the end of the Array.</returns>
-    let pickBack (chooser: 'T -> 'U option) (arr: 'T[]) : 'U =
+    let inline pickBack ([<InlineIfLambda>] chooser: 'T -> 'U option) (arr: 'T[]) : 'U =
         if isNull arr then nullExn "pickBack"
         let mutable i = arr.Length - 1
         let mutable result = None
@@ -1397,7 +1402,7 @@ module Array =
     /// <param name="chooser">The function to transform the Array elements into options.</param>
     /// <param name="arr">The input Array.</param>
     /// <returns>The first transformed element searched from the end of the Array that is <c>Some(x)</c>.</returns>
-    let tryPickBack (chooser: 'T -> 'U option) (arr: 'T[]) : 'U option =
+    let inline tryPickBack ([<InlineIfLambda>] chooser: 'T -> 'U option) (arr: 'T[]) : 'U option =
         if isNull arr then nullExn "tryPickBack"
         let mutable i = arr.Length - 1
         let mutable result = None
@@ -1416,13 +1421,14 @@ module Array =
         if isNull arr2 then nullExn "zipDefault second"
         let len1 = arr1.Length
         let len2 = arr2.Length
+        let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt getDefaultVal // see Benchmarks/InlineIfLambda
         Array.init (max len1 len2) (fun i ->
             if i >= len2 then // first is longer
                 let x = arr1.[i]
-                x, getDefaultVal i x
+                x, f.Invoke(i, x)
             elif i >= len1 then // second is longer
                 let x = arr2.[i]
-                getDefaultVal i x, x
+                f.Invoke(i, x), x
             else
                 arr1.[i], arr2.[i]
             )

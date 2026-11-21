@@ -157,9 +157,10 @@ Full results: [.NET 8](results-net8.csv), [.NET 10](results-net10.csv),
 
 ## Recommendation
 
-Not implemented yet; the library is unchanged by this benchmark.
+The results above were measured before these changes. `current` now runs the same code as
+`adapt` for the two-argument functions and as `inlineIfLambda` for `pickBack` and `partition3`.
 
-1. **Without a dependency change:** adapt the two-argument callbacks once with
+1. **Without a dependency change (done, see the changelog):** adapt the two-argument callbacks once with
    `OptimizedClosures.FSharpFunc.Adapt` in `filteri`, `findIndexi`, `mapPrevNext` and `zipDefault`,
    like ResizeArrayT does. That is 1.3× to 5× faster on .NET for every caller and unchanged in Fable.
    Make the not inlined functions with one-argument callbacks (`pickBack`, `tryPickBack`,
