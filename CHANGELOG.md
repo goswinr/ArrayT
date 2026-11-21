@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.30.0-fsharp11] - 2026-11-21
 ### Changed
 - **Breaking:** ArrayT now needs FSharp.Core 11.0.101 or later, the first version with `OptimizeClosureIfNotInlinedAttribute`, instead of 6.0.7. Building it needs the .NET 11 SDK (F# 11).
 - `Array.filteri`, `findIndexi`, `tryFindIndexi` and `mapPrevNext` are `inline` with `[<InlineIfLambda; OptimizeClosureIfNotInlined>]`, as in FSharp.Core 11. A lambda argument is inlined into the loop, any other function is adapted once with `OptimizedClosures`. For lambdas they were measured 1.6 to 7 times faster on .NET, see `Benchmarks/InlineIfLambda`.
@@ -126,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - copy from ResizeArray library 0.19.0
 
+[0.30.0-fsharp11]: https://github.com/goswinr/ArrayT/compare/0.29.0...0.30.0-fsharp11
 [0.29.0]: https://github.com/goswinr/ArrayT/compare/0.28.0...0.29.0
 [0.28.0]: https://github.com/goswinr/ArrayT/compare/0.27.0...0.28.0
 [0.27.0]: https://github.com/goswinr/ArrayT/compare/0.26.1...0.27.0
